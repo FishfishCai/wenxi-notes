@@ -1,0 +1,22 @@
+{
+  "strictLineBreaks": true,
+  "showLineNumber": true,
+  "vimMode": false,
+  "newFileLocation": "folder",
+  "showUnsupportedFiles": false,
+  "attachmentFolderPath": "Assets",
+  "showInlineTitle": true,
+  "newFileFolderPath": "",
+  "alwaysUpdateLinks": true,
+  "spellcheck": false,
+  "smartIndentList": true,
+  "rightToLeft": false,
+  "pdfExportSettings": {
+    "includeName": false,
+    "pageSize": "Letter",
+    "landscape": false,
+    "margin": "0",
+    "downscalePercent": 100
+  },
+  "promptDelete": false
+}

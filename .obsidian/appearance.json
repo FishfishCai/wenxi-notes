@@ -1,0 +1,19 @@
+{
+  "cssTheme": "Catppuccin",
+  "accentColor": "",
+  "textFontFamily": "CodeNewRoman Nerd Font",
+  "monospaceFontFamily": "CodeNewRoman Nerd Font Mono",
+  "interfaceFontFamily": "CodeNewRoman Nerd Font Mono",
+  "enabledCssSnippets": [
+    "better-bullet-points-in-edit-mode",
+    "enlarge-image-on-horver",
+    "image-cards",
+    "tag-pills",
+    "blockquote-styles"
+  ],
+  "translucency": true,
+  "showViewHeader": true,
+  "showRibbon": false,
+  "baseFontSize": 15,
+  "nativeMenus": true
+}

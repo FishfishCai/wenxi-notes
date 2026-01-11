@@ -1,0 +1,38 @@
+{
+  "pluginList": [
+    "RyotaUshio/obsidian-latex-theorem-equation-referencer",
+    "zhaoshenzhai/obsidian-mathlinks",
+    "Yaozhuwa/AttachFlow"
+  ],
+  "pluginSubListFrozenVersion": [
+    {
+      "repo": "RyotaUshio/obsidian-latex-theorem-equation-referencer",
+      "version": "2.2.0"
+    },
+    {
+      "repo": "zhaoshenzhai/obsidian-mathlinks",
+      "version": ""
+    },
+    {
+      "repo": "Yaozhuwa/AttachFlow",
+      "version": "latest"
+    }
+  ],
+  "themesList": [
+    {
+      "repo": "catppuccin/obsidian",
+      "lastUpdate": "196964318"
+    }
+  ],
+  "updateAtStartup": true,
+  "updateThemesAtStartup": false,
+  "enableAfterInstall": true,
+  "loggingEnabled": false,
+  "loggingPath": "BRAT-log",
+  "loggingVerboseEnabled": false,
+  "debuggingMode": false,
+  "notificationsEnabled": true,
+  "personalAccessToken": "",
+  "selectLatestPluginVersionByDefault": false,
+  "allowIncompatiblePlugins": false
+}

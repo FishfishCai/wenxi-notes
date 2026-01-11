@@ -1,0 +1,12 @@
+{
+  "refreshInterval": 60,
+  "additionalTaskKeywords": [
+    "TODO:"
+  ],
+  "includeCodeBlocks": true,
+  "includeCalloutBlocks": true,
+  "taskViewMode": "default",
+  "languageCommentSupport": {
+    "enabled": true
+  }
+}

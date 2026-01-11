@@ -1,0 +1,292 @@
+/* TodoView theme-aligned styles. Inherit fonts/colors from the active Obsidian theme. */
+.todo-view {
+  color: var(--text-normal);
+}
+
+/* Toolbar and mode icons */
+.todo-view .todo-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+/* First row of toolbar - contains search input and mode icons */
+.todo-view .todo-toolbar-first-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Flexible container for search input: grows to fill available space */
+.todo-view .todo-toolbar-right {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 120px;
+}
+
+/* Visually-hidden label for accessibility */
+.todo-view .sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.todo-view .todo-mode-icons {
+  /* group stays at the far right after the search grows */
+  display: inline-flex;
+}
+
+/* List layout */
+.todo-view .todo-list {
+  font-family: var(--font-text);
+  font-size: var(--font-text-size);
+  margin: 0;
+  padding-left: var(--size-2-2);
+  list-style-type: none;
+}
+
+/* List item */
+.todo-view .todo-item {
+  padding: var(--size-2-2) 0;
+  border-bottom: 1px solid var(--background-modifier-border, rgba(0,0,0,0.1));
+}
+
+/* Task text and completion state */
+.todo-view .todo-text {
+  line-height: var(--line-height-tight, 1.4);
+}
+.todo-view .todo-text.completed {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* Keyword toggle (TODO/DOING/DONE) */
+.todo-view .todo-keyword {
+  color: var(--interactive-accent);
+  cursor: pointer;
+  font-weight: var(--font-weight-bold, var(--font-bold, 600));
+  font-size: 0.85em;
+}
+
+/* Hover hint */
+.todo-view .todo-keyword:hover {
+  text-decoration: underline;
+}
+
+/* Keyboard focus highlight for state keyword when tabbing elements */
+.todo-view .todo-keyword:focus,
+.todo-view .todo-keyword:focus-visible {
+  outline: 2px solid var(--interactive-accent, #7f6df2);
+  outline-offset: 2px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--interactive-accent, #7f6df2) 20%, transparent);
+}
+
+/* Checkbox alignment */
+.todo-view .todo-checkbox {
+  margin-right: var(--size-2-2);
+  vertical-align: middle;
+}
+
+/* Non-clickable link-like styling for in-text links */
+.todo-view .todo-link-like {
+  color: var(--link-color);
+  text-decoration: underline dotted;
+  cursor: pointer; /* visually like a link, does not intercept clicks */
+}
+
+/* Priority badge */
+.todo-view .priority-badge {
+  display: inline-block;
+  margin-left: var(--size-2-2);
+  padding: 0 var(--size-2-2);
+  border-radius: var(--radius-s);
+  background-color: var(--background-modifier-accent, var(--interactive-accent));
+  color: var(--text-on-accent);
+  font-weight: var(--font-weight-medium, var(--font-medium));
+  font-size: 0.7em;
+  line-height: 1.6;
+}
+
+/* High priority (A): stronger, urgent tint */
+.todo-view .priority-badge.priority-high {
+  background-color: var(--color-red);
+  color: var(--text-on-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-red) 40%, transparent);
+}
+
+/* Medium priority (B): default accent */
+.todo-view .priority-badge.priority-med {
+  background-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+/* Low priority (C): muted tone */
+.todo-view .priority-badge.priority-low {
+  background-color: var(--background-modifier-border);
+  color: var(--text-muted);
+  box-shadow: inset 0 0 0 1px var(--background-modifier-border);
+}
+
+/* Tag styling (#tag) */
+.todo-view .todo-tag {
+  display: inline-block;
+  padding: 1px 6px;
+  margin: 0 2px;
+  border-radius: var(--tag-radius);
+  color: var(--tag-color);
+  background-color: var(--tag-background);
+  border: var(--tag-border-width) solid var(--tag-border-color);
+  font-size: var(--tag-size);
+  font-weight: var(--tag-weight);
+  vertical-align: baseline;
+  border-inline-start: none;
+  border-inline-end: none;
+  padding-top: var(--tag-padding-y);
+  padding-bottom: var(--tag-padding-y);
+}
+
+/* File info (path:line) */
+.todo-view .todo-file-info {
+  color: var(--text-muted);
+  font-size: 0.75em;
+  margin-top: var(--size-2-2);
+}
+
+/* Empty-state Guidance UI */
+.todo-view .todo-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 24px 16px;
+  margin: 12px 12px 0;
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: 12px;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--background-secondary) 90%, transparent),
+      color-mix(in srgb, var(--background-secondary) 96%, transparent)
+    );
+}
+
+.todo-view .todo-empty-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-normal);
+}
+
+.todo-view .todo-empty-subtitle {
+  max-width: 640px;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.todo-view .todo-empty-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.todo-view .todo-empty-btn {
+  appearance: none;
+  border: 1px solid var(--background-modifier-border);
+  background: var(--background-primary);
+  color: var(--text-normal);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease, transform 60ms ease;
+}
+
+.todo-view .todo-empty-btn:hover {
+  background: var(--background-modifier-hover);
+  border-color: var(--interactive-accent);
+}
+
+.todo-view .todo-empty-btn:active {
+  transform: translateY(1px);
+}
+
+/* Icon base for toolbar buttons rendered via CSS masks */
+.todo-view .todo-mode-icon {
+  /* display: inline-block; */
+  /* width: var(--icon-size); */
+  /* height: var(--icon-size); */
+  background-color: currentColor;
+  /* mask-repeat: no-repeat; */
+  /* mask-position: center; */
+  /* mask-size: var(--icon-size) var(--icon-size); */
+}
+
+/* Date display styling */
+.todo-view .todo-date-container {
+  margin-top: var(--size-2-2);
+  font-size: 0.8em;
+  color: var(--text-muted);
+}
+
+.todo-view .todo-date {
+  padding: 2px 6px;
+  margin: 2px 0;
+  border-radius: var(--radius-s);
+  border-left: 3px solid;
+  background-color: color-mix(in srgb, var(--interactive-accent) 5%, transparent);
+  border-left-color: color-mix(in srgb, var(--interactive-accent) 50%, transparent);
+}
+
+.todo-view .todo-date .date-label {
+  font-weight: var(--font-weight-medium, var(--font-medium));
+  opacity: 0.8;
+}
+
+.todo-view .todo-date .date-value {
+  font-weight: var(--font-weight-normal);
+  margin-left: 4px;
+}
+
+/* Scheduled and Deadline date styling */
+.todo-view .todo-date-overdue {
+  background-color: color-mix(in srgb, var(--color-red) 5%, transparent);
+  border-left-color: color-mix(in srgb, var(--color-red) 50%, transparent);
+}
+
+.todo-view .todo-date-overdue .date-value {
+  color: var(--color-red);
+  font-weight: var(--font-weight-semibold);
+}
+
+.todo-view .todo-date-today {
+  background-color: color-mix(in srgb, var(--color-orange) 5%, transparent);
+  border-left-color: color-mix(in srgb, var(--color-orange) 50%, transparent);
+}
+
+.todo-view .todo-date-today .date-value {
+  color: var(--text-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.todo-view .todo-date-soon {
+  background-color: color-mix(in srgb, var(--background-modifier-accent) 5%, transparent);
+  border-left-color: color-mix(in srgb, var(--interactive-accent) 50%, transparent);
+}
+
+.todo-view .todo-date-soon .date-value {
+  color: var(--text-accent);
+}

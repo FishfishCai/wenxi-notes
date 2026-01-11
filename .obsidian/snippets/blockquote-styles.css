@@ -1,0 +1,26 @@
+/* 默认无框块引用 */
+blockquote {
+  border: none;
+  background: transparent;
+  padding: 10px 15px;
+  margin: 10px 0;
+}
+
+/* 有框块引用样式 */
+blockquote.framed, 
+blockquote[data-type="framed"] {
+  border: 2px solid #4a90e2;
+  background-color: #f0f8ff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* 另一种有框样式变体 */
+blockquote.framed-alt, 
+blockquote[data-type="framed-alt"] {
+  border-left: 4px solid #e24a4a;
+  background: linear-gradient(135deg, #fff5f5, #ffecec);
+  padding: 15px;
+  border-radius: 4px;
+}
