@@ -119,7 +119,7 @@
               "type": "outgoing-link",
               "state": {
                 "file": "code/basic/git.md",
-                "linksCollapsed": false,
+                "linksCollapsed": true,
                 "unlinkedCollapsed": false
               },
               "icon": "links-going-out",
@@ -136,8 +136,7 @@
               "title": "History"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
