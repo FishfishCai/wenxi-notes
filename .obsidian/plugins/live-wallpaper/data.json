@@ -1,5 +1,5 @@
 {
-  "wallpaperPath": "plugins/live-wallpaper/wallpapers/active/normal/4.mp4",
+  "wallpaperPath": "plugins/live-wallpaper/wallpapers/active/normal/2.mp4",
   "wallpaperType": "video",
   "playbackSpeed": 1,
   "Quality": false,
@@ -61,7 +61,7 @@
       "shuffle": false,
       "dayStartTime": "08:00",
       "nightStartTime": "20:00",
-      "intervalCheckTime": "00:10",
+      "intervalCheckTime": "00:05",
       "isCustomInterval": false
     },
     "wallpaperDayTypes": [],

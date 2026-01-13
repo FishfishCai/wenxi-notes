@@ -1,21 +1,20 @@
 [
   "better-link-clicker-plugin",
   "obsidian-latex-suite",
-  "obsidian42-brat",
   "attachment-flow-plugin",
   "better-link-clicker",
-  "editor-width-slider",
-  "lapel",
   "obsidian-tikzjax",
-  "obsidian-style-settings",
-  "settings-search",
-  "obsidian-quiet-outline",
   "mathlinks",
   "file-explorer-note-count",
   "live-wallpaper",
-  "todoseq",
   "pdf-plus",
   "quick-preview",
   "math-booster",
-  "obsidian-git"
+  "obsidian-git",
+  "editor-width-slider",
+  "lapel",
+  "obsidian-quiet-outline",
+  "settings-search",
+  "obsidian-style-settings",
+  "obsidian42-brat"
 ]
