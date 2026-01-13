@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "fd540530edcfd9bf",
+        "id": "9724d0962d0531a7",
         "type": "tabs",
         "children": [
           {
-            "id": "ef5f8d8bfdcbdd45",
+            "id": "89d14545bc34f198",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -137,14 +137,15 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "ef5f8d8bfdcbdd45",
+  "active": "89d14545bc34f198",
   "lastOpenFiles": [
+    "math/milnor.md",
+    "course/economy.md",
+    "_sop/usc ece.md",
     "game/stardew_valley.md",
     "game/minecraft.md",
     "math/Milnor.pdf",
-    "course/economy.md",
     "math/rudin.md",
-    "math/milnor.md",
     "code/prompt/canvas.md",
     "course/econ",
     "course",

@@ -6,7 +6,6 @@
   "obsidian-tikzjax",
   "mathlinks",
   "file-explorer-note-count",
-  "live-wallpaper",
   "pdf-plus",
   "quick-preview",
   "math-booster",
@@ -16,5 +15,6 @@
   "obsidian-quiet-outline",
   "settings-search",
   "obsidian-style-settings",
-  "obsidian42-brat"
+  "obsidian42-brat",
+  "live-wallpaper"
 ]
