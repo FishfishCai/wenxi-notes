@@ -47,3 +47,15 @@ Parallelogram law is wrong in $\mathbb{C^{n}}$.
 
 > [!theorem|: Spectral Theorem] $A \in \mathbb{R}^{n,n}$
 > If $A=A^{\top}$, then it has an orthomornal basis composed of eigenvectors.
+
+> [!definition| of Projection Matrix] $a,q \in \mathbb{R}^n$
+> Projection matrix of $q$ is $qq^{\top}$, whose rank is $1$.<br>
+> Component of $a$ along $q$ is equal to $qq^{\top} * a$.
+>  > Orthogonal projection matrix is $(I - qq^{\top})$, whose rank is $n-1$.
+  
+> [!lemma|*] $v_1, v_2, ..., v_k \in \mathbb{R}^n$
+> If $v_{1}, v_{2}, ..., v_{k}$ is an orthonormal set, then the matrix $v_{1}v_{1}^{\top}+...+v_{k}v_{k}^{\top}$ projects to $\langle v_{1}, v_{2}, ..., v_{k} \rangle$.
+> > Let $Q=(v_{1},v_{2},..., v_{k})$, then projection matrix to $\langle v_{1}, v_{2}, ..., v_{k} \rangle$ is $P = QQ^{\top} = v_{1}v_{1}^{\top}+...+v_{k}v_{k}^{\top}$, whose rank is k.<br>
+> > $Q^{\top}x$ gives the coefficients when $x$ is projected to the $Range(Q)$.<br>
+> > $I-QQ^{\top}$ is the complementary projection, whose rank is $n-k$.<br>
+

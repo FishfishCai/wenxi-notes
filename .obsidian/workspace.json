@@ -137,10 +137,11 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "ccea1679418a135c",
+  "active": "89d14545bc34f198",
   "lastOpenFiles": [
-    "math/Chapter 2 Schemes.md",
+    "code/prompt/canvas.md",
     "math/Numerical Linear Algebra.md",
+    "math/Chapter 2 Schemes.md",
     "math/rudin.md",
     "course/economy.md",
     "math/milnor.md",
@@ -148,7 +149,6 @@
     "game/stardew_valley.md",
     "game/minecraft.md",
     "math/Milnor.pdf",
-    "code/prompt/canvas.md",
     "course/econ",
     "course",
     "code/prompt/python.md",
