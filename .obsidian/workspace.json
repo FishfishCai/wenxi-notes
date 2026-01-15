@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "course/economy.md",
+                "file": "math/Numerical Linear Algebra.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "economy"
+              "title": "Numerical Linear Algebra"
             }
           }
         ]
@@ -137,15 +137,17 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "89d14545bc34f198",
+  "active": "ccea1679418a135c",
   "lastOpenFiles": [
-    "math/milnor.md",
+    "math/Chapter 2 Schemes.md",
+    "math/Numerical Linear Algebra.md",
+    "math/rudin.md",
     "course/economy.md",
+    "math/milnor.md",
     "_sop/usc ece.md",
     "game/stardew_valley.md",
     "game/minecraft.md",
     "math/Milnor.pdf",
-    "math/rudin.md",
     "code/prompt/canvas.md",
     "course/econ",
     "course",
@@ -170,8 +172,6 @@
     "copilot/copilot-custom-prompts/Make longer.md",
     "copilot/copilot-custom-prompts/Make shorter.md",
     "copilot/copilot-custom-prompts/Emojify.md",
-    "copilot/copilot-custom-prompts/Explain like I am 5.md",
-    "copilot/copilot-custom-prompts/Simplify.md",
     "copilot/copilot-custom-prompts",
     "copilot",
     "math/Topology from the Differentiable Viewpoint (John Willard Milnor) (Z-Library).pdf",
