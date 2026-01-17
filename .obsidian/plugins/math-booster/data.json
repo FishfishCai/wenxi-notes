@@ -27,7 +27,7 @@
       "eqRefSuffix": "",
       "labelPrefix": "",
       "lineByLine": true,
-      "theoremCalloutStyle": "Framed",
+      "theoremCalloutStyle": "Vivid",
       "theoremCalloutFontInherit": true,
       "beginProof": "\\begin{proof}",
       "endProof": "\\end{proof}",
@@ -68,37 +68,6 @@
             "end": "□",
             "linkedBeginPrefix": "Proof of ",
             "linkedBeginSuffix": "."
-          }
-        }
-      },
-      "日本語": {
-        "id": "日本語",
-        "meta": {
-          "tags": [
-            "ja"
-          ]
-        },
-        "body": {
-          "theorem": {
-            "axiom": "公理",
-            "definition": "定義",
-            "lemma": "補題",
-            "proposition": "命題",
-            "theorem": "定理",
-            "corollary": "系",
-            "claim": "主張",
-            "assumption": "仮定",
-            "example": "例",
-            "exercise": "演習問題",
-            "conjecture": "予想",
-            "hypothesis": "仮説",
-            "remark": "注"
-          },
-          "proof": {
-            "begin": "証明.",
-            "end": "□",
-            "linkedBeginPrefix": "",
-            "linkedBeginSuffix": "の証明."
           }
         }
       }

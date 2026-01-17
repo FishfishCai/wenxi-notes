@@ -57,7 +57,7 @@ and thus $|a^\top b|\le\|a\|\|b\|$. Equality holds iff $\|\delta\|=0$, i.e., the
 > The reverse of [[#^8c734c]] is incorrect. If $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$, then $\Re(a^{*}b)=\Re(b^{*}a)=0$.
 
 > [!remark|]
-> [[#^845c0b]] is incorrect in $\mathbb{C}$. If $\|a\|=\|b\|$, $\langle a+b , a-b \rangle = 0$ not always holds.
+> [[#^845c0b]] is incorrect in $\mathbb{C}^{n}$. If $\|a\|=\|b\|$, $\langle a+b , a-b \rangle = 0$ not always holds.
 
 ## Matrix
 > [!definition|] Symmetric Positive Definite Matrix
@@ -70,7 +70,7 @@ and thus $|a^\top b|\le\|a\|\|b\|$. Equality holds iff $\|\delta\|=0$, i.e., the
 > [!definition|] Orthogonal Matrix
 > Let $Q \in \mathbb{R}^{n,n}$, and $v_i$ for $i \in {1,2,\dots,n}$ denotes the $i$-th column of $Q$. $Q$ is an orthogonal matrix if all $v_i$ are unit vectors and $\langle v_i, v_j\rangle = 0$ for all $i \neq j$.
 
-> [!lemma|] 
+> [!lemma|] Lemma
 > $Q$ is an orthogonal matrix iff. $Q^{\top}Q=I$.
 
 > [!theorem|] Spectral Theorem

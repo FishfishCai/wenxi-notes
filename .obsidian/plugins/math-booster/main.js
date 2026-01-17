@@ -2880,12 +2880,10 @@ var TheoremCalloutRenderer = class _TheoremCalloutRenderer extends import_obsidi
       return;
     }
     ;
-    if (!this.info || _TheoremCalloutRenderer.areDifferentInfo(info, this.info)) {
-      this.renderTitle(info, existingMainTitleEl);
-      this.addCssClasses(info);
-      this.addEditButton();
-      this.info = info;
-    }
+    this.renderTitle(info, existingMainTitleEl);
+    this.addCssClasses(info);
+    this.addEditButton();
+    this.info = info;
     setTimeout(() => {
       if (this.containerEl.closest(".hover-popover.hover-editor"))
         return;

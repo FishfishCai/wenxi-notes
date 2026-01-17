@@ -9,7 +9,8 @@
     "enlarge-image-on-horver",
     "image-cards",
     "tag-pills",
-    "blockquote-styles"
+    "blockquote-styles",
+    "tikz-reading-dark-fix"
   ],
   "translucency": true,
   "showViewHeader": true,

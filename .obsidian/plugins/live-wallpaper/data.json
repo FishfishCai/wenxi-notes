@@ -3,7 +3,7 @@
   "currentWallpaper": {
     "path": "plugins/live-wallpaper/wallpapers/active/normal/1.mp4",
     "type": "video",
-    "zIndex": 5,
+    "zIndex": 100,
     "opacity": 15,
     "brightness": 100,
     "blurRadius": 0,
@@ -22,7 +22,7 @@
     "config": {
       "path": "plugins/live-wallpaper/wallpapers/active/normal/1.mp4",
       "type": "video",
-      "zIndex": 5,
+      "zIndex": 100,
       "opacity": 15,
       "brightness": 100,
       "blurRadius": 0,

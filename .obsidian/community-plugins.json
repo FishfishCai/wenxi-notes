@@ -1,14 +1,11 @@
 [
   "better-link-clicker-plugin",
-  "obsidian-latex-suite",
   "attachment-flow-plugin",
   "better-link-clicker",
-  "obsidian-tikzjax",
   "mathlinks",
   "file-explorer-note-count",
   "pdf-plus",
   "quick-preview",
-  "math-booster",
   "obsidian-git",
   "editor-width-slider",
   "lapel",
@@ -16,5 +13,8 @@
   "settings-search",
   "obsidian-style-settings",
   "obsidian42-brat",
-  "live-wallpaper"
+  "live-wallpaper",
+  "obsidian-latex-suite",
+  "math-booster",
+  "obsidian-tikzjax"
 ]
