@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "game/minecraft.md",
+                "file": "math/Numerical Linear Algebra.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "minecraft"
+              "title": "Numerical Linear Algebra"
             }
           }
         ]
@@ -139,15 +139,15 @@
   },
   "active": "89d14545bc34f198",
   "lastOpenFiles": [
-    "math/Numerical Linear Algebra.md",
     "math/milnor.md",
+    "game/minecraft.md",
+    "math/Numerical Linear Algebra.md",
     "code/prompt/canvas.md",
     "math/Chapter 2 Schemes.md",
     "math/rudin.md",
     "course/economy.md",
     "_sop/usc ece.md",
     "game/stardew_valley.md",
-    "game/minecraft.md",
     "math/Milnor.pdf",
     "course/econ",
     "course",
