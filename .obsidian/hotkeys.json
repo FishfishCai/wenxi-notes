@@ -2,123 +2,18 @@
   "file-explorer:new-file-in-new-pane": [],
   "editor:delete-paragraph": [],
   "workspace:goto-last-tab": [],
-  "workspace:next-tab": [
-    {
-      "modifiers": [
-        "Ctrl"
-      ],
-      "key": "Tab"
-    },
-    {
-      "modifiers": [
-        "Meta",
-        "Shift"
-      ],
-      "key": "]"
-    },
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "PageDown"
-    }
-  ],
-  "workspace:previous-tab": [
-    {
-      "modifiers": [
-        "Ctrl",
-        "Shift"
-      ],
-      "key": "Tab"
-    },
-    {
-      "modifiers": [
-        "Meta",
-        "Shift"
-      ],
-      "key": "["
-    },
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "PageUp"
-    }
-  ],
-  "workspace:goto-tab-1": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "1"
-    }
-  ],
-  "workspace:goto-tab-2": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "2"
-    }
-  ],
-  "workspace:goto-tab-3": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "3"
-    }
-  ],
-  "workspace:goto-tab-4": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "4"
-    }
-  ],
-  "workspace:goto-tab-5": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "5"
-    }
-  ],
-  "workspace:goto-tab-6": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "6"
-    }
-  ],
-  "workspace:goto-tab-7": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "7"
-    }
-  ],
-  "workspace:goto-tab-8": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "8"
-    }
-  ],
+  "workspace:next-tab": [],
+  "workspace:previous-tab": [],
+  "workspace:goto-tab-1": [],
+  "workspace:goto-tab-2": [],
+  "workspace:goto-tab-3": [],
+  "workspace:goto-tab-4": [],
+  "workspace:goto-tab-5": [],
+  "workspace:goto-tab-6": [],
+  "workspace:goto-tab-7": [],
+  "workspace:goto-tab-8": [],
   "editor:insert-link": [],
-  "app:go-back": [
-    {
-      "modifiers": [
-        "Mod",
-        "Alt"
-      ],
-      "key": "ArrowLeft"
-    }
-  ],
+  "app:go-back": [],
   "editor:open-link-in-new-leaf": [],
   "editor:open-link-in-new-window": [],
   "editor:open-link-in-new-split": [],
@@ -139,13 +34,19 @@
     }
   ],
   "workspace:undo-close-pane": [],
-  "editor:insert-table": [
-    {
-      "modifiers": [
-        "Ctrl",
-        "Mod"
-      ],
-      "key": "T"
-    }
-  ]
+  "editor:toggle-italics": [],
+  "workspace:close-window": [],
+  "workspace:close": [],
+  "editor:toggle-checklist-status": [],
+  "markdown:toggle-preview": [],
+  "app:go-forward": [],
+  "editor:toggle-bold": [],
+  "editor:open-search-replace": [],
+  "markdown:add-metadata-property": [],
+  "editor:follow-link": [],
+  "global-search:open": [],
+  "file-explorer:new-file": [],
+  "workspace:new-tab": [],
+  "app:open-help": [],
+  "workspace:edit-file-title": []
 }

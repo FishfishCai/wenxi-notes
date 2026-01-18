@@ -1,0 +1,17 @@
+# Plugins
+- AttachFlow: better PDF and image notes reference.
+- Better Link Clicker: change click-to-open into Ctrl+click-to-open.
+- BRAT: support install plugins from GitHub and beta versions.
+- Editor Width Slider: adjust editor line width interactively with a slider.
+- File Explorer Note Count: show note counts in the file explorer.
+- Git: support Git.
+- Lapel: show extra info at the line number area.
+- Latex Suite: support LaTeX input and shortcuts.
+- LaTeX-like Theorem & Equation Referencer: provide theorem-style callouts.
+- Live Background: dynamic wallpaper.
+- MathLinks: dependency of LaTeX-like Theorem & Equation Referencer.
+- PDF++: enhance PDF reading and annotation.
+- Quick Preview: dependency of LaTeX-like Theorem & Equation Referencer.
+- Quiet Outline: show a clean, low-noise outline panel.
+- Style Settings: expose theme and CSS options in a settings panel for controlled UI customization.
+- TikZJax: support TikZ diagrams.
