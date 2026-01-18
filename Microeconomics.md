@@ -18,9 +18,32 @@ Decisions about quantities are best made incrementally. “How many” decisions
 Your best choice depends on your other choices, the choices of others, developments in related markets, and expectations about the future. When any of these factors change, the best decision may change.
 
 # Demand and consumer choice
-## 1. individual demand
+## 1. Individual demand
 - individual demand curve: A graph that plots the quantity of an item that an individual buyer plans to purchase at each price.
 - “holding other things constant”: A commonly used qualifier noting that your conclusions may change if some factor that you haven’t analyzed changes.
 - law of demand: The tendency for quantity demanded to be higher when the price is lower.
+## 2.2 Your Decisions and Your Demand Curve
 - rational rule for buyers: Buy more of an item if the marginal benefit of one more is greater than or equal to the price.
 - diminishing marginal benefit: Each additional unit yields a smaller marginal benefit than the previous unit.
+## 2.3 Market Demand
+- market demand curve: A graph plotting the total quantity of an item demanded by the entire market, at each price.
+- movement along the demand curve: A price change causes movement from one point on a fixed demand curve to another point on the same curve. 
+- change in the quantity demanded: The change in quantity associated with movement along a fixed demand curve.
+## 2.4 What Shifts Demand Curves?
+- shift in the demand curve: A movement of the demand curve itself.
+- increase in demand: A shift of the demand curve to the right.
+- decrease in demand: A shift of the demand curve to the left.
+- normal good: A good for which higher income causes an increase in demand.
+- inferior good: A good for which higher income causes a decrease in demand.
+- complementary goods: Goods that go together. Your demand for a good will decrease if the price of a complementary good rises and will increase if the price of a complementary good falls.
+- substitute goods: Goods that replace each other. Your demand for a good will increase if the price of a substitute good rises, and it will fall if the price of a substitute good falls.
+- network effect: When a good becomes more useful because other people use it. If more people buy such a good, your demand for it will also increase.
+- congestion effect: When a good becomes less valuable because other people use it. If more people buy such a product, your demand for it will decrease.
+
+#
+## 3.1 Individual Supply: What You Sell, at Each Price
+- individual supply curve: A graph plotting the quantity of an item that a business plans to sell at each price.
+- law of supply: The tendency for the quantity supplied to be higher when the price is higher.
+## 3.2 Your Decisions and Your Individual Supply Curve
+- perfect competition: Markets in which (1) all firms in an industry sell an identical good; and (2) there are many buyers and sellers, each of whom is small relative to the size of the market.
+- price-taker: Someone who decides to charge the prevailing price and whose actions do not affect the prevailing price.
