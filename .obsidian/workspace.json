@@ -11,16 +11,15 @@
             "id": "1ace231dd6b75de6",
             "type": "leaf",
             "state": {
-              "type": "pdf",
+              "type": "markdown",
               "state": {
-                "file": "math/Milnor.pdf",
-                "page": 1,
-                "left": -8,
-                "top": 473,
-                "zoom": 1.6597744360902256
+                "file": "Fluid Dynamic.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
               },
-              "icon": "lucide-file-text",
-              "title": "Milnor"
+              "icon": "lucide-file",
+              "title": "Fluid Dynamic"
             }
           }
         ]
@@ -138,22 +137,22 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "1ace231dd6b75de6",
+  "active": "ccea1679418a135c",
   "lastOpenFiles": [
+    "Microeconomics.md",
+    "Numerical Linear Algebra.md",
+    "Fluid Dynamic.md",
+    "Milnor.pdf",
     "prompt/python.md",
     "prompt/canvas.md",
-    "math/Differential Topology.md",
-    "math/Milnor.pdf",
-    "math/Numerical Linear Algebra.md",
-    "math/Real Analysis.md",
-    "math/Microeconomics.md",
+    "Differential Topology.md",
+    "Real Analysis.md",
     "basic/ssh.md",
     "basic/nvidia.md",
     "basic/wandb.md",
     "basic/git.md",
     "basic/conda.md",
     "code/machine_learning/basic.md",
-    "math/Fluid Dynamic.md",
     "math/introduction_to_smooth_manifolds.pdf",
     "Lecture notes.md",
     "未命名.md",
