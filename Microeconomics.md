@@ -40,10 +40,16 @@ Your best choice depends on your other choices, the choices of others, developme
 - network effect: When a good becomes more useful because other people use it. If more people buy such a good, your demand for it will also increase.
 - congestion effect: When a good becomes less valuable because other people use it. If more people buy such a product, your demand for it will decrease.
 
-#
+# Supply and Producer Choice
 ## 3.1 Individual Supply: What You Sell, at Each Price
 - individual supply curve: A graph plotting the quantity of an item that a business plans to sell at each price.
 - law of supply: The tendency for the quantity supplied to be higher when the price is higher.
 ## 3.2 Your Decisions and Your Individual Supply Curve
 - perfect competition: Markets in which (1) all firms in an industry sell an identical good; and (2) there are many buyers and sellers, each of whom is small relative to the size of the market.
 - price-taker: Someone who decides to charge the prevailing price and whose actions do not affect the prevailing price.
+- variable costs: Those costs—like labor and raw materials—that vary with the quantity of output you produce.
+- fixed cost: Those costs that don’t vary when you change the quantity of output you produce.
+- Rational Rule for Sellers in Competitive Markets: Sell one more unit if the price is greater than (or is equal to) the marginal cost.
+- marginal product: The increase in output that arises from an additional unit of an input, like labor.
+- diminishing marginal product: The marginal product of an input declines as you use more of that input.
+
