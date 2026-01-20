@@ -39,7 +39,7 @@
 	{trigger: "thm", replacement: "> [!theorem|]$0\n$1", options: "t"},
 	{trigger: "lemma", replacement: "> [!lemma|] $0\n$1", options: "t"},
 	{trigger: "prop", replacement: "> [!proposition|]$0\n$1", options: "t"},
-	{trigger: "rmk", replacement: "> [!remark|]$0\n$1", options: "t"},
+	{trigger: "remark", replacement: "> [!remark|]$0\n$1", options: "t"},
 	{trigger: "example", replacement: "> [!example|]$0\n$1", options: "t"},
 
     // tikz
@@ -49,9 +49,9 @@
 	{trigger: "text", replacement: "\\text{$0}$1", options: "mA"},
 
     // style
- 	{trigger: "bf", replacement: "\\mathbf{$0}", options: "mA"},
-	{trigger: "rm", replacement: "\\mathrm{$0}", options: "mA"},
-    	{trigger: "bb", replacement: "\\mathbb{$0}", options: "mA"},
+ 	{trigger: "bf", replacement: "\\mathbf{$0}", options: "m"},
+	{trigger: "rm", replacement: "\\mathrm{$0}", options: "m"},
+    	{trigger: "bb", replacement: "\\mathbb{$0}", options: "m"},
 
     // accents
 	{trigger: "hat", replacement: "\\hat{$0}", options: "m"},
@@ -73,10 +73,10 @@
     	{trigger: "^", replacement: "^{$0}", options: "mA"},
 
     // brackets
-	{trigger: "mod", replacement: "|$0|$1", options: "m"},
-	{trigger: "norm", replacement: "\|$0\|", options: "m"},
-	{trigger: "ceil", replacement: "\\lceil$0\\rceil", options: "m"},
-	{trigger: "floor", replacement: "\\lfloor$0\\rfloor", options: "m"},
+	{trigger: "mod", replacement: "|$0|$1", options: "mA"},
+	{trigger: "norm", replacement: "\\|$0\\|", options: "mA"},
+	{trigger: "ceil", replacement: "\\lceil$0\\rceil", options: "mA"},
+	{trigger: "floor", replacement: "\\lfloor$0\\rfloor", options: "mA"},
 	{trigger: "(", replacement: "(${VISUAL})", options: "mA"},
 	{trigger: "[", replacement: "[${VISUAL}]", options: "mA"},
 	{trigger: "{", replacement: "{${VISUAL}}", options: "mA"},
@@ -110,9 +110,9 @@
 
     // sets
 	{trigger: "eset", replacement: "\\emptyset", options: "mA"},
-    	{trigger: "in", replacement: "\\in", options: "mA"},
+    	{trigger: "in", replacement: "\\in", options: "m"},
 	{trigger: "and", replacement: "\\cap", options: "mA"},
-	{trigger: "or", replacement: "\\cup", options: "mA"},
+	{trigger: "or", replacement: "\\cup", options: "m"},
     	{trigger: "subset", replacement: "\\subset", options: "mA"},
     	{trigger: "supset", replacement: "\\supset", options: "mA"},
     	{trigger: "sub=", replacement: "\\subseteq", options: "mA"},
@@ -148,6 +148,7 @@
     	{trigger: "tr", replacement: "\\mathrm{Tr}", options: "m"},
 	{trigger: "ker", replacement: "\\ker", options: "mA"},
     	{trigger: "coker", replacement: "\\mathop{\\mathrm{coker}}", options: "mA"},
+    {trigger: "span", replacement: "\\text{span}($0)", options: "mA"},
 
     // complex
     	{trigger: "conj", replacement: "^{*}", options: "m"},
@@ -170,6 +171,7 @@
 	{trigger: "\\\\(${GREEK})([A-Za-z])", replacement: "\\[[0]] [[1]]", options: "rmA"},
 ]
 ```
+
 ```
 {
 	"${GREEK}": "alpha|beta|gamma|Gamma|delta|Delta|epsilon|varepsilon|zeta|eta|theta|vartheta|Theta|iota|kappa|lambda|Lambda|mu|nu|xi|Xi|pi|Pi|rho|varrho|sigma|Sigma|tau|upsilon|Upsilon|phi|varphi|Phi|chi|psi|Psi|omega|Omega"
