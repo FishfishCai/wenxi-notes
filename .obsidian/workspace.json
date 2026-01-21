@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "Numerical Linear Algebra.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "Numerical Linear Algebra"
             }
           }
         ]
@@ -140,15 +140,15 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
-    "Numerical Linear Algebra.md",
     "Rudin.pdf",
-    "rudin.pdf",
-    "README.md",
     "Fluid Dynamic.md",
+    "Real Analysis.md",
+    "README.md",
+    "Numerical Linear Algebra.md",
+    "rudin.pdf",
     "Microeconomics.md",
     "Differential Topology.md",
     "Milnor.pdf",
-    "Real Analysis.md",
     "latexsuite",
     "latex.json",
     "未命名.txt",
