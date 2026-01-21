@@ -14,7 +14,7 @@
               "type": "markdown",
               "state": {
                 "file": "Fluid Dynamic.md",
-                "mode": "preview",
+                "mode": "source",
                 "source": false,
                 "backlinks": false
               },
@@ -140,13 +140,13 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
-    "Numerical Linear Algebra.md",
-    "README.md",
-    "Fluid Dynamic.md",
     "Microeconomics.md",
     "Differential Topology.md",
-    "Real Analysis.md",
     "Milnor.pdf",
+    "Numerical Linear Algebra.md",
+    "Fluid Dynamic.md",
+    "README.md",
+    "Real Analysis.md",
     "latexsuite",
     "latex.json",
     "未命名.txt",
