@@ -146,6 +146,7 @@
 	{trigger: "invs", replacement: "^{-1}", options: "m"},
     	{trigger: "tran", replacement: "^{\\top}", options: "m"},
     	{trigger: "tr", replacement: "\\mathrm{Tr}", options: "m"},
+    {trigger: "det", replacement: "\\det", options: "mA"},
 	{trigger: "ker", replacement: "\\ker", options: "mA"},
     	{trigger: "coker", replacement: "\\mathop{\\mathrm{coker}}", options: "mA"},
     {trigger: "span", replacement: "\\text{span}($0)", options: "mA"},
