@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Microeconomics.md",
+                "file": "Deep Learning Code.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Microeconomics"
+              "title": "Deep Learning Code"
             }
           }
         ]
@@ -140,11 +140,14 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
+    "prompt/python.md",
+    "Deep Learning Code.md",
+    "MATH526.md",
+    "Microeconomics.md",
     "Fluid Dynamic.md",
     "Numerical Linear Algebra.md",
     "Rudin.pdf",
     "Real Analysis.md",
-    "Microeconomics.md",
     "Differential Topology.md",
     "basic/conda.md",
     "basic/git.md",
@@ -157,9 +160,7 @@
     "latexsuite",
     "latex.json",
     "未命名.txt",
-    "未命名.md",
     "tem.md",
-    "prompt/python.md",
     "prompt/canvas.md",
     "code/machine_learning/basic.md",
     "math/introduction_to_smooth_manifolds.pdf",
