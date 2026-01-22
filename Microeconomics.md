@@ -52,4 +52,3 @@ Your best choice depends on your other choices, the choices of others, developme
 - Rational Rule for Sellers in Competitive Markets: Sell one more unit if the price is greater than (or is equal to) the marginal cost.
 - marginal product: The increase in output that arises from an additional unit of an input, like labor.
 - diminishing marginal product: The marginal product of an input declines as you use more of that input.
-

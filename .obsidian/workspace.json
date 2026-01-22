@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Numerical Linear Algebra.md",
+                "file": "Microeconomics.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Numerical Linear Algebra"
+              "title": "Microeconomics"
             }
           }
         ]
@@ -140,15 +140,20 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
-    "Rudin.pdf",
     "Fluid Dynamic.md",
-    "Real Analysis.md",
-    "README.md",
     "Numerical Linear Algebra.md",
-    "rudin.pdf",
+    "Rudin.pdf",
+    "Real Analysis.md",
     "Microeconomics.md",
     "Differential Topology.md",
+    "basic/conda.md",
+    "basic/git.md",
+    "basic/wandb.md",
+    "basic/nvidia.md",
+    "basic/ssh.md",
     "Milnor.pdf",
+    "README.md",
+    "rudin.pdf",
     "latexsuite",
     "latex.json",
     "未命名.txt",
@@ -156,11 +161,6 @@
     "tem.md",
     "prompt/python.md",
     "prompt/canvas.md",
-    "basic/ssh.md",
-    "basic/nvidia.md",
-    "basic/wandb.md",
-    "basic/git.md",
-    "basic/conda.md",
     "code/machine_learning/basic.md",
     "math/introduction_to_smooth_manifolds.pdf",
     "Lecture notes.md",
