@@ -107,6 +107,20 @@ and thus $|a^\top b|\le\|a\|\|b\|$. Equality holds iff $\|\delta\|=0$, i.e., the
 
 ^4b5424
 
+> [!theorem|] Modified Gram–Schmidt Process
+> Let $a_{1}, a_{2}, ..., a_{k} \in \mathbb{R}^{n}$. If  $a_{1}, a_{2}, ..., a_{k}$ are independent, we can construct an orthonormal set $v_{1}, v_{2}, ..., v_{k}$, where 
+> $$
+> \begin{align*}
+> v_1 &= \frac{a_1}{\|a_1\|},\\
+> v_i &=
+> \frac{\bigl( I - v_1 v_1^T\bigr) \bigl( I-v_{2}v_{2}^{\top}\bigr)\cdots \bigl( I-v_{i-1}v_{i-1}^{\top}\bigr)a_i}
+> {\|\bigl( I - v_1 v_1^T\bigr) \bigl( I-v_{2}v_{2}^{\top}\bigr) \cdots \bigl( I-v_{i-1}v_{i-1}^{\top}\bigr)a_i\|},
+> \qquad i=2,\dots,k.
+> \end{align*}
+> $$
+
+^c68556
+
 # Real Matrix
 > [!definition|] Symmetric Positive Definite Matrix
 > Let $A\in \mathbb{R}^{n,n}$. $A$ is a symmetic positive definite matrix if $A=A^{\top}$ and $x^{\top}Ax>0$ for all $x\neq 0$.
@@ -171,6 +185,23 @@ This emplies that $f(e_{1}), f(e_{2}), \cdots , f(e_{n})$ form an orthonormal ba
 `\begin{proof}`
 $\lambda_{i}w^{*}v=w^{*}\lambda_{i}v=w^{*}Qv=(Q^{\top}w)^{*}v=(\lambda_{j}^{-1}w)^{*}v=\lambda_{j}w^{*}v$, implying that $v^{*}w=w^{*}v=0$.
 `\end{proof}`
+
+> [!lemma|] 
+> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, then A has n real eigenvalues.
+
+^6e7882
+
+`\begin{proof}`
+Let $R(x)=\frac{x^{\top}Ax}{x^{\top}x}$  and $S^{n-1}=\{x\in \mathbb{R}^{n}:\|x\|=1\}$. Since $S^{n}$ is a compact set, there exists $x^{*}$ such that $x^{*\top}Ax^{*}=\underset{\|x\|=1}{\max}x^{\top}Ax$. Let $L(x,\lambda)=x^{\top}Ax-\lambda(x^{\top}x-1)$. > By the method of Lagrange multipliers, $\nabla_{x}L(x^{*},\lambda)=0$, which implies $Ax^{*}=\lambda x^{*}$. Then we consider the orthogonal complement of $x^*$ and iterate the argument.
+`\end{proof}`
+
+> [!theorem|] Spectral Theorem
+> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, then $A$ admits an orthonormal basis consisting of eigenvectors.
+
+`\begin{proof}`
+This follows from [[#^6e7882]] and [[#^bb6200]].
+`\end{proof}`
+modified gram sch
 > [!lemma|] 
 > Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, then $\det(Q)=\pm1$.
 
@@ -186,9 +217,6 @@ $\lambda_{i}w^{*}v=w^{*}\lambda_{i}v=w^{*}Qv=(Q^{\top}w)^{*}v=(\lambda_{j}^{-1}w
 Following [[#^4b5424]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of the $Q$.
 `\end{proof}`
 
-> [!theorem|] Spectral Theorem
-> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, then $A$ admits an orthonormal basis consisting of eigenvectors.
-
 # Complex Matrix
 > [!definition|] Unitary Matrix
 > Let $Q\in \mathbb{C}^{n}$. Q is an unitary matrix if columns of $Q$ are orthonormal.
@@ -198,3 +226,34 @@ Following [[#^4b5424]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depe
 
 > [!remark|]
 > [[#^8f1e27]], [[#^3b00f3]], [[#^a25c0d]], [[#^d83a9a]], [[#^e92a78]] and [[#^bb6200]] follow if we change $^{\top}$ to $^{*}$.
+
+# Computation
+> [!lemma|] 
+> Op count for $a^{\top}b$ is $2n-1$.
+
+`\begin{proof}`
+$n$ multiplication and $n-1$ addition.
+`\end{proof}`
+
+> [!lemma|] 
+> Op count for $a-b$ is $n$.
+
+^ed7e9f
+
+> [!lemma|] 
+> Op count for $\alpha a$ is $n$.
+
+^592ada
+
+> [!lemma|] 
+> Op count for $(I-P)x$ where $P=qq^{\top}$ is $4n-1$.
+
+^dd24b3
+
+`\begin{proof}`
+$(I-P)x=x-q(q^{\top}x)$, which is the combinition of [[#^ed7e9f]], [[#^592ada]] and [[#^dd24b3]].
+`\end{proof}`
+> [!theorem|]
+> Op count for [[#^c68556]] is 
+
+Novikov analysis
