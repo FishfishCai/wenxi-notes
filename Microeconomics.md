@@ -52,3 +52,13 @@ Your best choice depends on your other choices, the choices of others, developme
 - Rational Rule for Sellers in Competitive Markets: Sell one more unit if the price is greater than (or is equal to) the marginal cost.
 - marginal product: The increase in output that arises from an additional unit of an input, like labor.
 - diminishing marginal product: The marginal product of an input declines as you use more of that input.
+
+# Equilibrium: Where Supply Meets Demand
+- planned economy: Centralized decisions are made about what and how goods and services are produced and allocated. 
+- market economy: Each individual makes their own production and consumption decisions, buying and selling in markets.
+- market: A setting bringing together potential buyers and sellers.
+- equilibrium: The point at which there is no tendency for change. A market is in equilibrium when the quantity supplied equals the quantity demanded.
+- equilibrium price: The price at which the market is in equilibrium. 
+- equilibrium quantity: The quantity demanded and supplied when the market is in equilibrium.
+- shortage: When the quantity demanded exceeds the quantity supplied.
+- surplus: When the quantity demanded is less than the quantity supplied.

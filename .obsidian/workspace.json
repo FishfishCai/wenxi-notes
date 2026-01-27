@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "game/endfield.md",
+                "file": "Microeconomics.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "endfield"
+              "title": "Microeconomics"
             }
           }
         ]
@@ -140,11 +140,11 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
+    "Deep Learning Code.md",
+    "game/endfield.md",
     "prompt/canvas.md",
     "Numerical Linear Algebra.md",
-    "game/endfield.md",
     "Microeconomics.md",
-    "Deep Learning Code.md",
     "prompt/python.md",
     "MATH526.md",
     "Fluid Dynamic.md",
