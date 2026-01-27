@@ -178,7 +178,7 @@ This emplies that $f(e_{1}), f(e_{2}), \cdots , f(e_{n})$ form an orthonormal ba
 ^e92a78
 
 > [!Lemma|]
-> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, $\lambda_{i}$ and $\lambda_{j}$ are two eigenvalue of $Q$ and $v, w \in \mathbb{C}^{n}$ are two eigenvectors s.t. $Qv = \lambda_{i}v$, $Qw=\lambda_{j}w$ and $\|v\|=\|w\|=1$, then $v^{*}w=w^{*}v=0$.
+> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, $\lambda_{i}$ and $\lambda_{j}$ are two different eigenvalue of $Q$ and $v, w \in \mathbb{C}^{n}$ are two eigenvectors s.t. $Qv = \lambda_{i}v$ and $Qw=\lambda_{j}w$, then $v^{*}w=w^{*}v=0$.
 
 ^bb6200
 
@@ -192,16 +192,26 @@ $\lambda_{i}w^{*}v=w^{*}\lambda_{i}v=w^{*}Qv=(Q^{\top}w)^{*}v=(\lambda_{j}^{-1}w
 ^6e7882
 
 `\begin{proof}`
-Let $R(x)=\frac{x^{\top}Ax}{x^{\top}x}$  and $S^{n-1}=\{x\in \mathbb{R}^{n}:\|x\|=1\}$. Since $S^{n}$ is a compact set, there exists $x^{*}$ such that $x^{*\top}Ax^{*}=\underset{\|x\|=1}{\max}x^{\top}Ax$. Let $L(x,\lambda)=x^{\top}Ax-\lambda(x^{\top}x-1)$. > By the method of Lagrange multipliers, $\nabla_{x}L(x^{*},\lambda)=0$, which implies $Ax^{*}=\lambda x^{*}$. Then we consider the orthogonal complement of $x^*$ and iterate the argument.
+Let $R(x)=\frac{x^{\top}Ax}{x^{\top}x}$  and $S^{n-1}=\{x\in \mathbb{R}^{n}:\|x\|=1\}$. Since $S^{n-1}$ is a compact set, there exists $x^{*}$ such that $x^{*\top}Ax^{*}=\underset{\|x\|=1}{\max}x^{\top}Ax$. Let $L(x,\lambda)=x^{\top}Ax-\lambda(x^{\top}x-1)$. By the method of Lagrange multipliers, $\nabla_{x}L(x^{*},\lambda)=0$, which implies $Ax^{*}=\lambda x^{*}$. Then we consider the subspace orthogonal to $x^*$ and iterate the argument.
+`\end{proof}`
+
+
+> [!lemma|] 
+> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, $\lambda_{i}$ and $\lambda_{j}$ are two eigenvalue of $A$ and $v,\,w\in \mathbb{R}^{n}$ are two different eigenvectors s.t. $Av = \lambda_{i}v$ and $Aw=\lambda_{j}w$, then $v^{\top}w=w^{\top}v=0$.
+
+^0a7023
+
+`\begin{proof}`
+$\lambda_{i}w^{\top}v=w^{\top}\lambda_{i}v=w^{\top}Av=(A^{\top}w)^{\top}v=(\lambda_{j}w)^{\top}v=\lambda_{j}w^{\top}v$, implying that $v^{\top}w=w^{\top}v=0$.
 `\end{proof}`
 
 > [!theorem|] Spectral Theorem
 > Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, then $A$ admits an orthonormal basis consisting of eigenvectors.
 
 `\begin{proof}`
-This follows from [[#^6e7882]] and [[#^bb6200]].
+This follows from [[#^6e7882]] and [[#^0a7023]].
 `\end{proof}`
-modified gram sch
+
 > [!lemma|] 
 > Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, then $\det(Q)=\pm1$.
 
@@ -229,31 +239,30 @@ Following [[#^4b5424]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depe
 
 # Computation
 > [!lemma|] 
-> Op count for $a^{\top}b$ is $2n-1$.
+> Operation count for $a^{\top}b$ is $2n-1$.
 
 `\begin{proof}`
 $n$ multiplication and $n-1$ addition.
 `\end{proof}`
 
 > [!lemma|] 
-> Op count for $a-b$ is $n$.
+> Operation count for $a-b$ is $n$.
 
 ^ed7e9f
 
 > [!lemma|] 
-> Op count for $\alpha a$ is $n$.
+> Operation count for $\alpha a$ is $n$.
 
 ^592ada
 
 > [!lemma|] 
-> Op count for $(I-P)x$ where $P=qq^{\top}$ is $4n-1$.
+> Operation count for $(I-P)x$ where $P=qq^{\top}$ is $4n-1$.
 
 ^dd24b3
 
 `\begin{proof}`
 $(I-P)x=x-q(q^{\top}x)$, which is the combinition of [[#^ed7e9f]], [[#^592ada]] and [[#^dd24b3]].
 `\end{proof}`
-> [!theorem|]
-> Op count for [[#^c68556]] is 
 
-Novikov analysis
+> [!theorem|]
+> Operation count for [[#^c68556]] is $\sum_{j=1}^{k}(4n-1)(j-1)+(2n-1)\sim2nk^{2}$.

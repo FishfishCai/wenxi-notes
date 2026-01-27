@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Numerical Linear Algebra.md",
-                "mode": "preview",
+                "file": "game/endfield.md",
+                "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Numerical Linear Algebra"
+              "title": "endfield"
             }
           }
         ]
@@ -140,12 +140,14 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
+    "prompt/canvas.md",
+    "Numerical Linear Algebra.md",
+    "game/endfield.md",
+    "Microeconomics.md",
     "Deep Learning Code.md",
     "prompt/python.md",
     "MATH526.md",
-    "Microeconomics.md",
     "Fluid Dynamic.md",
-    "Numerical Linear Algebra.md",
     "Rudin.pdf",
     "Real Analysis.md",
     "Differential Topology.md",
@@ -161,7 +163,6 @@
     "latex.json",
     "未命名.txt",
     "tem.md",
-    "prompt/canvas.md",
     "code/machine_learning/basic.md",
     "math/introduction_to_smooth_manifolds.pdf",
     "Lecture notes.md",
@@ -175,7 +176,6 @@
     "prompt",
     "code/markdown cheatsheet.md",
     "tem/rebuttal/summary.md",
-    "copilot/copilot-custom-prompts/Rewrite as tweet thread.md",
     "未命名.canvas",
     "Untitled.canvas"
   ]
