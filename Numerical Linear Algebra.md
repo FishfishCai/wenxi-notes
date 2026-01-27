@@ -266,3 +266,30 @@ $(I-P)x=x-q(q^{\top}x)$, which is the combinition of [[#^ed7e9f]], [[#^592ada]] 
 
 > [!theorem|]
 > Operation count for [[#^c68556]] is $\sum_{j=1}^{k}(4n-1)(j-1)+(2n-1)\sim2nk^{2}$.
+
+> [!theorem|] Novikov's Analysis
+> Assume that the training data are linearly separable. That is, there exists a vector $w_N$ with $\|w_N\| = 1$ s.t. for all training samples $(x_i, y_i)$, $y_i \, w_N^\top x_i \ge \varepsilon > 0.$ Assume further that the input vectors are bounded, i.e., $\|x_i\|^2 \le R \quad \text{for all } i.$ Then the perceptron algorithm makes only finitely many classification mistakes.
+
+$w_{j}^{\top}w_{j}=w_{j-1}^{\top}w_{j-1}$ if there is  no misclassification.
+$w_{j}^{\top}w_{j}=(w_{j-1}+x_{j}y_{j})^{\top}(w_{j-1}+x_{j}y_{j}) = w_{j-1}^{\top}w_{j-1}+ y_{j}^{2}x_{j}^{\top}x_{j}+2y_{j}w_{j-1}^{\top}x_{j}$
+Then, $w_{j}^{\top}w_{j}\leqslant w_{j-1}^{\top}w_{j-1}+ x_{j}^{\top}x_{j}$. We suppose that $x_{j}^{\top}x_{j}$ is bounded, then $\|w_{j}\|\leqslant \sqrt{m_{j}}R$.
+Suppose that there exists $w_{N}$ s.t. $\|w_{N}\|=1$ is a perfect classifer.
+$w_{N}^{\top}w_{j}=w_{N}^{\top}w_{j-1}$ if there is  no misclassification.
+$w_{N}^{\top}w_{j}=w_{N}^{\top}(w_{j-1}+x_{i}y_{j})=w_{N}^{\top}w_{j-1} + \varepsilon$ 
+$|w_{N}^{\top}w_{j}|\leqslant\|w_{N}\|\|w_{j}\|\implies \|w_{j}\|\geq w_{N}^{\top}w_{j}\geq m_{j}\varepsilon$
+So $m_{j}\leqslant (\frac{R}{\varepsilon})^{2}$
+
+Householder Reflection
+$H(x)=(I - 2 v v^\top)x$
+If $v=\frac{a-b}{\|a-b\|}$ and $\|a\|=\|b\|$, then $H(a)=b$ and $H(b)=a$.
+
+QR factorization using Householder
+Suppose $a=(a1, a2, \cdots, a_{N})$, choose $b=(\pm\|a\|, 0, \cdots , 0)$. $+$ if $a_{1}\leqslant0$ and $-$ if $a_{1}>0$.
+Construct $v_{1}=\frac{a-b}{\|a-b\|}$
+
+
+
+
+
+
+

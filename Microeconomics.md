@@ -52,7 +52,15 @@ Your best choice depends on your other choices, the choices of others, developme
 - Rational Rule for Sellers in Competitive Markets: Sell one more unit if the price is greater than (or is equal to) the marginal cost.
 - marginal product: The increase in output that arises from an additional unit of an input, like labor.
 - diminishing marginal product: The marginal product of an input declines as you use more of that input.
-
+## 3.3 Market Supply: What the Market Sells
+- market supply curve: A graph plotting the total quantity of an item supplied by the entire market, at each price.
+- movement along the supply curve: A price change causes movement from one point on a fixed supply curve to another point on the same curve.
+- change in the quantity supplied: The change in quantity associated with movement along a fixed supply curve.
+- shift in the supply curve: A movement of the supply curve itself.
+- increase in supply: A shift of the supply curve to the right.
+- decrease in supply: A shift of the supply curve to the left.
+- substitutes-in-production: Alternative uses of your resources. Your supply of a good will decrease if the price of a substitute-in-production rises.
+- complements-in-production: Goods that are made together. Your supply of a good will increase if the price of a complement-in-production rises.
 # Equilibrium: Where Supply Meets Demand
 - planned economy: Centralized decisions are made about what and how goods and services are produced and allocated. 
 - market economy: Each individual makes their own production and consumption decisions, buying and selling in markets.
