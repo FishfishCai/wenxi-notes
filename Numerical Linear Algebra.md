@@ -267,29 +267,20 @@ $(I-P)x=x-q(q^{\top}x)$, which is the combinition of [[#^ed7e9f]], [[#^592ada]] 
 > [!theorem|]
 > Operation count for [[#^c68556]] is $\sum_{j=1}^{k}(4n-1)(j-1)+(2n-1)\sim2nk^{2}$.
 
+# Machine Learning
 > [!theorem|] Novikov's Analysis
-> Assume that the training data are linearly separable. That is, there exists a vector $w_N$ with $\|w_N\| = 1$ s.t. for all training samples $(x_i, y_i)$, $y_i \, w_N^\top x_i \ge \varepsilon > 0.$ Assume further that the input vectors are bounded, i.e., $\|x_i\|^2 \le R \quad \text{for all } i.$ Then the perceptron algorithm makes only finitely many classification mistakes.
+> Assume that the training data are linearly separable. That is, there exists a vector $w_N$ with $\|w_N\| = 1$ s.t. for all training samples $(x_i, y_i)$, $y_i \, w_N^\top x_i \ge \varepsilon > 0.$ Assume further that the input vectors are bounded, i.e., $\|x_i\| \le R \text{ for all } i.$ Then the perceptron algorithm makes only finitely many classification mistakes.
 
-$w_{j}^{\top}w_{j}=w_{j-1}^{\top}w_{j-1}$ if there is  no misclassification.
-$w_{j}^{\top}w_{j}=(w_{j-1}+x_{j}y_{j})^{\top}(w_{j-1}+x_{j}y_{j}) = w_{j-1}^{\top}w_{j-1}+ y_{j}^{2}x_{j}^{\top}x_{j}+2y_{j}w_{j-1}^{\top}x_{j}$
-Then, $w_{j}^{\top}w_{j}\leqslant w_{j-1}^{\top}w_{j-1}+ x_{j}^{\top}x_{j}$. We suppose that $x_{j}^{\top}x_{j}$ is bounded, then $\|w_{j}\|\leqslant \sqrt{m_{j}}R$.
-Suppose that there exists $w_{N}$ s.t. $\|w_{N}\|=1$ is a perfect classifer.
-$w_{N}^{\top}w_{j}=w_{N}^{\top}w_{j-1}$ if there is  no misclassification.
-$w_{N}^{\top}w_{j}=w_{N}^{\top}(w_{j-1}+x_{i}y_{j})=w_{N}^{\top}w_{j-1} + \varepsilon$ 
-$|w_{N}^{\top}w_{j}|\leqslant\|w_{N}\|\|w_{j}\|\implies \|w_{j}\|\geq w_{N}^{\top}w_{j}\geq m_{j}\varepsilon$
-So $m_{j}\leqslant (\frac{R}{\varepsilon})^{2}$
+`\begin{proof}`
+If there is no misclassification, $w_{j}^{\top}w_{j}=w_{j-1}^{\top}w_{j-1}$ and if there is misclassification, $w_{j}^{\top}w_{j}=(w_{j-1}+x_{j}y_{j})^{\top}(w_{j-1}+x_{j}y_{j}) = w_{j-1}^{\top}w_{j-1}+ y_{j}^{2}x_{j}^{\top}x_{j}+2y_{j}w_{j-1}^{\top}x_{j}$, implying $w_{j}^{\top}w_{j}\leqslant w_{j-1}^{\top}w_{j-1}+ x_{j}^{\top}x_{j}$. Since $x_{j}^{\top}x_{j}$ is bounded, then $\|w_{j}\|\leqslant \sqrt{m_{j}}R$. Besides, if there's no misclassification, $w_{N}^{\top}w_{j}=w_{N}^{\top}w_{j-1}$ and if there is misclassification, $w_{N}^{\top}w_{j}=w_{N}^{\top}(w_{j-1}+x_{i}y_{j})=w_{N}^{\top}w_{j-1} + y_i \, w_N^\top x_i$, implying $w_{N}^{\top}w_{j}\geq y_i \, w_N^\top x_i$. Since $\|w_{N}\|\|w_{j}\|\geq |w_{N}^{\top}w_{j}|$, then $\|w_{j}\|\geq m_{j}\varepsilon$. Therefore, $m_{j}\leqslant(\frac{R}{\varepsilon})^{2}$ 
+`\end{proof}`
 
-Householder Reflection
-$H(x)=(I - 2 v v^\top)x$
-If $v=\frac{a-b}{\|a-b\|}$ and $\|a\|=\|b\|$, then $H(a)=b$ and $H(b)=a$.
+# Reflection
+> [!definition|] Householder Reflection Operator
+> Let $\|v\|=1$. The Householder reflection operator associated with v is $H(x):=(I-2vv^{\top})x$.
 
-QR factorization using Householder
-Suppose $a=(a1, a2, \cdots, a_{N})$, choose $b=(\pm\|a\|, 0, \cdots , 0)$. $+$ if $a_{1}\leqslant0$ and $-$ if $a_{1}>0$.
-Construct $v_{1}=\frac{a-b}{\|a-b\|}$
+> [!lemma|] 
+> Let $a,b \in \mathbb{R}^{n}$. If $v=\frac{a-b}{\|a-b\|}$ and $\|a\|=\|b\|$, then $H(a)=b$ and $H(b)=a$.
 
-
-
-
-
-
-
+> [!theorem|] QR factorization using Householder reflection operator
+> Let $A^{(0)} = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n \times k}$. For the $i$-th step, take the tail vector $a_i := A_{i:n,\,i}^{(i-1)}\in\mathbb{R}^{n-i+1}$. Define $e_1=(1,0,\dots,0)^\top\in\mathbb{R}^{n-i+1}$ and set $b := -\mathrm{sign}((a_i)_1)\,\|a_i\|\,e_1$. Let $v := \dfrac{a_i-b}{\|a_i-b\|}$ and define $H := \begin{bmatrix} I_{i-1} & 0 \\ 0 & \hat H \end{bmatrix}$ where $\hat H = I - 2vv^{\top}$. Update $A^{(i)}=HA^{(i-1)}$. $Q = H_1 H_2\cdots H_k$ and $R=A^{(k)}$. 
