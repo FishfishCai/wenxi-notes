@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Fluid Dynamic.md",
+                "file": "game/endfield.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Fluid Dynamic"
+              "title": "endfield"
             }
           }
         ]
@@ -140,6 +140,7 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
+    "Fluid Dynamic.md",
     "game/endfield.md",
     "Numerical Linear Algebra.md",
     "Microeconomics.md",
@@ -147,7 +148,6 @@
     "prompt/canvas.md",
     "prompt/python.md",
     "MATH526.md",
-    "Fluid Dynamic.md",
     "Rudin.pdf",
     "Real Analysis.md",
     "Differential Topology.md",
