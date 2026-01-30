@@ -1,3 +1,5 @@
+# Unit
+$1\text{psi} = 144\frac{\text{lb}}{\text{ft}^{2}}$ 
 # Basics Definitions
 - Dynamic viscosity $\mu \,(Pa * s)$
 - Kinematic viscosity $\nu :=\frac{\mu}{\rho} \, (m^{2}/s)$
