@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "basic/git.md",
+                "file": "prompt/canvas.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "git"
+              "title": "canvas"
             }
           }
         ]
@@ -140,9 +140,12 @@
   },
   "active": "1ace231dd6b75de6",
   "lastOpenFiles": [
+    "game/stardew_valley.md",
+    "game/minecraft.md",
+    "game/endfield.md",
+    "basic/git.md",
     "Latex.md",
     "Fluid Dynamic.md",
-    "game/endfield.md",
     "Numerical Linear Algebra.md",
     "Microeconomics.md",
     "Deep Learning Code.md",
@@ -153,7 +156,6 @@
     "Real Analysis.md",
     "Differential Topology.md",
     "basic/conda.md",
-    "basic/git.md",
     "basic/wandb.md",
     "basic/nvidia.md",
     "basic/ssh.md",
@@ -168,10 +170,8 @@
     "math/introduction_to_smooth_manifolds.pdf",
     "Lecture notes.md",
     "test.md",
-    "game/minecraft.md",
     "math/Chapter 2 Schemes.md",
     "_sop/usc ece.md",
-    "game/stardew_valley.md",
     "course/econ",
     "course",
     "prompt",
