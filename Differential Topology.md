@@ -1,5 +1,5 @@
 # Note
-#### Smooth Manifold ([[Milnor.pdf#page=12&selection=0,0,7,4|Milnor, p.12]])
+#### Smooth Manifold ([[Differential Topology.pdf#page=12&selection=0,0,7,4|Milnor, p.12]])
 - Smooth: $U \subset R^k$ and $V\subset R^l$ are open sets. For $f: U \rightarrow V$, all partial derivatives exist and are continuous.
 	- $M \subset R^k$ and $N\subset R^l$. For $f: M \rightarrow N$, for each $x\in X$, there exists an open set $U\subset R^k$ containing $x$ and a smooth mapping $F:U\rightarrow R^l$ that coincides with $f$ on $U \cap X$.
 		- Extention: $F$.
@@ -8,7 +8,7 @@
 - Smooth manifold: For $M \subset R^k$, for each $x\in M$, there exits a neighborhood $W$ of $x$ such that $W\cap M$ is diffeomorphic to an open set $U$ of $R^m$.
 	- Parametrization: the diffeomorphism $g: U \rightarrow W \cap M$.
 	- Coordinate: the inverse diffeomorphism $g: W \cap M \rightarrow U$.
-#### Tangent Space ([[Milnor.pdf#page=13&selection=236,0,242,11|Milnor, p.13]])
+#### Tangent Space ([[Differential Topology.pdf#page=13&selection=236,0,242,11|Milnor, p.13]])
 - Derivative: $U \subset R^k$ and $V\subset R^l$ are open sets. For smooth $f: U \rightarrow V$, $df_x:R^k\rightarrow R^l$, $df_x(h)=\lim_{t \to 0} \frac{f(x + t h) - f(x)}{t}$.
 	- $df_x$ is a linear mapping.
 	- Chain rule: $d(g\circ f)_x = dg_y\circ df_x$ with $f(x)=y$.
@@ -21,7 +21,7 @@
 	- $df_x$ is independent of $F$.
 	- Chain rule: $d(g\circ f)_x = dg_y\circ df_x$ with $f(x)=y$.
 	- $M \subset R^k$ and $N\subset R^l$. If there exists a diffeomorphism $f$ between $M$ and $N$, then $k=l$ and $df_x$ is an isomorphism.
-#### Regular Value ([[Milnor.pdf#page=18&selection=159,0,161,6|Milnor, p.18]])
+#### Regular Value ([[Differential Topology.pdf#page=18&selection=159,0,161,6|Milnor, p.18]])
 - $f:M\rightarrow N$ is a smooth map between manifolds.
 	- Regular point:  $x\in M$ and $df_x$ is surjective.
 	- Regular value: $y\in N$ and $f^{-1}(y)$ contains only regular points.

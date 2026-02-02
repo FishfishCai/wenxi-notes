@@ -107,6 +107,22 @@ and thus $|a^\top b|\le\|a\|\|b\|$. Equality holds iff $\|\delta\|=0$, i.e., the
 
 ^4b5424
 
+> [!remark|]
+> Gram-Schmidt process can also be formed as $AR_{1}R_{2}\cdots R_{k}$, where $$
+R_i=\begin{pmatrix}
+1 & 0 & \cdots & 0 & 0 & \cdots & 0\\
+0 & 1 & \cdots & 0 & 0 & \cdots & 0\\
+\vdots & \vdots & \ddots & \vdots & \vdots &  & \vdots\\
+0 & 0 & \cdots & 1 & 0 & \cdots & 0\\
+0 & 0 & \cdots & 0 & \dfrac{1}{\left\|\left(I-v_1v_1^T-\cdots-v_{i-1}v_{i-1}^T\right)a_i\right\|} &
+-\dfrac{\left\langle v_i,\left(I-v_1v_1^T-\cdots-v_{i-1}v_{i-1}^T\right)a_{i+1}\right\rangle}{\left\|\left(I-v_1v_1^T-\cdots-v_{i-1}v_{i-1}^T\right)a_i\right\|} & \cdots &
+-\dfrac{\left\langle v_i,\left(I-v_1v_1^T-\cdots-v_{i-1}v_{i-1}^T\right)a_k\right\rangle}{\left\|\left(I-v_1v_1^T-\cdots-v_{i-1}v_{i-1}^T\right)a_i\right\|}\\
+0 & 0 & \cdots & 0 & 0 & 1 & \cdots\\
+\vdots & \vdots &  & \vdots & \vdots &  & \ddots
+\end{pmatrix}.
+$$
+
+
 > [!theorem|] Modified Gram–Schmidt Process
 > Let $a_{1}, a_{2}, ..., a_{k} \in \mathbb{R}^{n}$. If  $a_{1}, a_{2}, ..., a_{k}$ are independent, we can construct an orthonormal set $v_{1}, v_{2}, ..., v_{k}$, where 
 > $$
@@ -283,4 +299,4 @@ If there is no misclassification, $w_{j}^{\top}w_{j}=w_{j-1}^{\top}w_{j-1}$ and 
 > Let $a,b \in \mathbb{R}^{n}$. If $v=\frac{a-b}{\|a-b\|}$ and $\|a\|=\|b\|$, then $H(a)=b$ and $H(b)=a$.
 
 > [!theorem|] QR factorization using Householder reflection operator
-> Let $A^{(0)} = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n \times k}$. For the $i$-th step, take the tail vector $a_i := A_{i:n,\,i}^{(i-1)}\in\mathbb{R}^{n-i+1}$. Define $e_1=(1,0,\dots,0)^\top\in\mathbb{R}^{n-i+1}$ and set $b := -\mathrm{sign}((a_i)_1)\,\|a_i\|\,e_1$. Let $v := \dfrac{a_i-b}{\|a_i-b\|}$ and define $H := \begin{bmatrix} I_{i-1} & 0 \\ 0 & \hat H \end{bmatrix}$ where $\hat H = I - 2vv^{\top}$. Update $A^{(i)}=HA^{(i-1)}$. $Q = H_1 H_2\cdots H_k$ and $R=A^{(k)}$. 
+> Let $A^{(0)} = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n \times k}$. For the $i$-th step, take the tail vector $a_i := A_{i:n,\,i}^{(i-1)}\in\mathbb{R}^{n-i+1}$. Define $e_1=(1,0,\dots,0)^\top\in\mathbb{R}^{n-i+1}$ and set $b := -\mathrm{sign}((a_i)_1)\,\|a_i\|\,e_1$. Let $v := \dfrac{a_i-b}{\|a_i-b\|}$ and define $H_{i} := \begin{bmatrix} I_{i-1} & 0 \\ 0 & \hat H_{i} \end{bmatrix}$ where $\hat H_{i} = I - 2vv^{\top}$. Update $A^{(i)}=H_{i}A^{(i-1)}$. $Q = H_1 H_2\cdots H_k$ and $R=A^{(k)}$. 

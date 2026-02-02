@@ -11,13 +11,35 @@
             "id": "2b45d65e0c3036fd",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "pdf",
+              "state": {
+                "file": "Numerical Linear Algebra.pdf",
+                "page": 71,
+                "left": -23,
+                "top": 635,
+                "zoom": 1.37
+              },
+              "icon": "lucide-file-text",
+              "title": "Numerical Linear Algebra"
+            }
+          },
+          {
+            "id": "e78f8a31c9acf31c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Numerical Linear Algebra.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "Numerical Linear Algebra"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -133,43 +155,43 @@
       "command-palette:打开命令面板": false
     }
   },
-  "active": "2b45d65e0c3036fd",
+  "active": "e78f8a31c9acf31c",
   "lastOpenFiles": [
-    "Algebraic Topology.pdf",
-    "Milnor.pdf",
-    "Differential Topology.md",
-    "Rudin.pdf",
+    "Numerical Linear Algebra.pdf",
+    "Numerical Linear Algebra.md",
+    "prompt/python.md",
     "prompt/tem.md",
+    "Partial Differential Equation.pdf",
+    "Evans L.C. Partial differential equations (AMS, 1997)(T)(664s).djvu (Administrator) (Z-Library).pdf",
+    "Deep Learning Code.md",
+    "Differential Topology.md",
+    "Microeconomics.md",
+    "Algebraic Topology.pdf",
+    "Latex.md",
+    "Fluid Dynamic.md",
+    "Stochastic Process.md",
+    "Differential Topology.pdf",
+    "Real Analysis and Complex Analysis.md",
+    "Real Analysis and Complex Analysis.pdf",
+    "README.md",
     "game/stardew_valley.md",
     "game/minecraft.md",
     "game/endfield.md",
     "basic/git.md",
-    "Latex.md",
-    "Fluid Dynamic.md",
-    "Numerical Linear Algebra.md",
-    "Microeconomics.md",
-    "Deep Learning Code.md",
-    "prompt/python.md",
-    "MATH526.md",
-    "Real Analysis.md",
     "basic/conda.md",
     "basic/wandb.md",
     "basic/nvidia.md",
     "basic/ssh.md",
-    "README.md",
     "rudin.pdf",
     "latexsuite",
     "latex.json",
     "未命名.txt",
     "tem.md",
     "code/machine_learning/basic.md",
-    "math/introduction_to_smooth_manifolds.pdf",
     "Lecture notes.md",
     "test.md",
     "math/Chapter 2 Schemes.md",
     "_sop/usc ece.md",
-    "course/econ",
-    "course",
     "未命名.canvas",
     "Untitled.canvas"
   ]
