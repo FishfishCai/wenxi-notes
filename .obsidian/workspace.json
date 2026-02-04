@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Microeconomics.md",
+                "file": "Numerical Linear Algebra.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Microeconomics"
+              "title": "Numerical Linear Algebra"
             }
           }
         ]
@@ -140,10 +140,10 @@
   },
   "active": "2b45d65e0c3036fd",
   "lastOpenFiles": [
-    "Algebraic Topology.pdf",
     "Microeconomics.md",
-    "Numerical Linear Algebra.md",
     "Numerical Linear Algebra.pdf",
+    "Algebraic Topology.pdf",
+    "Numerical Linear Algebra.md",
     "prompt/python.md",
     "prompt/tem.md",
     "Partial Differential Equation.pdf",
