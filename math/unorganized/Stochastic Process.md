@@ -1,5 +1,3 @@
-# MATH 526
-
 ### Probability
 
 #### 1. Definition

@@ -1,25 +1,5 @@
 ## Chapter 1
 
-#### 1. Space
-
-- Topology space:
-  - $\emptyset \in \mathcal{T}$ and $X \in \mathcal{T}$ 
-  - $\bigcap_{i=1}^n U_i \in \mathcal{T}$ 
-  - $\bigcup_{\alpha \in A} U_\alpha \in \mathcal{T}$
-- $\sigma$ - algebra space:
-  - $X \in \mathcal{M}$
-  - If $A\in \mathcal{M}$, then $A^c \in \mathcal{M}$
-  - $\bigcup_{n=1}^{\infty}A_i\in\mathcal{M}$
-- Metric space:
-  - $0\leq \rho(x,y) < \infty$
-  - $\rho(x,y) = 0$ if and only if $x=y$
-  - $\rho(x,y)=\rho(y,x)$
-  - $\rho(x,y)\leq\rho(x,z)+\rho(z,y)$
-- Measure space:
-  - $\mu(\emptyset)=0$
-  - $\mu(A)\geq 0$
-  - $\mu(\bigcup_{n=1}^\infty A_i)=\sum_{n=1}^\infty\mu(A_i)$
-
 #### 2. Set
 - Open: The members of topology.
 - Measurable: The members of $\sigma$ - algebra.

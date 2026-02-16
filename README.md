@@ -4,7 +4,6 @@
 - BRAT: support install plugins from GitHub and beta versions.
 - Editor Width Slider: adjust editor line width interactively with a slider.
 - File Explorer Note Count: show note counts in the file explorer.
-- Git: support Git.
 - Lapel: show extra info at the line number area.
 - Latex Suite: support LaTeX input and shortcuts.
 - LaTeX-like Theorem & Equation Referencer: provide theorem-style callouts.
@@ -154,7 +153,7 @@
     // complex
     	{trigger: "conj", replacement: "^{*}", options: "m"},
     	{trigger: "re", replacement: "\\mathrm{Re}", options: "mA"},
-	{trigger: "im", replacement: "\\mathrm{Im}", options: "mA"},
+	{trigger: "im", replacement: "\\mathrm{Im}", options: "m"},
 
     // number
 	{trigger: "CC", replacement: "\\mathbb{C}", options: "mA"},
@@ -168,6 +167,7 @@
     	{trigger: /\\(sinh|cosh|tanh|coth)([A-Za-z])/, replacement: "\\[[0]] [[1]]", options: "rmA"},
 
     // greek
+    {trigger: "ep", replacement: "\\varepsilon", options: "mA"},
 	{trigger: "(^|[^\\\\])(${GREEK})", replacement: "[[0]]\\[[1]]", options: "rmA", description: "Add backslash before Greek letters"},
 	{trigger: "\\\\(${GREEK})([A-Za-z])", replacement: "\\[[0]] [[1]]", options: "rmA"},
 ]

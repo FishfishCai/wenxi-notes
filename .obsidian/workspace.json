@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Numerical Linear Algebra.md",
+                "file": "README.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "Numerical Linear Algebra"
+              "title": "README"
             }
           }
         ]
@@ -58,7 +58,7 @@
             "state": {
               "type": "file-explorer",
               "state": {
-                "sortOrder": "byModifiedTime",
+                "sortOrder": "alphabetical",
                 "autoReveal": true
               },
               "icon": "lucide-folder-closed",
@@ -101,26 +101,15 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "code/basic/git.md",
-                "linksCollapsed": true,
-                "unlinkedCollapsed": false
+                "file": "math/Numerical Linear Algebra.pdf",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "git 的出链列表"
-            }
-          },
-          {
-            "id": "fef58c19d0220875",
-            "type": "leaf",
-            "state": {
-              "type": "git-history-view",
-              "state": {},
-              "icon": "history",
-              "title": "History"
+              "title": "Numerical Linear Algebra 的出链列表"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -130,7 +119,6 @@
   "left-ribbon": {
     "hiddenItems": {
       "obsidian42-brat:BRAT": false,
-      "obsidian-git:Open Git source control": false,
       "graph:查看关系图谱": false,
       "pdf-plus:PDF++: Toggle auto-copy": false,
       "pdf-plus:PDF++: Toggle auto-focus": false,
@@ -140,41 +128,43 @@
   },
   "active": "2b45d65e0c3036fd",
   "lastOpenFiles": [
+    "math/Numerical Linear Algebra.pdf",
+    "math/unorganized/Stochastic Process.md",
+    "math/unorganized/Real Analysis and Complex Analysis.pdf",
+    "math/unorganized/Partial Differential Equation.pdf",
+    "math/unorganized/Differential Topology.md",
+    "math/unorganized/Algebraic Topology.pdf",
+    "math/unorganized",
+    "math/Least Square.md",
+    "math/QR Factorization.md",
+    "math/Machine Learning.md",
+    "math/Complex Vector.md",
+    "math/Complex Matrix.md",
+    "math/Real Vector.md",
+    "math/Computation.md",
+    "math/Functional Matrix.md",
+    "math/Real Matrix.md",
+    "math/Structure.md",
+    "math/unorganized/Real Analysis and Complex Analysis.md",
+    "basic/latex.md",
     "Microeconomics.md",
-    "Numerical Linear Algebra.pdf",
-    "Algebraic Topology.pdf",
-    "Numerical Linear Algebra.md",
-    "prompt/python.md",
-    "prompt/tem.md",
-    "Partial Differential Equation.pdf",
-    "Evans L.C. Partial differential equations (AMS, 1997)(T)(664s).djvu (Administrator) (Z-Library).pdf",
-    "Deep Learning Code.md",
-    "Differential Topology.md",
-    "Latex.md",
-    "Fluid Dynamic.md",
-    "Stochastic Process.md",
-    "Differential Topology.pdf",
-    "Real Analysis and Complex Analysis.md",
-    "Real Analysis and Complex Analysis.pdf",
     "README.md",
-    "game/stardew_valley.md",
-    "game/minecraft.md",
-    "game/endfield.md",
-    "basic/git.md",
+    "deepLearning/code.md",
+    "deepLearning",
+    "physics/Fluid Dynamic.md",
+    "physics/images/Pasted image 20260205010053.png",
+    "physics/images",
+    "math/unorganized/Differential Topology.pdf",
+    "physics",
+    "_sop/wisc cs.md",
+    "math",
+    "_sop/uiuc cs.md",
+    "_sop/ucsd cse.md",
+    "_sop/ut cs.md",
+    "physics/images/Pasted image 20260205004425.png",
     "basic/conda.md",
+    "basic/git.md",
     "basic/wandb.md",
-    "basic/nvidia.md",
-    "basic/ssh.md",
-    "rudin.pdf",
-    "latexsuite",
-    "latex.json",
-    "未命名.txt",
-    "tem.md",
-    "code/machine_learning/basic.md",
-    "Lecture notes.md",
-    "test.md",
-    "math/Chapter 2 Schemes.md",
-    "_sop/usc ece.md",
     "未命名.canvas",
     "Untitled.canvas"
   ]

@@ -30,3 +30,5 @@
 			- There exists a neighborhood $V \subset N$ of y such that $\#f^{-1}(y) = \#f^{-1}(y')$ for all $y' \in V$.
 	- Critical point: $x\in M$ and $df_x$ is not surjective.
 	- Critical value: $y\in N$ and one of $f^{-1}(y)$ is critical point.
+
+
