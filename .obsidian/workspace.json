@@ -13,13 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "README.md",
+                "file": "basic/wandb.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "README"
+              "title": "wandb"
             }
           }
         ]
@@ -128,6 +128,7 @@
   },
   "active": "2b45d65e0c3036fd",
   "lastOpenFiles": [
+    "README.md",
     "math/Numerical Linear Algebra.pdf",
     "math/unorganized/Stochastic Process.md",
     "math/unorganized/Real Analysis and Complex Analysis.pdf",
@@ -148,7 +149,6 @@
     "math/unorganized/Real Analysis and Complex Analysis.md",
     "basic/latex.md",
     "Microeconomics.md",
-    "README.md",
     "deepLearning/code.md",
     "deepLearning",
     "physics/Fluid Dynamic.md",
