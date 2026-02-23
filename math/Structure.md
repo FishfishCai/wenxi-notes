@@ -1,3 +1,4 @@
+#Topology
 ## Topological Structure
 > [!definition|] Topology
 >  $\mathcal{T}$ is a topology on a set $X$ if:  

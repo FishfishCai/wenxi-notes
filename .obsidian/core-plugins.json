@@ -13,7 +13,7 @@
   "daily-notes": false,
   "templates": false,
   "note-composer": false,
-  "command-palette": true,
+  "command-palette": false,
   "slash-command": false,
   "editor-status": true,
   "bookmarks": false,

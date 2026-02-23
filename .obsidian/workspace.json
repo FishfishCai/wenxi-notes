@@ -4,22 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "ccc7a159a7bf2f4d",
+        "id": "40c4e14203e1f60c",
         "type": "tabs",
         "children": [
           {
-            "id": "2b45d65e0c3036fd",
+            "id": "d632b941635f6ed7",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "basic/wandb.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "wandb"
+              "title": "新标签页"
             }
           }
         ]
@@ -101,12 +96,11 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "math/Numerical Linear Algebra.pdf",
                 "linksCollapsed": false,
-                "unlinkedCollapsed": true
+                "unlinkedCollapsed": false
               },
               "icon": "links-going-out",
-              "title": "Numerical Linear Algebra 的出链列表"
+              "title": "出链"
             }
           }
         ]
@@ -122,49 +116,49 @@
       "graph:查看关系图谱": false,
       "pdf-plus:PDF++: Toggle auto-copy": false,
       "pdf-plus:PDF++: Toggle auto-focus": false,
-      "pdf-plus:PDF++: Toggle auto-paste": false,
-      "command-palette:打开命令面板": false
+      "pdf-plus:PDF++: Toggle auto-paste": false
     }
   },
-  "active": "2b45d65e0c3036fd",
+  "active": "d632b941635f6ed7",
   "lastOpenFiles": [
-    "README.md",
-    "math/Numerical Linear Algebra.pdf",
-    "math/unorganized/Stochastic Process.md",
-    "math/unorganized/Real Analysis and Complex Analysis.pdf",
-    "math/unorganized/Partial Differential Equation.pdf",
-    "math/unorganized/Differential Topology.md",
-    "math/unorganized/Algebraic Topology.pdf",
-    "math/unorganized",
+    "math/Condition Number.md",
+    "math/Stability.md",
+    "math/_prompt_math.md",
+    "math/Floating Point Arithmetic.md",
     "math/Least Square.md",
-    "math/QR Factorization.md",
     "math/Machine Learning.md",
-    "math/Complex Vector.md",
     "math/Complex Matrix.md",
-    "math/Real Vector.md",
+    "math/Complex Vector.md",
     "math/Computation.md",
-    "math/Functional Matrix.md",
-    "math/Real Matrix.md",
+    "math/Matrix Operator.md",
+    "math/Real Vector.md",
     "math/Structure.md",
-    "math/unorganized/Real Analysis and Complex Analysis.md",
-    "basic/latex.md",
-    "Microeconomics.md",
-    "deepLearning/code.md",
-    "deepLearning",
+    "math/Real Matrix.md",
+    "math/QR Factorization.md",
     "physics/Fluid Dynamic.md",
-    "physics/images/Pasted image 20260205010053.png",
-    "physics/images",
-    "math/unorganized/Differential Topology.pdf",
-    "physics",
-    "_sop/wisc cs.md",
-    "math",
-    "_sop/uiuc cs.md",
-    "_sop/ucsd cse.md",
-    "_sop/ut cs.md",
-    "physics/images/Pasted image 20260205004425.png",
+    "math/textbook/Numerical Linear Algebra.pdf",
+    "README.md",
+    "deepLearning/_prompt_python.md",
+    "deepLearning/code.md",
+    "_tem.md",
     "basic/conda.md",
     "basic/git.md",
+    "basic/latex.md",
+    "basic/nvidia.md",
+    "basic/ssh.md",
     "basic/wandb.md",
+    "math/textbook/Real Analysis and Complex Analysis.pdf",
+    "math/textbook/Differential Topology.pdf",
+    "math/textbook",
+    "math/unorganized/Stochastic Process.md",
+    "math/textbook/Partial Differential Equation.pdf",
+    "math/textbook/Algebraic Topology.pdf",
+    "math/unorganized",
+    "deepLearning",
+    "physics/images/Pasted image 20260205010053.png",
+    "physics/images",
+    "physics",
+    "physics/images/Pasted image 20260205004425.png",
     "未命名.canvas",
     "Untitled.canvas"
   ]

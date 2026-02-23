@@ -4,7 +4,7 @@
   "vimMode": false,
   "newFileLocation": "folder",
   "showUnsupportedFiles": false,
-  "attachmentFolderPath": "Assets",
+  "attachmentFolderPath": "_tem",
   "showInlineTitle": true,
   "newFileFolderPath": "",
   "alwaysUpdateLinks": true,
@@ -21,5 +21,7 @@
   "promptDelete": false,
   "autoPairBrackets": false,
   "foldHeading": false,
-  "foldIndent": false
+  "foldIndent": false,
+  "propertiesInDocument": "hidden",
+  "autoConvertHtml": true
 }

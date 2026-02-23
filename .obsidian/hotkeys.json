@@ -48,5 +48,7 @@
   "file-explorer:new-file": [],
   "workspace:new-tab": [],
   "app:open-help": [],
-  "workspace:edit-file-title": []
+  "workspace:edit-file-title": [],
+  "command-palette:open": [],
+  "app:open-settings": []
 }

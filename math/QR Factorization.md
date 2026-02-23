@@ -1,3 +1,8 @@
+---
+tags:
+---
+#NumericalLinearAlgebra 
+Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]]
 ## QR Factorization
 > [!theorem|] Classical Gram–Schmidt Process
 > Let $a_{1}, a_{2}, ..., a_{k} \in \mathbb{R}^{n}$. If  $a_{1}, a_{2}, ..., a_{k}$ are independent, we can construct an orthonormal set $v_{1}, v_{2}, ..., v_{k}$, where 
@@ -73,7 +78,7 @@
 > [!theorem|]
 > Operation count for [[#^c68556]] is $\sum_{j=1}^{k}(4n-1)(j-1)\sim2nk^{2}$.
 
-> [!theorem|] QR factorization using Householder reflection operator
+> [!theorem|] QR factorization using Householder reflection matrix
 > Let $A^{(0)} = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n \times k}$. For the $i$-th step, take the tail vector $a_i := A_{i:n,\,i}^{(i-1)}\in\mathbb{R}^{n-i+1}$. Define $e_1=(1,0,\dots,0)^\top\in\mathbb{R}^{n-i+1}$ and set $b := -\mathrm{sign}((a_i)_1)\,\|a_i\|\,e_1$. Let $v := \dfrac{a_i-b}{\|a_i-b\|}$ and define $H_{i} := \begin{bmatrix} I_{i-1} & 0 \\ 0 & \hat H_{i} \end{bmatrix}$ where $\hat H_{i} = I - 2vv^{\top}$. Update $A^{(i)}=H_{i}A^{(i-1)}$. $Q = H_1 H_2\cdots H_k$ and $R=A^{(k)}$. 
 
 ^857b04

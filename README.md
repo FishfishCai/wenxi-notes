@@ -1,5 +1,4 @@
 # Plugins
-- AttachFlow: better PDF and image notes reference.
 - Better Link Clicker: change click-to-open into Ctrl+click-to-open.
 - BRAT: support install plugins from GitHub and beta versions.
 - Editor Width Slider: adjust editor line width interactively with a slider.
@@ -9,11 +8,9 @@
 - LaTeX-like Theorem & Equation Referencer: provide theorem-style callouts.
 - Live Background: dynamic wallpaper.
 - MathLinks: dependency of LaTeX-like Theorem & Equation Referencer.
-- PDF++: enhance PDF reading and annotation.
 - Quick Preview: dependency of LaTeX-like Theorem & Equation Referencer.
 - Quiet Outline: show a clean, low-noise outline panel.
 - Style Settings: expose theme and CSS options in a settings panel for controlled UI customization.
-- TikZJax: support TikZ diagrams.
 
 # Latex Suite
 ```
@@ -41,20 +38,17 @@
 	{trigger: "remark", replacement: "> [!remark|]$0\n$1", options: "t"},
 	{trigger: "example", replacement: "> [!example|]$0\n$1", options: "t"},
 
-    // tikz
-    	{trigger: "tikz", replacement: "```tikz\n\\usepackage{tikz-cd}\n\\begin{document}\n\\begin{tikzcd}\n$0\n\\end{tikzcd}\n\\end{document}\n``` ", options: "t"},
-
     // text
 	{trigger: "text", replacement: "\\text{$0}$1", options: "mA"},
 
     // style
  	{trigger: "bf", replacement: "\\mathbf{$0}", options: "m"},
 	{trigger: "rm", replacement: "\\mathrm{$0}", options: "m"},
-    	{trigger: "bb", replacement: "\\mathbb{$0}", options: "m"},
+    {trigger: "bb", replacement: "\\mathbb{$0}", options: "m"},
 
     // accents
 	{trigger: "hat", replacement: "\\hat{$0}", options: "m"},
-    	{trigger: "bar", replacement: "\\bar{$0}", options: "m"},
+    {trigger: "bar", replacement: "\\bar{$0}", options: "m"},
 	{trigger: "dot", replacement: "\\dot{$0}", options: "m"},
 	{trigger: "ddot", replacement: "\\ddot{$0}", options: "m"},
 	{trigger: "tilde", replacement: "\\tilde{$0}", options: "m"},
@@ -69,7 +63,7 @@
 
     // script
 	{trigger: "_", replacement: "_{$0}", options: "mA"},
-    	{trigger: "^", replacement: "^{$0}", options: "mA"},
+    {trigger: "^", replacement: "^{$0}", options: "mA"},
 
     // brackets
 	{trigger: "mod", replacement: "|$0|$1", options: "mA"},
@@ -88,71 +82,73 @@
 
     // arith
 	{trigger: "sq", replacement: "\\sqrt{$0}", options: "mA"},
-    	{trigger: "cdot", replacement: "\\cdot", options: "mA"},
+    {trigger: "cdot", replacement: "\\cdot", options: "mA"},
 	{trigger: "xx", replacement: "\\times", options: "mA"},
 	{trigger: "sum", replacement: "\\sum", options: "mA"},
 	{trigger: "prod", replacement: "\\prod", options: "mA"},
-    	{trigger: "+-", replacement: "\\pm", options: "mA"},
+    {trigger: "+-", replacement: "\\pm", options: "mA"},
 	{trigger: "-+", replacement: "\\mp", options: "mA"},
 
     // relation
 	{trigger: "===", replacement: "\\equiv", options: "mA"},
-    	{trigger: "!=", replacement: "\\neq", options: "mA"},
+    {trigger: "!=", replacement: "\\neq", options: "mA"},
 	{trigger: ">=", replacement: "\\geq", options: "mA"},
 	{trigger: "<=", replacement: "\\leqslant", options: "mA"},
 	{trigger: ">>", replacement: "\\gg", options: "mA"},
 	{trigger: "<<", replacement: "\\ll", options: "mA"},
 	{trigger: "sim", replacement: "\\sim", options: "mA"},
-    	{trigger: "prop", replacement: "\\propto", options: "mA"},
+    {trigger: "prop", replacement: "\\propto", options: "mA"},
 	{trigger: "perp", replacement: "\\perp", options: "mA"},
-    	{trigger: "para", replacement: "\\parallel", options: "mA"},
+    {trigger: "para", replacement: "\\parallel", options: "mA"},
 
     // sets
 	{trigger: "eset", replacement: "\\emptyset", options: "mA"},
-    	{trigger: "in", replacement: "\\in", options: "m"},
+    {trigger: "in", replacement: "\\in", options: "m"},
 	{trigger: "and", replacement: "\\cap", options: "mA"},
 	{trigger: "or", replacement: "\\cup", options: "m"},
-    	{trigger: "subset", replacement: "\\subset", options: "mA"},
-    	{trigger: "supset", replacement: "\\supset", options: "mA"},
-    	{trigger: "sub=", replacement: "\\subseteq", options: "mA"},
-    	{trigger: "sup=", replacement: "\\supseteq", options: "mA"},
+	{trigger: "subset", replacement: "\\subset", options: "mA"},
+	{trigger: "supset", replacement: "\\supset", options: "mA"},
+	{trigger: "sub=", replacement: "\\subseteq", options: "mA"},
+	{trigger: "sup=", replacement: "\\supseteq", options: "mA"},
 
     // logic
 	{trigger: "exists", replacement: "\\exists", options: "mA"},
 	{trigger: "forall", replacement: "\\forall", options: "mA"},
 
     // arrows
-    	{trigger: "<->", replacement: "\\leftrightarrow ", options: "mA"},
+    {trigger: "<->", replacement: "\\leftrightarrow ", options: "mA"},
 	{trigger: "->", replacement: "\\to", options: "mA"},
 	{trigger: "<-", replacement: "\\leftarrow", options: "mA"},
-    	{trigger: "=>", replacement: "\\implies", options: "mA"},
+    {trigger: "=>", replacement: "\\implies", options: "mA"},
 	{trigger: "=<", replacement: "\\impliedby", options: "mA"},
 
     // analysis
-    	{trigger: "...", replacement: "\\cdots ", options: "mA"},
-    	{trigger: "infty", replacement: "\\infty", options: "mA"},
-    	{trigger: "lim", replacement: "\\lim", options: "mA"},
+	{trigger: "...", replacement: "\\cdots ", options: "mA"},
+	{trigger: "infty", replacement: "\\infty", options: "mA"},
+	{trigger: "lim", replacement: "\\lim", options: "mA"},
 
     // calculus
 	{trigger: "nabla", replacement: "\\nabla", options: "mA"},
 	{trigger: "partial", replacement: "\\partial", options: "mA"},
-    	{trigger: "par", replacement: "\\frac{ \\partial $0 }{ \\partial $1 } $2", options: "m"},
-    	{trigger: "der", replacement: "\\frac{d $0}{d $1} $2", options: "m"},
+	{trigger: "par", replacement: "\\frac{ \\partial $0 }{ \\partial $1 } $2", options: "m"},
+	{trigger: "der", replacement: "\\frac{d $0}{d $1} $2", options: "m"},
 	{trigger: "int", replacement: "\\int_{$0}^{$1} $2", options: "m"},
 
     // linear
 	{trigger: "ip", replacement: "\\langle $0 \\rangle", options: "m"},
 	{trigger: "invs", replacement: "^{-1}", options: "m"},
-    	{trigger: "tran", replacement: "^{\\top}", options: "m"},
-    	{trigger: "tr", replacement: "\\mathrm{Tr}", options: "m"},
+	{trigger: "tran", replacement: "^{\\top}", options: "m"},
+	{trigger: "tr", replacement: "\\mathrm{Tr}", options: "m"},
     {trigger: "det", replacement: "\\det", options: "mA"},
 	{trigger: "ker", replacement: "\\ker", options: "mA"},
-    	{trigger: "coker", replacement: "\\mathop{\\mathrm{coker}}", options: "mA"},
+    {trigger: "coker", replacement: "\\mathop{\\mathrm{coker}}", options: "mA"},
     {trigger: "span", replacement: "\\text{span}($0)", options: "mA"},
+    {trigger: "range", replacement: "\\mathrm{range}($0)", options: "m"},
+    {trigger: "null", replacement: "\\mathrm{null}($0)", options: "m"},
 
     // complex
-    	{trigger: "conj", replacement: "^{*}", options: "m"},
-    	{trigger: "re", replacement: "\\mathrm{Re}", options: "mA"},
+	{trigger: "conj", replacement: "^{*}", options: "m"},
+	{trigger: "re", replacement: "\\mathrm{Re}", options: "mA"},
 	{trigger: "im", replacement: "\\mathrm{Im}", options: "m"},
 
     // number
@@ -160,11 +156,12 @@
 	{trigger: "RR", replacement: "\\mathbb{R}", options: "mA"},
 	{trigger: "ZZ", replacement: "\\mathbb{Z}", options: "mA"},
 	{trigger: "NN", replacement: "\\mathbb{N}", options: "mA"},
+	{trigger: "FF", replacement: "\\mathbb{F}", options: "mA"},
 
     // trig
-    	{trigger: /([^\\])(arcsin|sin|arccos|cos|arctan|tan|csc|sec|cot)/, replacement: "[[0]]\\[[1]]", options: "rmA"},
-    	{trigger: /\\(arcsin|sin|arccos|cos|arctan|tan|csc|sec|cot)([A-Za-gi-z])/, replacement: "\\[[0]] [[1]]", options: "rmA"},
-    	{trigger: /\\(sinh|cosh|tanh|coth)([A-Za-z])/, replacement: "\\[[0]] [[1]]", options: "rmA"},
+	{trigger: /([^\\])(arcsin|sin|arccos|cos|arctan|tan|csc|sec|cot)/, replacement: "[[0]]\\[[1]]", options: "rmA"},
+	{trigger: /\\(arcsin|sin|arccos|cos|arctan|tan|csc|sec|cot)([A-Za-gi-z])/, replacement: "\\[[0]] [[1]]", options: "rmA"},
+	{trigger: /\\(sinh|cosh|tanh|coth)([A-Za-z])/, replacement: "\\[[0]] [[1]]", options: "rmA"},
 
     // greek
     {trigger: "ep", replacement: "\\varepsilon", options: "mA"},

@@ -1,3 +1,5 @@
+#LinearAlgebra 
+Prerequisite knowledge: [[Structure]], [[Real Vector]]
 ## Complex Vector
 > [!definition|] Inner Product in $\mathbb{C}^{n}$
 > Let $a,b\in\mathbb{C}^n$. The inner product  in $\mathbb{C}^{n}$ is $\langle a, b \rangle := b^{*}a$.
