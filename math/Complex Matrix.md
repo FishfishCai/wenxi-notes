@@ -2,7 +2,7 @@
 Prerequisite knowledge: [[Complex Vector]], [[Real Matrix]]
 ## Unitary Matrix
 > [!definition|] Unitary Matrix
-> Let $Q\in \mathbb{C}^{n}$. Q is an unitary matrix if columns of $Q$ are orthonormal.
+> Let $Q\in \mathbb{C}^{n,n}$. Q is an unitary matrix if columns of $Q$ are orthonormal.
 
 > [!remark|]
 > The eigenvectors of an orthogonal matrix form an unitary matrix.

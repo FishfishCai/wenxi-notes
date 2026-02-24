@@ -2,7 +2,7 @@
 tags:
 ---
 #NumericalLinearAlgebra 
-Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]]
+Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]], [[Stability]]
 ## QR Factorization
 > [!theorem|] Classical Gram–Schmidt Process
 > Let $a_{1}, a_{2}, ..., a_{k} \in \mathbb{R}^{n}$. If  $a_{1}, a_{2}, ..., a_{k}$ are independent, we can construct an orthonormal set $v_{1}, v_{2}, ..., v_{k}$, where 
@@ -17,7 +17,7 @@ Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]]
 > $$
 
 > [!theorem|] QR Factorization
-> Let $A = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n \times k}$, where $a_i$ denotes the $i$-th column of $A$. If $v_1, v_2, \dots, v_k$ is the orthonormal set constructed from $a_{i}$, via the classical Gram–Schmidt process. We have
+> Let $A = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n \times k}$, where $a_i$ denotes the $i$-th column of $A$. If $v_1, v_2, \dots, v_k$ is the orthonormal set constructed from $a_{i}$ via the classical Gram–Schmidt process. We have
 > $$
 > \begin{aligned}
 > a_1 &= \|a_1\|\, v_1,\\
@@ -76,12 +76,23 @@ Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]]
 ^c68556
 
 > [!theorem|]
-> Operation count for [[#^c68556]] is $\sum_{j=1}^{k}(4n-1)(j-1)\sim2nk^{2}$.
+> The operation count for [[#^c68556]] is $\sum_{j=1}^{k}(4n-1)(j-1)\sim2nk^{2}$.
 
-> [!theorem|] QR factorization using Householder reflection matrix
-> Let $A^{(0)} = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n \times k}$. For the $i$-th step, take the tail vector $a_i := A_{i:n,\,i}^{(i-1)}\in\mathbb{R}^{n-i+1}$. Define $e_1=(1,0,\dots,0)^\top\in\mathbb{R}^{n-i+1}$ and set $b := -\mathrm{sign}((a_i)_1)\,\|a_i\|\,e_1$. Let $v := \dfrac{a_i-b}{\|a_i-b\|}$ and define $H_{i} := \begin{bmatrix} I_{i-1} & 0 \\ 0 & \hat H_{i} \end{bmatrix}$ where $\hat H_{i} = I - 2vv^{\top}$. Update $A^{(i)}=H_{i}A^{(i-1)}$. $Q = H_1 H_2\cdots H_k$ and $R=A^{(k)}$. 
+>[!theorem|] QR factorization using Householder reflection matrix
+> Let $A_{0}=[a_1,a_2,\cdots,a_k]\in\mathbb{R}^{n,k}$. The matrix $R:=A_{k}$ is upper triangular, $Q:=H_1H_2\cdots H_k$ is orthogonal and $A_{0}=QR$ if, at the $i$-th step, we compute in the following order:
+> $$
+> \begin{align*}
+> \hat{a}_{i}&={A_{i}}_{i:n,i}\in\mathbb{R}^{n-i+1}\\
+> e_i&=(1,0,\dots,0)^\top\in\mathbb{R}^{n-i+1}\\
+> b_{i}&=-\mathrm{sign}((a_i)_1)|a_i|e_i\in\mathbb{R}^{n-i+1}\\
+> v_{i}&=\frac{a_i-b_{i}}{|a_i-b_{i}|}\in\mathbb{R}^{n-i+1}\\
+> \hat H_i&=I-2v_{i}v_{i}^\top\in\mathbb{R}^{n-i+1,n-i+1}\\
+> H_{i} &= \begin{bmatrix} I_{i-1} & 0 \\ 0 & \hat H_{i} \end{bmatrix}\in\mathbb{R}^{n,n}\\
+> A_{i}&=H_iA_{i-1}
+> \end{align*}
+> $$
 
 ^857b04
 
 > [!theorem|]
-> Operation count for [[#^857b04]] is $\sum_{j=1}^{k}4(n-j-1)(k-j+1)\sim 2nk^{2}-\frac{2}{3}k^{3}$.
+> The operation count for [[#^857b04]] is $\sum_{j=1}^{k}4(n-j-1)(k-j+1)\sim 2nk^{2}-\frac{2}{3}k^{3}$.

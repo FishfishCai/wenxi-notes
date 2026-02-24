@@ -8,7 +8,7 @@ Prerequisite knowledge: [[Structure]], [[Real Vector]]
 > Let $a,b\in\mathbb{C}^n$.  The norm in $\mathbb{C}^{n}$ is $\|a\| := \sqrt{\langle a,a \rangle} = \sqrt{a^{*}a}$.
  
 > [!lemma|] 
-> Let $a,b \in \mathbb{C}^n$. If $\langle a, b \rangle$, then  $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$.
+> Let $a,b \in \mathbb{C}^n$. If $\langle a, b \rangle$, $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$.
 
 ^6241d2
 

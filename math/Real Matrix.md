@@ -10,12 +10,12 @@ Prerequisite knowledge: [[Real Vector]]
 
 ## Orthogonal Matrix
 > [!definition|] Orthogonal Matrix
-> Let $Q \in \mathbb{R}^{n,n}$. Q is an orthonormal matrix if columns of $Q$ are orthonormal.
+> Let $Q \in \mathbb{R}^{n,n}$. Q is an orthogonal matrix if columns of $Q$ are orthonormal.
 
 ^39be3e
 
 > [!Lemma|]
-> $Q$ is an orthogonal matrix iff $Q^{\top}Q=I$.
+> Let $Q\in \mathbb{R}^{n,n}$. $Q$ is an orthogonal matrix iff $Q^{\top}Q=I$.
 
 ^03854c
 
@@ -25,12 +25,12 @@ Prerequisite knowledge: [[Real Vector]]
 ^727a78
 
 > [!lemma|] 
-> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, then $\|Qx-Qy\|=\|x-y\|$ for all $x, y\in \mathbb{R}^{n}$.
+> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, $\|Qx-Qy\|=\|x-y\|$ for all $x, y\in \mathbb{R}^{n}$.
 
 ^4c69c4
 
 > [!lemma|] 
-> Let $f:\mathbb{R}^{n}\to \mathbb{R}^{n}$. If $f(0)=0$ and $\|f(x)-f(y)\|=\|x-y\|$, then there exists an orthogonal matrix $Q$ s.t. $f(x)=Qx$.
+> Let $f:\mathbb{R}^{n}\to \mathbb{R}^{n}$. If $f(0)=0$ and $\|f(x)-f(y)\|=\|x-y\|$, there exists an orthogonal matrix $Q$ s.t. $f(x)=Qx$.
 
 `\begin{proof}`
 Let $e_{1}, e_{2}, \cdots , e_{n}$ be the standard basis of $\mathbb{R}^{n}$. 
@@ -45,7 +45,7 @@ This emplies that $f(e_{1}), f(e_{2}), \cdots , f(e_{n})$ form an orthonormal ba
 `\end{proof}`
 
 > [!lemma|] 
-> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix and $\lambda$ is an eigenvalue of $Q$, then $|\lambda| = 1$.
+> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix and $\lambda$ is an eigenvalue of $Q$, $|\lambda| = 1$.
 
 ^a712cb
 
@@ -55,7 +55,7 @@ This emplies that $f(e_{1}), f(e_{2}), \cdots , f(e_{n})$ form an orthonormal ba
 ^f47e7a
 
 > [!Lemma|]
-> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, $\lambda_{i}$ and $\lambda_{j}$ are two different eigenvalue of $Q$ and $v, w \in \mathbb{C}^{n}$ are two eigenvectors s.t. $Qv = \lambda_{i}v$ and $Qw=\lambda_{j}w$, then $v^{*}w=w^{*}v=0$.
+> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, $\lambda_{i}$ and $\lambda_{j}$ are two different eigenvalue of $Q$ and $v, w \in \mathbb{C}^{n}$ are two eigenvectors corresponding to $\lambda_{i}$ and $\lambda_{j}$, $v^{*}w=w^{*}v=0$.
 
 ^b5daf5
 
@@ -64,15 +64,15 @@ $\lambda_{i}w^{*}v=w^{*}\lambda_{i}v=w^{*}Qv=(Q^{\top}w)^{*}v=(\lambda_{j}^{-1}w
 `\end{proof}`
 
 > [!lemma|] 
-> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, then $\det(Q)=\pm1$.
+> Let $Q\in \mathbb{R}^{n,n}$. If $Q$ is an orthogonal matrix, $\det(Q)=\pm1$.
 
 ^f982d8
 
 > [!remark|]
-> In [[#^f982d8]], if $\det(Q)=1$, then the columns of $Q$ have +ve orientation. And if $\det(Q)=-1$, then the columns of $Q$ have -ve orientation.
+> For [[#^f982d8]], if $\det(Q)=1$,  the columns of $Q$ have +ve orientation. And if $\det(Q)=-1$, the columns of $Q$ have -ve orientation.
 
 > [!Remark|] 
-> Let  $A\in \mathbb{R}^{n,n}$, $\det(A)$ can be interp as the signed volume of the parallelepiped formed by the columns of $A$.
+> Let  $A\in \mathbb{R}^{n,n}$. $\det(A)$ can be interperated as the signed volume of the parallelepiped formed by the columns of $A$.
 
 `\begin{proof}`
 Following [[QR Factorization#^4b5424]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of the $Q$.
@@ -80,16 +80,16 @@ Following [[QR Factorization#^4b5424]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}
 
 ## Spectral Theorem
 > [!lemma|] 
-> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, then A has $n$ real eigenvalues.
+> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, A has $n$ real eigenvalues.
 
 ^909e8b
 
 `\begin{proof}`
-Let $R(x)=\frac{x^{\top}Ax}{x^{\top}x}$  and $S^{n-1}=\{x\in \mathbb{R}^{n}:\|x\|=1\}$. Since $S^{n-1}$ is a compact set, there exists $x^{*}$ such that $x^{*\top}Ax^{*}=\underset{\|x\|=1}{\max}x^{\top}Ax$. Let $L(x,\lambda)=x^{\top}Ax-\lambda(x^{\top}x-1)$. By the method of Lagrange multipliers, $\nabla_{x}L(x^{*},\lambda)=0$, which implies $Ax^{*}=\lambda x^{*}$. Then we consider the subspace orthogonal to $x^*$ and iterate the argument.
+Let $R(x)=\frac{x^{\top}Ax}{x^{\top}x}$  and $S^{n-1}=\{x\in \mathbb{R}^{n}:\|x\|=1\}$. Since $S^{n-1}$ is a compact set, there exists $x^{*}$ such that $x^{*\top}Ax^{*}=\underset{\|x\|=1}{\max}x^{\top}Ax$. Let $L(x,\lambda)=x^{\top}Ax-\lambda(x^{\top}x-1)$. By the method of Lagrange multipliers, $\nabla_{x}L(x^{*},\lambda)=0$, implying that $Ax^{*}=\lambda x^{*}$. Then we consider the subspace orthogonal to $x^*$ and iterate the argument.
 `\end{proof}`
 
 > [!lemma|] 
-> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, $\lambda_{i}$ and $\lambda_{j}$ are two eigenvalue of $A$ and $v,\,w\in \mathbb{R}^{n}$ are two different eigenvectors s.t. $Av = \lambda_{i}v$ and $Aw=\lambda_{j}w$, then $v^{\top}w=w^{\top}v=0$.
+> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, $\lambda_{i}$ and $\lambda_{j}$ are two different eigenvalue of $A$ and $v,\,w\in \mathbb{R}^{n}$ are two eigenvectors corresponding to $\lambda_{i}$ and $\lambda_{j}$, $v^{\top}w=w^{\top}v=0$.
 
 ^81eb66
 
@@ -98,7 +98,7 @@ $\lambda_{i}w^{\top}v=w^{\top}\lambda_{i}v=w^{\top}Av=(A^{\top}w)^{\top}v=(\lamb
 `\end{proof}`
 
 > [!theorem|] Spectral Theorem
-> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, then $A$ admits an orthonormal basis consisting of eigenvectors.
+> Let $A \in \mathbb{R}^{n,n}$. If $A = A^{\top}$, $A$ admits an orthonormal basis consisting of eigenvectors.
 
 `\begin{proof}`
 This follows from [[#^909e8b]] and [[#^81eb66]] .
