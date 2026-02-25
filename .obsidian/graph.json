@@ -34,6 +34,13 @@
         "a": 1,
         "rgb": 6084188
       }
+    },
+    {
+      "query": "tag:#Optimization  ",
+      "color": {
+        "a": 1,
+        "rgb": 6084269
+      }
     }
   ],
   "collapse-display": true,
@@ -46,6 +53,6 @@
   "repelStrength": 20,
   "linkStrength": 1,
   "linkDistance": 30,
-  "scale": 0.4691500282517096,
+  "scale": 1.0014338896636215,
   "close": true
 }

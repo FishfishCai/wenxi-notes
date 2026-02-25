@@ -1,5 +1,5 @@
 #Application
-Prerequisite knowledge: [[Real Vector]]
+Prerequisite knowledge: [[Real Vector Space]]
 ## Percepton
 > [!theorem|] Novikov's Analysis
 > Assume that the training data are linearly separable. That is, there exists a vector $w_N$ with $\|w_N\| = 1$ s.t. for all training samples $(x_i, y_i)$, $y_i \, w_N^\top x_i \ge \varepsilon > 0.$ Assume further that the input vectors are bounded, i.e., $\|x_i\| \le R \text{ for all } i.$ Then the perceptron algorithm makes only finitely many classification mistakes.

@@ -30,7 +30,7 @@ Prerequisite knowledge: [[Floating Point Arithmetic]], [[Condition Number]]
 > [!remark|]
 > For [[#^babbb2]] and [[#^7e80c6]], in finite dimensional space, since all kinds of norms are equivalent, they are regardless of the norm.
 
-> [!lemma|] 
+> [!proposition|]
 > $\circledast \in\{+,-,\times,\div\}$ is backward stable.
 
 > [!Theorem|]

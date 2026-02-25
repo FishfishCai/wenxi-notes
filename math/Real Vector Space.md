@@ -1,6 +1,6 @@
 #LinearAlgebra 
 Prerequisite knowledge: [[Structure]]
-## Real Vector
+## Real Vector Space
 > [!definition|] Inner Product in $\mathbb{R}^{n}$
 > Let $a,b \in \mathbb{R}^n$. The inner product in $\mathbb{R}^{n}$ is $\langle a, b \rangle := a^\top b = \sum_{i=1}^n a_i b_i$.
 
@@ -10,15 +10,15 @@ Prerequisite knowledge: [[Structure]]
 > [!definition|] Outer Product in  $\mathbb{R}^{n}$
 > Let $a,b \in \mathbb{R}^n$. The outer product  in  $\mathbb{R}^{n}$ is $ab^\top$.
 
-> [!lemma|]
+> [!proposition|]
 > Let $a,b\in\mathbb{R}^n$. $\|a+b\|^2=\|a\|^2+\|b\|^2$ iff $\langle a, b \rangle =0$.
 
-> [!lemma|]
+> [!proposition|]
 >  Let $a,b\in\mathbb{R}^n$. If $\|a\|=\|b\|$,  $\langle a+b, a-b\rangle = 0$.
 
 ^9fece5
 
-> [!lemma|]
+> [!proposition|]
 > Let $a,b\in\mathbb{R}^n$. If $a\neq0$, then there exist $\beta\in\mathbb{R}$ and $\delta\in\mathbb{R}^n$ such that $b=\beta a+\delta$ and $a^\top\delta=0$, where $\beta=\frac{a^\top b}{a^\top a}$ and $\delta=b-\beta a$.
 
 > [!thm|] Cauchy-Schwarz Inequality

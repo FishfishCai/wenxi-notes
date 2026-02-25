@@ -1,5 +1,5 @@
 #NumericalLinearAlgebra 
-Prerequisite knowledge: [[Real Vector]], [[Real Matrix]]
+Prerequisite knowledge: [[Real Vector Space]], [[Real Matrix]]
 ## Projection Matrix
 > [!definition|] Projection Matrix of Vector
 > Let $v \in \mathbb{R}^n$. $\|v\| = 1$. The projection matrix of vector $v$ is $vv^{\top}$, whose rank is $1$. For any $x \in \mathbb{R}^n$, the component of $x$ along $v$ is given by $vv^{\top} x$.
@@ -7,7 +7,7 @@ Prerequisite knowledge: [[Real Vector]], [[Real Matrix]]
 > [!definition|] Orthogonal Projection Matrix of Vector
 > Let $v \in \mathbb{R}^n$. $\|v\| = 1$. The orthogonal projection matrix onto the subspace orthogonal to $v$ is $I - vv^{\top}$, whose rank is $n - 1$.
 
-> [!lemma|]
+> [!proposition|]
 > Let $v_1, v_2, \dots, v_k \in \mathbb{R}^n$. If ${v_1, v_2, \dots, v_k}$ is an orthonormal set, the matrix $P = v_1 v_1^{\top} + \cdots + v_k v_k^{\top}$ is the projection matrix onto the subspace $\text{span}(v_{1}, v_{2}, \cdots , v_{k})$.
 
 ^c331b4

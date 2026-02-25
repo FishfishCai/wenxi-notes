@@ -23,11 +23,20 @@ Prerequisite knowledge: [[Structure]], [[Matrix Operator]]
 > [!theorem|]
 > Let $A \in \mathbb{R}^{n,n}$ and $x,b \in \mathbb{R}^m$. Assume $A$ is nonsingular. Given $A$, the  condition number of computing $x$ with $Ax=b$ is $\kappa(b)=\|A^{-1}\|\frac{\|b\|}{\|x\|}\le \|A\|\|A^{-1}\|$. If $\|\cdot\|=\|\cdot\|_2$, the equality holds if $b$ is a multiple of a left singular vector of $A$ corresponding to the maximal singular value $\sigma_1$.
 
+> [!theorem|]
+> Let $A \in \mathbb{R}^{n,n}$ and $x,b \in \mathbb{R}^m$. Assume $A$ is nonsingular. Given $b$, the  condition number of computing $x$ with $x=A^{-1}b$ is $\kappa(A)=\|A\|\|A^{-1}\|$. 
+
 > [!definition|] Condition Number of Matrix
 > Let $A\in \mathbb{R}^{n,k}$. $A$ is full-rank. The condition number of $A$ is $\kappa(A):=\|A\|\|A^{+}\|$.
 
-> [!remark|]
-> If $\kappa(A)$ is small, $A$ is said to be well-conditioned. If $\kappa(A)$ is large, $A$ is said to be ill-conditioned. If $\|\cdot\| = \|\cdot\|_{2}$, $\kappa(A)=\frac{\sigma_{1}}{\sigma_{n}}$, where $\sigma_{1}$ is the maximal eigenvalue of $A$ and $\sigma_{n}$ is the minimal eigenvalue of $A$.
+> [!proposition|]
+> Let $A\in \mathbb{R}^{n,n}$ and $\|\cdot\| = \|\cdot\|_{2}$. $\kappa(A)=\frac{\sigma_{1}}{\sigma_{n}}$, where $\sigma_{1}$ is the maximal eigenvalue of $A$ and $\sigma_{n}$ is the minimal eigenvalue of $A$. 
 
-> [!theorem|]
-> Let $A \in \mathbb{R}^{n,n}$ and $x,b \in \mathbb{R}^m$. Assume $A$ is nonsingular. Given $b$, the  condition number of computing $x$ with $x=A^{-1}b$ is $\kappa(A)=\|A\|\|A^{-1}\|$. 
+> [!proposition|]
+> Let $A\in \mathbb{R}^{n,n}$ and $\|\cdot\| = \|\cdot\|_{2}$. $\kappa(A) = 1$ iff $A$ is orthogonal.
+
+> [!proposition|]
+> Let $A\in \mathbb{R}^{n,n}$ and $\|\cdot\| = \|\cdot\|_{2}$. If each entry of $A$ is i.i.d. normal with $\mu=0$ and $\sigma^{2}=1$, $\log\kappa(A)\sim \log n$.
+
+> [!Theorem]
+> Let $T_n \in \mathbb{R}^{n, n}$. $T_n = \begin{pmatrix} 2 & -1 & 0 & \dots & 0 \\ -1 & 2 & -1 & \dots & 0 \\ 0 & -1 & 2 & \dots & 0 \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & 0 & \dots & 2 \end{pmatrix}$, $h = \frac{1}{n+1}$, $b \in \mathbb{R}^{n}$, and $k \in \{1, \dots, n\}$. The eigenvalues of $T_n$ are $\lambda_k = 4 \sin^2(\frac{k \pi h}{2})$, and the condition number of computing $x$ with $T_n x = b$ is $\kappa(x)\sim \frac{4}{\pi^2 h^2}$.

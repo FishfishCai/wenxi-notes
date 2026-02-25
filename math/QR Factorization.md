@@ -96,3 +96,23 @@ Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]], [
 
 > [!theorem|]
 > The operation count for [[#^857b04]] is $\sum_{j=1}^{k}4(n-j-1)(k-j+1)\sim 2nk^{2}-\frac{2}{3}k^{3}$.
+
+> [!theorem|]
+> [[#^857b04]] is backward stable.
+
+^cd77ab
+
+> [!theorem|] Solving $Ax=b$ via QR Factorization
+> The solution $x$ of $Ax=b$ can be solved in the following way:
+> - Do QR factorization $A=QR$.
+> - Compute $y=Q^{\top}b$.
+> - Compute $x=R^{-1}y$.
+
+^bda798
+
+> [!theorem|]
+> [[#^bda798]] is backward stable.
+
+`\begin{proof}`
+$b=(\tilde Q+\delta Q)(\tilde R+\delta R)\tilde x=\bigl[\tilde Q\tilde R+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ By [[#^cd77ab]], $b=\bigl[A+\delta A+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ Since $\tilde Q\tilde R=A+\delta A$ and $\tilde Q$ is unitary, we have $\frac{\|\tilde R\|}{\|A\|}\le \|\tilde Q^{*}\|\frac{\|A+\delta A\|}{\|A\|}=O(1)$ as $\epsilon_{\text{machine}}\to 0$. This gives us $\frac{\|(\delta Q)\tilde R\|}{\|A\|}\le \|\delta Q\|\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$ and $\frac{\|\tilde Q(\delta R)\|}{\|A\|}\le \|\tilde Q\|\frac{\|\delta R\|}{\|\tilde R\|}\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$. Finally, $\frac{\|(\delta Q)(\delta R)\|}{\|A\|}\le \|\delta Q\|\frac{\|\delta R\|}{\|A\|}=O(\epsilon_{\text{machine}}^{2}).$ The total perturbation $\Delta A$ thus satisfies $\frac{\|\Delta A\|}{\|A\|}\le \frac{\|\delta A\|}{\|A\|}+\frac{\|(\delta Q)\tilde R\|}{\|A\|}+\frac{\|\tilde Q(\delta R)\|}{\|A\|}+\frac{\|(\delta Q)(\delta R)\|}{\|A\|}=O(\epsilon_{\text{machine}})$.
+`\end{proof}`
