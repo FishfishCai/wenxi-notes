@@ -4,8 +4,8 @@ Prerequisite knowledge: [[Structure]]
 > [!definition|] Inner Product in $\mathbb{R}^{n}$
 > Let $a,b \in \mathbb{R}^n$. The inner product in $\mathbb{R}^{n}$ is $\langle a, b \rangle := a^\top b = \sum_{i=1}^n a_i b_i$.
 
-> [!definition|] Norm in  $\mathbb{R}^{n}$
-> Let $a,b \in \mathbb{R}^n$. The norm in  $\mathbb{R}^{n}$ is  $\|a\| := \sqrt{\langle a,a \rangle} = \sqrt{a^\top a}$.
+> [!definition|] $l_{p}$-norm in  $\mathbb{R}^{n}$
+> Let $a\in \mathbb{R}^n$. The $l_{p}$-norm in  $\mathbb{R}^{n}$ is  $\|a\|_{p}:=\left(\sum_{i=1}^{n}|a_{i}|^{p}\right)^{\frac{1}{p}}$ for $1\leqslant p < \infty$ and $\max_{1 \leqslant i\leqslant n}|a_{i}|$ for $p=\infty$. 
 
 > [!definition|] Outer Product in  $\mathbb{R}^{n}$
 > Let $a,b \in \mathbb{R}^n$. The outer product  in  $\mathbb{R}^{n}$ is $ab^\top$.

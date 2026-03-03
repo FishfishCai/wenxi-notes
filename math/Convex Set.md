@@ -4,4 +4,54 @@ Prerequisite knowledge: [[Real Vector Space]]
 > [!definition|] Convex
 > Let $M\subset \mathbb{R}^{n}$. $M$ is convex if for any $x,y\in M$, $[x,y]\subset M$.
 
+> [!proposition|]
+> Let $A\in \mathbb{R}^{n,k}$ and $b\in \mathbb{R}^{n}$. $n$ can be infinite. The set of solution $x$ of $Ax\leqslant b$ is convex.
+
+^654f9c
+
+> [!remark|]
+> If we replace some of  $\leqslant$ in [[#^654f9c]] with $<$, the statement still holds. 
+
+> [!definition|] Convex Combination
+> Let $y_{1},\cdots ,y_{k} \in \mathbb{R}^{n}$. The convex combinition of $y_{1},\cdots , y_{n}$ is $y=\sum_{i=1}^{k}\lambda_{i}y_{i}$, where  $\lambda_{1}, \cdots , \lambda_{k}>0$ and $\sum_{i=1}^{k}\lambda_{i}=1$.
+
+> [!proposition|]
+> Let $M \subset \mathbb{R}^{n}$. $M$ is convex iff every convex combinition of of vectors from $M$ again is a vector from $M$.
+
+> [!proposition|]
+> Let $\{M_{\alpha}\}_{\alpha}$ be a family of convex sets in $\mathbb{R}^{n}$. $M=\cap_{\alpha}M_{\alpha}$ is convex.
+
+> [!definition|] Convex Hull
+> Let $M\in \mathbb{R}^{n}$. $M\neq \emptyset$. $\text{Conv}(M)$ is the convex hull of $M$ if $M$ is the intersection of all convex sets containing $M$.
+
+> [!proposition|]
+> Let $M\in \mathbb{R}^{n}$. $M\neq \emptyset$. $\text{Conv}(M)=\{\text{all convex combinations of vectors from }M\}$.
+
+## Conic Set
+> [!definition|] Conic
+> Let $M \subset \mathbb{R}^{n}$. $M \neq \emptyset$. $M$ is conic if for any $x$ in $M$, the ray $Rx=\{tx:t\geq 0\} \subset M$.
+
+> [!definition|] Cone
+> Let $M\subset R^{n}$. Cone is a convex conic set.
+
+> [!proposition|] 
+> Let $M\subset \mathbb{R}^{n}$. $M\neq \emptyset$. $M$ is a cone iff $M$ is conic and for any $x,y\in M$, $x+y\in M$.
+
+> [!proposition|]
+> Let $A\in \mathbb{R}^{n,k}$ and $b\in \mathbb{R}^{n}$. $n$ can be infinite. The set of solution $x$ of $Ax\leqslant 0$ a cone.
+
+> [!definition|] Conic Combination
+> Let $y_{1},\cdots ,y_{k} \in \mathbb{R}^{n}$. The conic combinition of $y_{1},\cdots , y_{n}$ is $y=\sum_{i=1}^{k}\lambda_{i}y_{i}$, where  $\lambda_{1}, \cdots , \lambda_{k}>0$.
+
+> [!proposition|]
+> Let $M \subset \mathbb{R}^{n}$. $M$ is a cone iff $M\neq\emptyset$ and every conic combinition of of vectors from $M$ again is a vector from $M$.
+
+> [!proposition|]
+> Let $\{M_{\alpha}\}_{\alpha}$ be a family of cones in $\mathbb{R}^{n}$. $M=\cap_{\alpha}M_{\alpha}$ is a cone.
+
+> [!definition|] Conic Hull
+> Let $M\in \mathbb{R}^{n}$. $M\neq \emptyset$. $\text{Cone}(M)$ is the conic hull of $M$ if $M$ is the intersection of all cones containing $M$.
+
+> [!proposition|]
+> Let $M\in \mathbb{R}^{n}$. $M\neq \emptyset$. $\text{Cone}(M)=\{\text{all conic combinations of vectors from }M\}$.
 
