@@ -1,7 +1,7 @@
 # file not needed
 .obsidian/plugins/live-wallpaper/wallpapers/
-math/textbook
-_tem
+math/textbook/
+_tem/
 
 # macOS System
 .DS_Store

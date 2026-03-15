@@ -117,6 +117,9 @@
   },
   "active": "6899e10c83093a6e",
   "lastOpenFiles": [
+    "_tem/1.21.11.xlsx",
+    "1.21.11.xlsx",
+    "code/1.21.11.xlsx",
     "math/QR Factorization.md",
     "math/Computation.md",
     "math/Condition Number.md",
@@ -142,7 +145,6 @@
     "^b5daf5.md",
     "math/_prompt_math.md",
     "math/Real Vector Space.md",
-    "math/Complex Vector.md",
     "code/tool",
     "code/latex",
     "code/setting",
@@ -154,8 +156,6 @@
     "math/baby_Rudin.pdf",
     "baby_Rudin.pdf",
     "math/textbook/OPTIIILN2023Spring.pdf",
-    "math/textbook/NumericalOptimization.pdf",
-    "math/textbook/Numerical Linear Algebra.pdf",
     "未命名.canvas",
     "Untitled.canvas"
   ]
