@@ -8,7 +8,7 @@ Prerequisite knowledge: [[Floating Point Arithmetic]], [[Condition Number]]
 > Let $F_{X}$ and $F_{Y}$ be idealized floating point system of $X$ and $Y$, $f:X\to Y$, $\tilde f:F_{X}\to F_{Y}$, and $x\in F_{X}$. The relative error of $\tilde{f}$ at $x$ is $\frac{\|\tilde f(x)-f(x)\|}{\|f(x)\|}$.
 
 > [!definition|] $O(\epsilon_{\text{machine}})$
-> Let $\{F\}_{X}$ be the set of all idealized floating point system of $X$ and $\tilde{f}:\{F\}_{X}\times X\to F$. $\tilde{f}(F,x)=O(\epsilon_{\text{machine}})$ iff there exist $C>0$ and $\epsilon_0>0$ s.t. for all $F$ satisfying $\epsilon_{\text{machine}}<\epsilon_0$ and all $x\in F$, $\|\tilde{f}(F,x)\|\le C\epsilon_{\text{machine}}$.
+> Let $\mathcal{F}(X)$ be the set of all idealized floating point system of $X$, $\tilde{f}:\mathcal{F}(X)\times X\to X$, and $\tilde{f}(F,x)\in F$. $\tilde{f}=O(\epsilon_{\text{machine}})$ iff there exist $C>0$ and $\epsilon_0>0$ s.t. for all $F$ satisfying $\epsilon_{\text{machine}}<\epsilon_0$ and all $x\in F$, $\|\tilde{f}(F,x)\|\le C\epsilon_{\text{machine}}$.
 
 > [!definition|] Accuracy
 > Let $F_{X}$ and $F_{Y}$ be idealized floating point system of $X$ and $Y$, $f:X\to Y$, $\tilde f:F_{X}\to F_{Y}$. $\tilde f$ is accurate for $f$ if $\frac{\|\tilde f(x)-f(x)\|}{\|f(x)\|}=O(\epsilon_{\text{machine}})$.
@@ -31,7 +31,7 @@ Prerequisite knowledge: [[Floating Point Arithmetic]], [[Condition Number]]
 > For [[#^babbb2]] and [[#^7e80c6]], in finite dimensional space, since all kinds of norms are equivalent, they are regardless of the norm.
 
 > [!proposition|]
-> $\circledast \in\{+,-,\times,\div\}$ is backward stable.
+> $\circledast$ is backward stable.
 
 > [!Theorem|]
 > Let $F_X$ and $F_Y$ be idealized floating point systems of $X$ and $Y$, $f:X\to Y$, $\tilde f:F_X\to F_Y$ and $\kappa(x)$ be the condition number of $f$ at $x$. If $\tilde f$ is backward stable for $f$, $\frac{\|\tilde f(x)-f(x)\|}{\|f(x)\|}=O(\kappa(x)\epsilon_{\text{machine}})$.

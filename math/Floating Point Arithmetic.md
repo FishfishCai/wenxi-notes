@@ -13,7 +13,7 @@
 > Let $F$ be an idealized floating point system. Rounding map $\mathrm{fl}:\mathbb{R}\to F$ sends each $x\in\mathbb{R}$ to the closest element in $F$.
 
 > [!definition|] Floating Point Operation
-> Let $F$ be an idealized floating point system, $x,y\in F$, and $\circledast \in\{+,-,\times,\div\}$. $x\circledast y:=\mathrm{fl}(x*y)$.
+> Let $F$ be an idealized floating point system, $x,y\in F$, and $* \in\{+,-,\times,\div\}$. $x\circledast y:=\mathrm{fl}(x*y)$.
 
 > [!Theorem|] Fundamental Axiom of Floating Point Arithmetic
 > Let $F$ be an idealized floating point system and $x,y\in F$. There exists $\epsilon$ with $|\epsilon|\le \epsilon_{\text{machine}}$ s.t. $x\circledast y=(x*y)(1+\epsilon)$.

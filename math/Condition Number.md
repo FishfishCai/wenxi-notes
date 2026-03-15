@@ -17,6 +17,7 @@ Prerequisite knowledge: [[Structure]], [[Matrix Operator]]
 > [!remark|]
 > For [[#^887783]], if $f$ is differentiable, $\kappa = \frac{\|J(x)\|\|x\|}{\|f(x)\|}$.
 
+## Condition Number of Matrix
 > [!Theorem|]
 > Let $A \in \mathbb{R}^{n,n}$ and $x,b \in \mathbb{R}^m$. Assume $A$ is nonsingular. Given $A$, the  condition number of computing $b$ with $Ax=b$ is $\kappa(x)=\|A\|\frac{\|x\|}{\|b\|}\le \|A\|\|A^{-1}\|$. If $\|\cdot\|=\|\cdot\|_2$, the equality holds if $x$ is a multiple of a right singular vector of $A$ corresponding to the minimal singular value $\sigma_n$
 
@@ -37,6 +38,3 @@ Prerequisite knowledge: [[Structure]], [[Matrix Operator]]
 
 > [!proposition|]
 > Let $A\in \mathbb{R}^{n,n}$ and $\|\cdot\| = \|\cdot\|_{2}$. If each entry of $A$ is i.i.d. normal with $\mu=0$ and $\sigma^{2}=1$, $\log\kappa(A)\sim \log n$.
-
-> [!Theorem]
-> Let $T_n \in \mathbb{R}^{n, n}$. $T_n = \begin{pmatrix} 2 & -1 & 0 & \dots & 0 \\ -1 & 2 & -1 & \dots & 0 \\ 0 & -1 & 2 & \dots & 0 \\ \vdots & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & 0 & \dots & 2 \end{pmatrix}$, $h = \frac{1}{n+1}$, $b \in \mathbb{R}^{n}$, and $k \in \{1, \dots, n\}$. The eigenvalues of $T_n$ are $\lambda_k = 4 \sin^2(\frac{k \pi h}{2})$, and the condition number of computing $x$ with $T_n x = b$ is $\kappa(x)\sim \frac{4}{\pi^2 h^2}$.

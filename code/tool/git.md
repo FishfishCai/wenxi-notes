@@ -18,8 +18,9 @@ git push -u origin main
 ```
 #### 上传
 ```
+git rm -r --cached .
 git add .
-git commit -m "fix bugs"
+git commit -m "-"
 git push
 ```
 #### 拉取
@@ -30,6 +31,7 @@ git pull --rebase origin main
 
 # 和remote完全一致
 git reset --hard
+git pull --rebase
 ```
 #### 在服务器上连接github
 ``````

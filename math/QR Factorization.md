@@ -2,7 +2,7 @@
 tags:
 ---
 #NumericalLinearAlgebra 
-Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]], [[Stability]]
+Prerequisite knowledge: [[Computation]], [[Matrix]], [[Matrix Operator]], [[Stability]]
 ## QR Factorization
 > [!theorem|] Classical Gram–Schmidt Process
 > Let $a_{1}, a_{2}, ..., a_{k} \in \mathbb{R}^{n}$. If  $a_{1}, a_{2}, ..., a_{k}$ are independent, we can construct an orthonormal set $v_{1}, v_{2}, ..., v_{k}$, where 
@@ -101,18 +101,3 @@ Prerequisite knowledge: [[Computation]], [[Real Matrix]], [[Matrix Operator]], [
 > [[#^857b04]] is backward stable.
 
 ^cd77ab
-
-> [!theorem|] Solving $Ax=b$ via QR Factorization
-> The solution $x$ of $Ax=b$ can be solved in the following way:
-> - Do QR factorization $A=QR$.
-> - Compute $y=Q^{\top}b$.
-> - Compute $x=R^{-1}y$.
-
-^bda798
-
-> [!theorem|]
-> [[#^bda798]] is backward stable.
-
-`\begin{proof}`
-$b=(\tilde Q+\delta Q)(\tilde R+\delta R)\tilde x=\bigl[\tilde Q\tilde R+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ By [[#^cd77ab]], $b=\bigl[A+\delta A+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ Since $\tilde Q\tilde R=A+\delta A$ and $\tilde Q$ is unitary, we have $\frac{\|\tilde R\|}{\|A\|}\le \|\tilde Q^{*}\|\frac{\|A+\delta A\|}{\|A\|}=O(1)$ as $\epsilon_{\text{machine}}\to 0$. This gives us $\frac{\|(\delta Q)\tilde R\|}{\|A\|}\le \|\delta Q\|\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$ and $\frac{\|\tilde Q(\delta R)\|}{\|A\|}\le \|\tilde Q\|\frac{\|\delta R\|}{\|\tilde R\|}\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$. Finally, $\frac{\|(\delta Q)(\delta R)\|}{\|A\|}\le \|\delta Q\|\frac{\|\delta R\|}{\|A\|}=O(\epsilon_{\text{machine}}^{2}).$ The total perturbation $\Delta A$ thus satisfies $\frac{\|\Delta A\|}{\|A\|}\le \frac{\|\delta A\|}{\|A\|}+\frac{\|(\delta Q)\tilde R\|}{\|A\|}+\frac{\|\tilde Q(\delta R)\|}{\|A\|}+\frac{\|(\delta Q)(\delta R)\|}{\|A\|}=O(\epsilon_{\text{machine}})$.
-`\end{proof}`

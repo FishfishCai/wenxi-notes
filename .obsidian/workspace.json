@@ -4,22 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "51fa4711a343eb7d",
+        "id": "df43ae622dde1905",
         "type": "tabs",
         "children": [
           {
-            "id": "f30d02ad17f7b47a",
+            "id": "6899e10c83093a6e",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "_tem/tem_prompt.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "tem_prompt"
+              "title": "新标签页"
             }
           }
         ]
@@ -120,36 +115,40 @@
       "graph:查看关系图谱": false
     }
   },
-  "active": "ccea1679418a135c",
+  "active": "6899e10c83093a6e",
   "lastOpenFiles": [
-    "_tem/images/Pasted image 20260205004425.png",
-    "_tem/images/Pasted image 20260205010053.png",
-    "_tem/Fluid Dynamic.md",
-    "_tem/tem_prompt.md",
-    "_other/python_prompt.md",
-    "deepLearning/code.md",
-    "math/_prompt_math.md",
-    "_other/vscode.md",
-    "_other/wandb.md",
-    "_other/ssh.md",
-    "_other/nvidia.md",
-    "_other/latex.md",
-    "_other/git.md",
-    "_other/conda.md",
-    "_tem/Pasted image 20260225041550.png",
-    "math/Convex Set.md",
-    "math/Real Matrix.md",
     "math/QR Factorization.md",
+    "math/Computation.md",
+    "math/Condition Number.md",
+    "math/Convex Set.md",
+    "math/Floating Point Arithmetic.md",
     "math/Least Square.md",
     "math/Machine Learning.md",
-    "math/Floating Point Arithmetic.md",
-    "math/Complex Vector.md",
-    "math/Complex Matrix.md",
-    "math/Real Vector Space.md",
-    "math/Structure.md",
-    "math/Condition Number.md",
-    "math/Computation.md",
+    "math/Matrix.md",
+    "math/Matrix Operator.md",
+    "math/Singular Vector Decomposition.md",
     "math/Stability.md",
+    "math/Structure.md",
+    "math/Vector Space.md",
+    "code/promptMath.md",
+    "code/setting/latexSuite.md",
+    "code/tool/conda.md",
+    "code/setting/vscode.md",
+    "code/setting/kitty.md",
+    "README.md",
+    "code/latex.md",
+    "code/pythonPrompt.md",
+    "math/Complex Matrix.md",
+    "^b5daf5.md",
+    "math/_prompt_math.md",
+    "math/Real Vector Space.md",
+    "math/Complex Vector.md",
+    "code/tool",
+    "code/latex",
+    "code/setting",
+    "_tem/images/Pasted image 20260205004425.png",
+    "_tem/images/Pasted image 20260205010053.png",
+    "_tem/Pasted image 20260225041550.png",
     "_tem",
     "math/textbook/baby_Rudin.pdf",
     "math/baby_Rudin.pdf",
@@ -157,9 +156,6 @@
     "math/textbook/OPTIIILN2023Spring.pdf",
     "math/textbook/NumericalOptimization.pdf",
     "math/textbook/Numerical Linear Algebra.pdf",
-    "math/textbook/Real Analysis and Complex Analysis.pdf",
-    "math/textbook/Differential Topology.pdf",
-    "math/textbook",
     "未命名.canvas",
     "Untitled.canvas"
   ]

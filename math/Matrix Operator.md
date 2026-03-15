@@ -1,5 +1,5 @@
 #NumericalLinearAlgebra 
-Prerequisite knowledge: [[Real Vector Space]], [[Real Matrix]]
+Prerequisite knowledge: [[Vector Space]], [[Matrix]]
 ## Projection Matrix
 > [!definition|] Projection Matrix of Vector
 > Let $v \in \mathbb{R}^n$. $\|v\| = 1$. The projection matrix of vector $v$ is $vv^{\top}$, whose rank is $1$. For any $x \in \mathbb{R}^n$, the component of $x$ along $v$ is given by $vv^{\top} x$.

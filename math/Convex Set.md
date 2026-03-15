@@ -1,5 +1,5 @@
 #Optimization 
-Prerequisite knowledge: [[Real Vector Space]]
+Prerequisite knowledge: [[Vector Space]]
 ## Affine Subspace
 > [!definition|] Affine Subsapce
 > Let $M\subset \mathbb{R}^{n}$ and $x\in R^{n}$.  
