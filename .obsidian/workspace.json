@@ -4,17 +4,22 @@
     "type": "split",
     "children": [
       {
-        "id": "df43ae622dde1905",
+        "id": "3e613b6513cb3ded",
         "type": "tabs",
         "children": [
           {
-            "id": "6899e10c83093a6e",
+            "id": "bc56face87d33d6a",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "code/pythonPrompt.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "pythonPrompt"
             }
           }
         ]
@@ -112,50 +117,51 @@
   "left-ribbon": {
     "hiddenItems": {
       "obsidian42-brat:BRAT": false,
-      "graph:查看关系图谱": false
+      "graph:查看关系图谱": false,
+      "vscode-editor:新建代码文件": false
     }
   },
-  "active": "6899e10c83093a6e",
+  "active": "ccea1679418a135c",
   "lastOpenFiles": [
-    "_tem/1.21.11.xlsx",
-    "1.21.11.xlsx",
-    "code/1.21.11.xlsx",
-    "math/QR Factorization.md",
+    "untitled folder",
+    "code/promptMath.md",
+    "math/unorganized/Continuous Optimization.md",
+    "math/unorganized/Differential Topology.md",
+    "math/unorganized/Real Analysis and Complex Analysis.md",
+    "math/unorganized/Stochastic Process.md",
     "math/Computation.md",
     "math/Condition Number.md",
     "math/Convex Set.md",
     "math/Floating Point Arithmetic.md",
     "math/Least Square.md",
     "math/Machine Learning.md",
-    "math/Matrix.md",
     "math/Matrix Operator.md",
+    "math/QR Factorization.md",
     "math/Singular Vector Decomposition.md",
     "math/Stability.md",
     "math/Structure.md",
     "math/Vector Space.md",
-    "code/promptMath.md",
-    "code/setting/latexSuite.md",
-    "code/tool/conda.md",
-    "code/setting/vscode.md",
-    "code/setting/kitty.md",
-    "README.md",
-    "code/latex.md",
     "code/pythonPrompt.md",
-    "math/Complex Matrix.md",
-    "^b5daf5.md",
-    "math/_prompt_math.md",
-    "math/Real Vector Space.md",
+    "code/machineLearning/tool/trainer.py",
+    "code/machineLearning/tool/load_args.py",
+    "code/machineLearning/tool/base_model.py",
+    "_tem/tem_prompt.md",
+    "code/tool/conda.md",
+    "math/Matrix.md",
+    "README.md",
+    "code/tool/git.md",
+    "code/tool/nvidia.md",
+    "code/machineLearning/tool",
+    "code/machineLearning/untitled folder",
+    "code/machineLearning",
+    "_tem/1.21.11.xlsx",
+    "1.21.11.xlsx",
+    "code/1.21.11.xlsx",
+    "code/setting/latexSuite.md",
     "code/tool",
-    "code/latex",
-    "code/setting",
     "_tem/images/Pasted image 20260205004425.png",
     "_tem/images/Pasted image 20260205010053.png",
     "_tem/Pasted image 20260225041550.png",
-    "_tem",
-    "math/textbook/baby_Rudin.pdf",
-    "math/baby_Rudin.pdf",
-    "baby_Rudin.pdf",
-    "math/textbook/OPTIIILN2023Spring.pdf",
     "未命名.canvas",
     "Untitled.canvas"
   ]

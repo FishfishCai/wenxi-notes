@@ -3,7 +3,7 @@
   "showLineNumber": true,
   "vimMode": false,
   "newFileLocation": "folder",
-  "showUnsupportedFiles": false,
+  "showUnsupportedFiles": true,
   "attachmentFolderPath": "_tem",
   "showInlineTitle": true,
   "newFileFolderPath": "",

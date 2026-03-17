@@ -56,4 +56,4 @@ $b=(\tilde Q+\delta Q)(\tilde R+\delta R)\tilde x=\bigl[\tilde Q\tilde R+(\delta
 `\end{proof}`
 
 > [!Theorem|]
-> Let $A, \Delta A \in\mathbb{R}^{n,n}$, $b\in\mathbb{R}^n$ and $x, y, b\in\mathbb{R}^n$. If $x$ minimizes $\|b-Ax\|$, $y$ minimizes $\|b+\Delta b-(A+\Delta A)y\|$, $\|\Delta A\|<\varepsilon\|A\|$, and $\|\Delta b\|<\varepsilon\|b\|$, $\frac{\|y-x\|}{\|x\|}\le \frac{2\varepsilon\kappa(A)}{1-\varepsilon\kappa(A)}+\frac{\varepsilon\kappa(A)(\kappa(A)+1)}{1-\varepsilon\kappa(A)}\frac{\|b-Ax\|}{\|A\|\|x\|}$.
+> Let $A, \Delta A \in\mathbb{R}^{n,n}$ and $x, y, b\in\mathbb{R}^n$. If $x$ minimizes $\|b-Ax\|$, $y$ minimizes $\|b+\Delta b-(A+\Delta A)y\|$, $\|\Delta A\|<\varepsilon\|A\|$ and $\|\Delta b\|<\varepsilon\|b\|$, $\frac{\|y-x\|}{\|x\|}\le \frac{2\varepsilon\kappa(A)}{1-\varepsilon\kappa(A)}+\frac{\varepsilon\kappa(A)(\kappa(A)+1)}{1-\varepsilon\kappa(A)}\frac{\|b-Ax\|}{\|A\|\|x\|}$.

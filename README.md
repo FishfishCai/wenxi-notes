@@ -11,3 +11,4 @@
 - Quick Preview: dependency of LaTeX-like Theorem & Equation Referencer.
 - Quiet Outline: show a clean, low-noise outline panel.
 - Style Settings: expose theme and CSS options in a settings panel for controlled UI customization.
+- VScode Editor: view codes in Obsidian.
