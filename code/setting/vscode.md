@@ -54,7 +54,7 @@
             "args": [
                 "-interaction=nonstopmode",
                 "-file-line-error",
-                "outdir=%OUTDIR%",
+                "-outdir=%OUTDIR%",
                 "-pdf",
                 "%DOCFILE%"
             ]
@@ -133,7 +133,7 @@
         "*.log"
     ],
     "latex-workshop.latex.autoClean.run": "onBuilt",
-    "latex-workshop.latex.recipe.default": "xelatex",
+    "latex-workshop.latex.recipe.default": "LaTeXmk",
     "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
     "latex-workshop.intellisense.argumentHint.enabled": false,
 
@@ -155,13 +155,19 @@
     // jupyter
     "jupyter.askForKernelRestart": false,
     
-    // copilot
-    "github.copilot.nextEditSuggestions.enabled": true,
-
     // ssh
     "remote.SSH.lockfilesInTmp": true,
     
     // git
     "git.autofetch": true,
+    "workbench.editorAssociations": {
+        "*.pdf": "latex-workshop-pdf-hook"
+    },
+    "cursor.composer.textSizeScale": 1.15,
+    "remote.SSH.remotePlatform": {
+        "server1": "linux",
+        "server2": "linux"
+    },
+    "redhat.telemetry.enabled": false,
 }
 ```
