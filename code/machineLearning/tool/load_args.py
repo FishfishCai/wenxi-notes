@@ -4,25 +4,27 @@ from types import SimpleNamespace
 from typing import Any, Dict, List
 
 
-def load_args(config_path: str) -> List[SimpleNamespace]:
+def load_args(
+    config_path: str,
+) -> List[SimpleNamespace]:
     """
-    Load experiment config(s) from a JSON file and return a list of namespace objects.
-    If the JSON has an ``experiments`` key, one namespace per experiment; otherwise a single namespace from the root.
+    Load experiment configuration from a JSON file and return one ``SimpleNamespace`` per experiment entry.
 
     Parameters
     ----------
     config_path : str
-        Path to a ``.json`` file; must have suffix ``.json``.
+        Path to a ``.json`` file; must use the ``.json`` suffix.
 
     Returns
     -------
-    list of SimpleNamespace
-        One namespace per experiment (attribute access by key); length 1 if JSON has no ``experiments`` key.
+    experiment_configs : list of SimpleNamespace
+        One namespace per experiment when the root object has an ``"experiments"`` list; otherwise a
+        single-element list built from the root object.
 
     Raises
     ------
     ValueError
-        If ``config_path`` does not have suffix ``.json``.
+        If ``config_path`` does not end with ``.json``.
     """
     cfg_path = Path(config_path)
     if cfg_path.suffix.lower() != ".json":
@@ -31,7 +33,7 @@ def load_args(config_path: str) -> List[SimpleNamespace]:
     with cfg_path.open("r", encoding="utf-8") as f:
         cfg: Dict[str, Any] = json.load(f)
 
-    # One namespace per experiment if "experiments" present; else single namespace from root
+    # Root ``experiments`` list vs single root dict
     if "experiments" in cfg:
         return [SimpleNamespace(**exp) for exp in cfg["experiments"]]
     return [SimpleNamespace(**cfg)]

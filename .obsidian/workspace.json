@@ -4,22 +4,17 @@
     "type": "split",
     "children": [
       {
-        "id": "3e613b6513cb3ded",
+        "id": "9b09b4c00a6c56e0",
         "type": "tabs",
         "children": [
           {
-            "id": "bc56face87d33d6a",
+            "id": "da54755229604179",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "code/pythonPrompt.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "pythonPrompt"
+              "title": "新标签页"
             }
           }
         ]
@@ -121,8 +116,9 @@
       "vscode-editor:新建代码文件": false
     }
   },
-  "active": "bc56face87d33d6a",
+  "active": "da54755229604179",
   "lastOpenFiles": [
+    "code/pythonPrompt.md",
     "code/tool/conda.md",
     "code/tool/git.md",
     "code/tool/nvidia.md",
@@ -132,7 +128,6 @@
     "_tem/~$1.21.11.xlsx",
     "code/setting/latexSuite.md",
     "code/setting/kitty.md",
-    "code/pythonPrompt.md",
     "code/promptMath.md",
     "code/latex.md",
     "README.md",

@@ -1,50 +1,63 @@
 import inspect
+from typing import Any, Dict, Optional
+
 import torch.nn as nn
 
 
 class BaseModel(nn.Module):
-    """Base class that stores initialization metadata for checkpoint reconstruction."""
+    """Stores constructor metadata so checkpoints can rebuild the same model class."""
 
-    def __init_subclass__(cls, name=None, **kwargs):
+    def __init_subclass__(
+        cls,
+        name: Optional[str] = None,
+        **kwargs: Any,
+    ) -> None:
         """
-        Set ``cls._name`` for checkpoint metadata (used in ``_metadata`` when saving state_dict).
+        Set ``cls._name`` used in ``state_dict`` metadata for checkpoint reconstruction.
 
         Parameters
         ----------
         cls : type
-            Subclass being created.
+            Subclass being registered.
         name : str or None, optional
-            Display name for the subclass; if None, the class name is used.
-        **kwargs : dict
-            Additional keyword arguments forwarded to ``nn.Module.__init_subclass__``.
+            Stored name; if None, ``cls.__name__`` is used. Default is None.
+        **kwargs : Any
+            Forwarded to ``nn.Module.__init_subclass__``.
+
+        Returns
+        -------
+        None
         """
         super().__init_subclass__(**kwargs)
         cls._name = name if name is not None else cls.__name__
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(
+        cls,
+        *args: Any,
+        **kwargs: Any,
+    ) -> "BaseModel":
         """
-        Allocate an instance and capture full init arguments; fill missing kwargs from the class signature.
-        Optionally print signature-mismatch messages when ``verbose`` is True in ``kwargs``.
+        Allocate an instance, record constructor arguments, and fill omitted keyword defaults from the signature.
 
         Parameters
         ----------
         cls : type
-            Class to instantiate (subclass of BaseModel).
+            Concrete ``BaseModel`` subclass to instantiate.
         *args : tuple
-            Positional arguments for the class constructor.
+            Positional arguments passed to the subclass ``__init__``.
         **kwargs : dict
-            Keyword arguments for the class constructor; may include ``verbose`` for diagnostics.
+            Keyword arguments for ``__init__``; may include ``verbose`` to print signature diagnostics.
 
         Returns
         -------
         instance : BaseModel
-            New instance with ``instance._init_kwargs`` holding full init metadata for reconstruction.
+            New instance with ``instance._init_kwargs`` storing full reconstruction metadata.
         """
         sig = inspect.signature(cls)
         model_name = cls.__name__
 
         verbose = kwargs.get("verbose", False)
-        # Warn on keys not in constructor signature
+        # Keys not present in the constructor signature
         for key in kwargs:
             if key not in sig.parameters:
                 if verbose:
@@ -53,7 +66,7 @@ class BaseModel(nn.Module):
                         f"that is not in {model_name}'s signature."
                     )
 
-        # Fill missing kwargs from signature defaults
+        # Defaults from the signature for missing kwargs
         for key, value in sig.parameters.items():
             if (value.default is not inspect._empty) and (key not in kwargs):
                 if verbose:
@@ -63,55 +76,67 @@ class BaseModel(nn.Module):
                     )
                 kwargs[key] = value.default
 
-        # Attach full init metadata for checkpoint reconstruction
         kwargs["args"] = args
         kwargs["_name"] = cls._name
-        ## Allocate instance and attach init metadata
+        ## ``nn.Module`` instance allocation and init metadata
         instance = super().__new__(cls)
         instance._init_kwargs = kwargs
 
         return instance
 
-    def state_dict(self, destination: dict=None, prefix: str='', keep_vars: bool=False):
+    def state_dict(
+        self,
+        destination: Optional[dict] = None,
+        prefix: str = "",
+        keep_vars: bool = False,
+    ) -> Dict[str, Any]:
         """
-        Return module state dict and attach init metadata under the ``'_metadata'`` key.
+        Return the module state dict and attach ``'_metadata'`` for ``BaseModel`` reconstruction.
 
         Parameters
         ----------
         destination : dict or None, optional
-            If provided, dict to populate with state; otherwise a new dict is created.
+            Optional dict to fill; if None, a new dict is created. Default is None.
         prefix : str, optional
-            Prefix prepended to parameter and buffer names in the returned dict.
+            Prefix for parameter and buffer names in keys. Default is ``""``.
         keep_vars : bool, optional
-            If True, keep tensor values in the computation graph; default False detaches.
+            If True, keep autograd history on tensors; if False, detach. Default is False.
 
         Returns
         -------
         state_dict : dict
-            Parameter/buffer name -> tensor mapping, plus ``'_metadata'`` with ``_init_kwargs``.
+            Mapping of names to tensors or buffers, plus ``'_metadata'`` copied from ``_init_kwargs``.
         """
-        state_dict = super().state_dict(destination=destination, prefix=prefix, keep_vars=keep_vars)
-        state_dict['_metadata'] = self._init_kwargs
+        state_dict = super().state_dict(
+            destination=destination,
+            prefix=prefix,
+            keep_vars=keep_vars,
+        )
+        state_dict["_metadata"] = self._init_kwargs
         return state_dict
 
-    def load_state_dict(self, state_dict, strict=True, assign=False):
+    def load_state_dict(
+        self,
+        state_dict: Dict[str, Any],
+        strict: bool = True,
+        assign: bool = False,
+    ) -> Any:
         """
-        Load parameters and buffers from a state dict; strip ``'_metadata'`` before delegating to ``nn.Module``.
+        Load tensors into the module after removing ``'_metadata'`` from the checkpoint dict.
 
         Parameters
         ----------
         state_dict : dict
-            State dict with parameter/buffer tensors and optionally ``'_metadata'``.
+            Checkpoint mapping that may include ``'_metadata'`` alongside weights and buffers.
         strict : bool, optional
-            If True, require exact key match between state_dict and module.
+            If True, keys must match exactly. Default is True.
         assign : bool, optional
-            If True, use in-place assignment where supported by ``nn.Module.load_state_dict``.
+            If True, use direct assignment where supported. Default is False.
 
         Returns
         -------
-        result : object
-            Return value from ``nn.Module.load_state_dict`` (e.g., missing/unexpected keys).
+        incompatible_keys : Any
+            Return value of ``nn.Module.load_state_dict`` (missing and unexpected key reports).
         """
         state_dict.pop("_metadata", None)
         return super().load_state_dict(state_dict, strict=strict, assign=assign)
-    
