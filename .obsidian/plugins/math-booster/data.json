@@ -31,6 +31,8 @@
       "theoremCalloutFontInherit": true,
       "beginProof": "\\begin{proof}",
       "endProof": "\\end{proof}",
+      "beginSolution": "\\begin{solution}",
+      "endSolution": "\\end{solution}",
       "insertSpace": true
     },
     "Courses/Homological Algebra/Lecture notes/Lecture notes.md": {}
@@ -73,7 +75,6 @@
       }
     },
     "showTheoremTitleinBuiltin": true,
-    "showTheoremContentinBuiltin": false,
     "renderEquationinBuiltin": true,
     "triggerSuggest": "\\ref",
     "triggerTheoremSuggest": "\\tref",
@@ -84,9 +85,6 @@
     "triggerSuggestRecentNotes": "\\rer",
     "triggerTheoremSuggestRecentNotes": "\\trer",
     "triggerEquationSuggestRecentNotes": "\\eqrer",
-    "triggerSuggestDataview": "\\ref:d",
-    "triggerTheoremSuggestDataview": "\\tref:d",
-    "triggerEquationSuggestDataview": "\\eqref:d",
     "enableSuggest": true,
     "enableTheoremSuggest": true,
     "enableEquationSuggest": true,
@@ -96,9 +94,6 @@
     "enableSuggestRecentNotes": true,
     "enableTheoremSuggestRecentNotes": true,
     "enableEquationSuggestRecentNotes": true,
-    "enableSuggestDataview": true,
-    "enableTheoremSuggestDataview": true,
-    "enableEquationSuggestDataview": true,
     "renderMathInSuggestion": true,
     "suggestNumber": 20,
     "searchMethod": "Fuzzy",
@@ -116,7 +111,6 @@
     "excludeExampleCallout": false,
     "enableProof": true,
     "enableMathPreviewInCalloutAndQuote": true,
-    "autocompleteDvQuery": "",
     "searchModalQueryType": "both",
     "searchModalRange": "recent",
     "searchModalDvQuery": ""

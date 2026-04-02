@@ -1,17 +1,17 @@
 [
   "better-link-clicker-plugin",
   "better-link-clicker",
-  "mathlinks",
-  "file-explorer-note-count",
-  "editor-width-slider",
-  "lapel",
-  "settings-search",
-  "obsidian-style-settings",
   "obsidian42-brat",
-  "live-wallpaper",
-  "math-booster",
-  "obsidian-quiet-outline",
-  "quick-preview",
+  "editor-width-slider",
+  "file-explorer-note-count",
+  "lapel",
   "obsidian-latex-suite",
-  "vscode-editor"
+  "live-wallpaper",
+  "vscode-editor",
+  "obsidian-style-settings",
+  "settings-search",
+  "mathlinks",
+  "quick-preview",
+  "obsidian-quiet-outline",
+  "math-booster"
 ]

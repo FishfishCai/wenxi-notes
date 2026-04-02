@@ -25,9 +25,61 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var main_exports = {};
 __export(main_exports, {
   VAULT_ROOT: () => VAULT_ROOT,
-  default: () => LatexReferencer3
+  default: () => MathBooster3
 });
 module.exports = __toCommonJS(main_exports);
+
+// node_modules/monkey-around/mjs/index.js
+function around(obj, factories) {
+  const removers = Object.keys(factories).map((key) => around1(obj, key, factories[key]));
+  return removers.length === 1 ? removers[0] : function() {
+    removers.forEach((r) => r());
+  };
+}
+function around1(obj, method, createWrapper) {
+  const original = obj[method], hadOwn = obj.hasOwnProperty(method);
+  let current = createWrapper(original);
+  if (original)
+    Object.setPrototypeOf(current, original);
+  Object.setPrototypeOf(wrapper, current);
+  obj[method] = wrapper;
+  return remove;
+  function wrapper(...args) {
+    if (current === original && obj[method] === wrapper)
+      remove();
+    return current.apply(this, args);
+  }
+  function remove() {
+    if (obj[method] === wrapper) {
+      if (hadOwn)
+        obj[method] = original;
+      else
+        delete obj[method];
+    }
+    if (current === original)
+      return;
+    current = original;
+    Object.setPrototypeOf(wrapper, original || Function);
+  }
+}
+
+// src/patches/page-preview.ts
+var patchPagePreview = (plugin) => {
+  const { app } = plugin;
+  plugin.register(
+    // @ts-ignore
+    around(app.internalPlugins.plugins["page-preview"].instance.constructor.prototype, {
+      onLinkHover(old) {
+        return function(parent, targetEl, linktext, ...args) {
+          old.call(this, parent, targetEl, linktext, ...args);
+          plugin.lastHoverLinktext = linktext;
+        };
+      }
+    })
+  );
+};
+
+// src/main.ts
 var import_obsidian36 = require("obsidian");
 
 // node_modules/obsidian-mathlinks/lib/api/provider.js
@@ -77,17 +129,6 @@ function update(app, file) {
   mathlinks.update(file);
 }
 
-// node_modules/obsidian-quick-preview/lib/index.js
-function registerQuickPreview(app, component, suggestClass, itemNormalizer) {
-  app.workspace.onLayoutReady(() => {
-    const plugin = app.plugins.getPlugin("quick-preview");
-    if (!plugin)
-      throw Error("Quick Preview API: Quick Preview is not enabled.");
-    const uninstaller = plugin.patchSuggester(suggestClass, itemNormalizer);
-    component.register(uninstaller);
-  });
-}
-
 // src/settings/profile.ts
 var import_obsidian3 = require("obsidian");
 
@@ -105,7 +146,8 @@ var THEOREM_LIKE_ENV_IDs = [
   "exercise",
   "conjecture",
   "hypothesis",
-  "remark"
+  "remark",
+  "question"
 ];
 var PROOF_LIKE_ENV_IDs = [
   "proof",
@@ -125,7 +167,8 @@ var THEOREM_LIKE_ENV_PREFIXES = [
   "exr",
   "cnj",
   "hyp",
-  "rmk"
+  "rmk",
+  "qst"
 ];
 var THEOREM_LIKE_ENVs = {};
 THEOREM_LIKE_ENV_IDs.forEach((id, index) => {
@@ -167,12 +210,19 @@ var DEFAULT_PROFILES = {
         "exercise": "Exercise",
         "conjecture": "Conjecture",
         "hypothesis": "Hypothesis",
-        "remark": "Remark"
+        "remark": "Remark",
+        "question": "Question"
       },
       proof: {
         begin: "Proof.",
         end: "\u25A1",
         linkedBeginPrefix: "Proof of ",
+        linkedBeginSuffix: "."
+      },
+      solution: {
+        begin: "Solution.",
+        end: "\u25A0", // <--- Change to \u25A0 (Black Square)
+        linkedBeginPrefix: "Solution of ",
         linkedBeginSuffix: "."
       }
     }
@@ -196,13 +246,20 @@ var DEFAULT_PROFILES = {
         "exercise": "\u6F14\u7FD2\u554F\u984C",
         "conjecture": "\u4E88\u60F3",
         "hypothesis": "\u4EEE\u8AAC",
-        "remark": "\u6CE8"
+        "remark": "\u6CE8",
+        "question": "Question"
       },
       proof: {
         begin: "\u8A3C\u660E.",
         end: "\u25A1",
         linkedBeginPrefix: "",
         linkedBeginSuffix: "\u306E\u8A3C\u660E."
+      },
+      solution: {
+        begin: "\u89E3.",
+        end: "\u25A0", // <--- Change to \u25A0 (Black Square)
+        linkedBeginPrefix: "",
+        linkedBeginSuffix: "\u306E\u89E3."
       }
     }
   }
@@ -309,6 +366,18 @@ var EditProfileModal = class extends import_obsidian3.Modal {
         var _a;
         text.setValue((_a = this.profile.body.proof[key]) != null ? _a : "").onChange((value) => {
           this.profile.body.proof[key] = value;
+        });
+      });
+    }
+    new import_obsidian3.Setting(contentEl).setName("Solutions").setHeading();
+    for (let i = 0; i < PROOF_SETTING_KEYS.length; i++) {
+      const key = PROOF_SETTING_KEYS[i];
+      const name = prettyNames[i];
+      // Note: We use a unique key for the settingRefs to avoid collision
+      this.settingRefs["sol_" + key] = new import_obsidian3.Setting(contentEl).setName(name).addText((text) => {
+        var _a;
+        text.setValue((_a = this.profile.body.solution[key]) != null ? _a : "").onChange((value) => {
+          this.profile.body.solution[key] = value;
         });
       });
     }
@@ -560,6 +629,8 @@ var DEFAULT_SETTINGS = {
   theoremCalloutFontInherit: false,
   beginProof: "\\begin{proof}",
   endProof: "\\end{proof}",
+  beginSolution: "\\begin{solution}",
+  endSolution: "\\end{solution}",
   insertSpace: true
 };
 var DEFAULT_EXTRA_SETTINGS = {
@@ -568,20 +639,16 @@ var DEFAULT_EXTRA_SETTINGS = {
   noteTitleInEquationLink: true,
   profiles: DEFAULT_PROFILES,
   showTheoremTitleinBuiltin: true,
-  showTheoremContentinBuiltin: false,
   renderEquationinBuiltin: true,
   triggerSuggest: "\\ref",
   triggerTheoremSuggest: "\\tref",
   triggerEquationSuggest: "\\eqref",
-  triggerSuggestActiveNote: "\\ref:a",
-  triggerTheoremSuggestActiveNote: "\\tref:a",
-  triggerEquationSuggestActiveNote: "\\eqref:a",
-  triggerSuggestRecentNotes: "\\ref:r",
-  triggerTheoremSuggestRecentNotes: "\\tref:r",
-  triggerEquationSuggestRecentNotes: "\\eqref:r",
-  triggerSuggestDataview: "\\ref:d",
-  triggerTheoremSuggestDataview: "\\tref:d",
-  triggerEquationSuggestDataview: "\\eqref:d",
+  triggerSuggestActiveNote: "\\rea",
+  triggerTheoremSuggestActiveNote: "\\trea",
+  triggerEquationSuggestActiveNote: "\\eqrea",
+  triggerSuggestRecentNotes: "\\rer",
+  triggerTheoremSuggestRecentNotes: "\\trer",
+  triggerEquationSuggestRecentNotes: "\\eqrer",
   enableSuggest: true,
   enableTheoremSuggest: true,
   enableEquationSuggest: true,
@@ -591,9 +658,6 @@ var DEFAULT_EXTRA_SETTINGS = {
   enableSuggestRecentNotes: true,
   enableTheoremSuggestRecentNotes: true,
   enableEquationSuggestRecentNotes: true,
-  enableSuggestDataview: true,
-  enableTheoremSuggestDataview: true,
-  enableEquationSuggestDataview: true,
   renderMathInSuggestion: true,
   suggestNumber: 20,
   searchMethod: "Fuzzy",
@@ -613,7 +677,6 @@ var DEFAULT_EXTRA_SETTINGS = {
   excludeExampleCallout: false,
   enableProof: true,
   enableMathPreviewInCalloutAndQuote: true,
-  autocompleteDvQuery: "",
   searchModalQueryType: "both",
   searchModalRange: "recent",
   searchModalDvQuery: ""
@@ -1077,9 +1140,8 @@ var TheoremCalloutSettingsHelper = class {
     }, (_a = this.defaultSettings.fold) != null ? _a : this.plugin.extraSettings.foldDefault);
   }
 };
-var SettingsHelper = class extends import_obsidian8.Component {
+var SettingsHelper = class {
   constructor(contentEl, settings, defaultSettings, plugin, allowUnset, addClear) {
-    super();
     this.contentEl = contentEl;
     this.settings = settings;
     this.defaultSettings = defaultSettings;
@@ -1212,7 +1274,7 @@ var MathContextSettingsHelper = class extends SettingsHelper {
     super(contentEl, settings, defaultSettings, plugin, !isRoot, !isRoot);
     this.file = file;
   }
-  onload() {
+  makeSettingPane() {
     this.addHeading("Theorem callouts - general");
     this.addProfileSetting();
     const styleSetting = this.addDropdownSetting("theoremCalloutStyle", THEOREM_CALLOUT_STYLES, "Style", void 0, void 0, () => this.plugin.forceRerender());
@@ -1264,10 +1326,10 @@ var MathContextSettingsHelper = class extends SettingsHelper {
     this.addHeading("Proofs (experimental)", ["proof-heading"]);
     this.addTextSetting("beginProof", "Beginning of a proof");
     this.addTextSetting("endProof", "End of a proof");
-    this.addHeading("Search & link auto-completion - general").then(async (setting) => {
-      setting.descEl.addClass("math-booster-new-feature");
-      await import_obsidian8.MarkdownRenderer.render(this.plugin.app, "**NOTE:** If you have the [**Quick Preview**](https://github.com/RyotaUshio/obsidian-quick-preview) plugin installed, holding down `Alt`/`Option` _(by default)_ will trigger a quick preview of the selected suggestion with the context around it.", setting.descEl, "", this);
-    });
+    this.addHeading("Solutions (experimental)", ["solution-heading"]);
+    this.addTextSetting("beginSolution", "Beginning of a solution");
+    this.addTextSetting("endSolution", "End of a solution");
+    this.addHeading("Search & link auto-completion - general");
     this.addToggleSetting("insertSpace", "Append whitespace after inserted link");
   }
   addProfileSetting(defaultValue) {
@@ -1280,7 +1342,7 @@ var MathContextSettingsHelper = class extends SettingsHelper {
   }
 };
 var ExtraSettingsHelper = class extends SettingsHelper {
-  onload() {
+  makeSettingPane() {
     this.settingRefs["foldDefault"] = addFoldOptionSetting(
       this.contentEl,
       'Default collapsibility when using the "Insert theorem callout" command',
@@ -1295,10 +1357,7 @@ var ExtraSettingsHelper = class extends SettingsHelper {
     this.addToggleSetting("showTheoremCalloutEditButton", "Show an edit button on a theorem callout");
     this.addToggleSetting("setOnlyTheoremAsMain", "If a note has only one theorem callout, automatically set it as main", `Regardless of this setting, putting "%% main %%" or "%% main: true %%" in a theorem callout will set it as main one of the note, which means any link to that note will be displayed with the theorem's title. Enabling this option implicitly sets a theorem callout as main when it's the only one in the note.`);
     this.addToggleSetting("setLabelInModal", "Show LaTeX/Pandoc label input form in theorem callout insert/edit modal");
-    this.addToggleSetting("enableMathPreviewInCalloutAndQuote", "Render equations inside callouts & add multi-line equation support to blockquotes", void 0, () => this.plugin.updateEditorExtensions()).then(async (setting) => {
-      setting.descEl.addClass("math-booster-new-feature");
-      await import_obsidian8.MarkdownRenderer.render(this.plugin.app, "**NOTE:** This feature is planned to be removed from this plugin, and instead, it will be available as a separate plugin [**Better Math in Callouts & Blockquotes**](https://github.com/RyotaUshio/obsidian-math-in-callout), featuring a bunch of improvements. Currently awaiting for approval by the Obsidian team.", setting.descEl, "", this);
-    });
+    this.addToggleSetting("enableMathPreviewInCalloutAndQuote", "Render equations inside callouts & add multi-line equation support to blockquotes", void 0, () => this.plugin.updateEditorExtensions());
     this.addToggleSetting("enableProof", "Enable proof environment", `For example, you can replace a pair of inline codes \`${DEFAULT_SETTINGS.beginProof}\` & \`${DEFAULT_SETTINGS.endProof}\` with "${DEFAULT_PROFILES[DEFAULT_SETTINGS.profile].body.proof.begin}" & "${DEFAULT_PROFILES[DEFAULT_SETTINGS.profile].body.proof.end}". You can style it with CSS snippets. See the documentation for the details.`, () => this.plugin.updateEditorExtensions());
     this.addSliderSetting("suggestNumber", { min: 1, max: 50, step: 1 }, "Number of suggestions", "Specify how many items are suggested at one time. Set it to a smaller value if you have a performance issue when equation suggestions with math rendering on.");
     this.addToggleSetting("renderMathInSuggestion", "Render math in equation suggestions", "Turn this off if you have a performance issue and reducing the number of suggestions doesn't fix it.");
@@ -1312,54 +1371,40 @@ var ExtraSettingsHelper = class extends SettingsHelper {
     list.createEl("li", { text: "Mod is Cmd on MacOS and Ctrl on other OS." });
     list.createEl("li", { text: "Meta is Cmd on MacOS and Win key on Windows." });
     this.addDropdownSetting("suggestLeafOption", LEAF_OPTIONS, "Opening option", "Specify how to open the selected suggestion.");
-    this.addHeading("Enhance Obsidian's built-in link auto-completion (experimental)").setDesc(`Configure how this plugin modifies the appearance of Obsidian's built-in link auto-completion (the one that pops up when you type "[["). This feature dives deep into Obsidian's internals, so it might break when Obsidian is updated. If you encounter any issue, please report it on GitHub.`);
+    this.addHeading("Enhance Obsidian's built-in link completion (experimental)").setDesc(`Configure how Math Booster modifies the appearance of Obsidian's built-in link completion (the one that pops up when you type "[["). This feature dives deep into Obsidian's internals, so it might break when Obsidian is updated. If you encounter any issue, please report it on GitHub.`);
     this.addToggleSetting("showTheoremTitleinBuiltin", "Show theorem title");
-    this.addToggleSetting("showTheoremContentinBuiltin", "Show theorem content", 'Only effective when "Show theorem title" is turned on.');
-    this.addToggleSetting("renderEquationinBuiltin", "Render equation").then(async (setting) => {
-      setting.descEl.addClass("math-booster-new-feature");
-      await import_obsidian8.MarkdownRenderer.render(this.plugin.app, "**NOTE:** This feature is planned to be removed from this plugin, and instead, it will be available as a separate plugin [**Rendered Block Link Suggestions**](https://github.com/RyotaUshio/obsidian-rendered-block-link-suggestions), which supports all types of blocks not limited to display math. Currently awaiting for approval by the Obsidian team.", setting.descEl, "", this);
-    });
-    this.addHeading("Configure this plugin's custom editor link auto-completion").setDesc(`It is recommended to turn off unnecessary auto-completions to improve performance.`);
-    this.addTextSetting("autocompleteDvQuery", "Dataview query for editor link auto-completion", "Only LIST queries are supported.");
+    this.addToggleSetting("renderEquationinBuiltin", "Render equation");
+    this.addHeading("Configure Math Booster's editor link auto-completion").setDesc(`It is recommended to turn off unnecessary auto-completions to improve performance.`);
     this.addHeading("Theorem & equation suggestion");
     this.addHeading("From entire vault", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableSuggest", "Enable");
+    this.addToggleSetting("enableSuggest", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerSuggest", "Trigger");
     this.addHeading("From recently opened notes", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableSuggestRecentNotes", "Enable");
+    this.addToggleSetting("enableSuggestRecentNotes", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerSuggestRecentNotes", "Trigger");
     this.addHeading("From active note", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableSuggestActiveNote", "Enable");
+    this.addToggleSetting("enableSuggestActiveNote", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerSuggestActiveNote", "Trigger");
-    this.addHeading("From Dataview query", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableSuggestDataview", "Enable");
-    this.addTextSetting("triggerSuggestDataview", "Trigger");
     this.addHeading("Theorem suggestion", ["editor-suggest-setting-heading"]);
     this.addHeading("From entire vault", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableTheoremSuggest", "Enable");
+    this.addToggleSetting("enableTheoremSuggest", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerTheoremSuggest", "Trigger");
     this.addHeading("From recently opened notes", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableTheoremSuggestRecentNotes", "Enable");
+    this.addToggleSetting("enableTheoremSuggestRecentNotes", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerTheoremSuggestRecentNotes", "Trigger");
     this.addHeading("From active note", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableTheoremSuggestActiveNote", "Enable");
+    this.addToggleSetting("enableTheoremSuggestActiveNote", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerTheoremSuggestActiveNote", "Trigger");
-    this.addHeading("From Dataview query", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableTheoremSuggestDataview", "Enable");
-    this.addTextSetting("triggerTheoremSuggestDataview", "Trigger");
     this.addHeading("Equation suggestion", ["editor-suggest-setting-heading"]);
     this.addHeading("From entire vault", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableEquationSuggest", "Enable");
+    this.addToggleSetting("enableEquationSuggest", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerEquationSuggest", "Trigger");
     this.addHeading("From recently opened notes", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableEquationSuggestRecentNotes", "Enable");
+    this.addToggleSetting("enableEquationSuggestRecentNotes", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerEquationSuggestRecentNotes", "Trigger");
     this.addHeading("From active note", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableEquationSuggestActiveNote", "Enable");
+    this.addToggleSetting("enableEquationSuggestActiveNote", "Enable", void 0, () => this.plugin.updateLinkAutocomplete());
     this.addTextSetting("triggerEquationSuggestActiveNote", "Trigger");
-    this.addHeading("From Dataview query", ["editor-suggest-setting-indented-heading"]);
-    this.addToggleSetting("enableEquationSuggestDataview", "Enable");
-    this.addTextSetting("triggerEquationSuggestDataview", "Trigger");
     this.addHeading("Indexing");
     this.addSliderSetting("importerNumThreads", { min: 1, max: 10, step: 1 }, "Indexer threads", "The maximum number of thread used for indexing.");
     this.addSliderSetting("importerUtilization", { min: 0.1, max: 1, step: 0.01 }, "Indexer CPU utilization", "The CPU utilization that indexer threads should use.");
@@ -2003,12 +2048,12 @@ var _MarkdownBlock = class _MarkdownBlock {
 };
 _MarkdownBlock.TYPES = ["markdown", "block", LINKBEARING_TYPE];
 var MarkdownBlock = _MarkdownBlock;
-var MathBlock = class extends MarkdownBlock {
-  static isMathBlock(object) {
+var MathBoosterBlock = class extends MarkdownBlock {
+  static isMathBoosterBlock(object) {
     return object !== void 0 && object.$types.includes("block-math-booster");
   }
 };
-var _TheoremCalloutBlock = class _TheoremCalloutBlock extends MathBlock {
+var _TheoremCalloutBlock = class _TheoremCalloutBlock extends MathBoosterBlock {
   constructor(init) {
     super(init);
     this.$types = _TheoremCalloutBlock.TYPES;
@@ -2062,7 +2107,7 @@ var _TheoremCalloutBlock = class _TheoremCalloutBlock extends MathBlock {
 };
 _TheoremCalloutBlock.TYPES = ["markdown", "block", "block-math-booster", "block-theorem", LINKBEARING_TYPE];
 var TheoremCalloutBlock = _TheoremCalloutBlock;
-var _EquationBlock = class _EquationBlock extends MathBlock {
+var _EquationBlock = class _EquationBlock extends MathBoosterBlock {
   constructor(init) {
     super(init);
     this.$types = _EquationBlock.TYPES;
@@ -2415,12 +2460,10 @@ var ContextSettingModal = class extends MathSettingModal {
     super(app, plugin, callback);
     this.file = file;
     this.parent = parent;
-    this.component = new import_obsidian12.Component();
   }
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
-    this.component.load();
     this.titleEl.setText("Local settings for " + this.file.path);
     contentEl.createDiv({
       text: "If you want the change to apply to the entire vault, go to the plugin settings.",
@@ -2431,7 +2474,7 @@ var ContextSettingModal = class extends MathSettingModal {
     }
     const defaultSettings = this.file.parent ? resolveSettings(void 0, this.plugin, this.file.parent) : DEFAULT_SETTINGS;
     const contextSettingsHelper = new MathContextSettingsHelper(contentEl, this.plugin.settings[this.file.path], defaultSettings, this.plugin, this.file);
-    this.component.addChild(contextSettingsHelper);
+    contextSettingsHelper.makeSettingPane();
     this.addButton("Save");
   }
   onClose() {
@@ -2441,7 +2484,6 @@ var ContextSettingModal = class extends MathSettingModal {
     if (this.parent) {
       this.parent.open();
     }
-    this.component.unload();
   }
 };
 var FileSuggestModal = class extends import_obsidian12.FuzzySuggestModal {
@@ -2542,7 +2584,6 @@ var MathSettingTab = class extends import_obsidian14.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
     this.plugin = plugin;
-    this.component = new import_obsidian14.Component();
   }
   addRestoreDefaultsButton() {
     new import_obsidian14.Setting(this.containerEl).addButton((btn) => {
@@ -2557,7 +2598,6 @@ var MathSettingTab = class extends import_obsidian14.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    this.component.load();
     containerEl.createEl("h4", { text: "Global" });
     const root = this.app.vault.getRoot();
     const globalHelper = new MathContextSettingsHelper(
@@ -2567,7 +2607,7 @@ var MathSettingTab = class extends import_obsidian14.PluginSettingTab {
       this.plugin,
       root
     );
-    this.component.addChild(globalHelper);
+    globalHelper.makeSettingPane();
     const extraHelper = new ExtraSettingsHelper(
       this.containerEl,
       this.plugin.extraSettings,
@@ -2576,7 +2616,7 @@ var MathSettingTab = class extends import_obsidian14.PluginSettingTab {
       false,
       false
     );
-    this.component.addChild(extraHelper);
+    extraHelper.makeSettingPane();
     const heading = extraHelper.addHeading("Equations - general");
     const numberingHeading = this.containerEl.querySelector(".equation-heading");
     this.containerEl.insertBefore(
@@ -2640,8 +2680,6 @@ var MathSettingTab = class extends import_obsidian14.PluginSettingTab {
     super.hide();
     await this.plugin.saveSettings();
     this.plugin.indexManager.trigger("global-settings-updated");
-    this.plugin.updateLinkAutocomplete();
-    this.component.unload();
   }
 };
 
@@ -2668,7 +2706,7 @@ var CleverefProvider = class extends Provider {
       return null;
     if (targetSubpathResult.type === "block") {
       const block = page.$blocks.get(targetSubpathResult.block.id);
-      if (MathBlock.isMathBlock(block)) {
+      if (MathBoosterBlock.isMathBoosterBlock(block)) {
         if (block.$display)
           return path && this.shouldShowNoteTitle(block) ? processedPath + " > " + block.$display : block.$display;
         if (block.$refName)
@@ -3020,7 +3058,7 @@ var TheoremCalloutRenderer = class _TheoremCalloutRenderer extends import_obsidi
   renderTitle(info, existingMainTitleEl) {
     const titleInner = this.containerEl.querySelector(".callout-title-inner");
     if (!titleInner)
-      throw Error(`${this.plugin.manifest.name}: Failed to find the title element of a theorem callout.`);
+      throw Error(`Math Booster: Failed to find the title element of a theorem callout.`);
     const newMainTitleEl = createSpan({
       text: info.theoremMainTitle,
       cls: "theorem-callout-main-title"
@@ -3127,10 +3165,14 @@ function readSettingsFromEl(calloutEl) {
   let type = (_a = calloutEl.getAttribute("data-callout")) == null ? void 0 : _a.trim().toLowerCase();
   if (type === void 0)
     return null;
-  const metadata = calloutEl.getAttribute("data-callout-metadata");
+  
+  let metadata = calloutEl.getAttribute("data-callout-metadata");
+  // 【修复1】：防止因缺少元数据直接中断渲染流程
   if (metadata === null)
-    return null;
+    metadata = "";
+    
   if (type === "math") {
+    if (!metadata) return null; // math 类型要求必须有 metadata
     const settings = JSON.parse(metadata);
     delete settings["_index"];
     return settings;
@@ -3158,7 +3200,11 @@ var createTheoremCalloutNumberingViewPlugin = (plugin) => import_view.ViewPlugin
     _update(view) {
       var _a;
       const infos = view.state.field(plugin.theoremCalloutsField);
-      for (const calloutEl of view.contentDOM.querySelectorAll(".callout.theorem-callout")) {
+      // 【修复2】：只查 .callout，不依赖 .theorem-callout 类，避免由于类名还没加上导致漏掉编号
+      for (const calloutEl of view.contentDOM.querySelectorAll(".callout")) {
+        const typeAttr = calloutEl.getAttribute("data-callout");
+        if (!typeAttr || !isTheoremCallout(plugin, typeAttr.toLowerCase())) continue;
+        
         const pos = view.posAtDOM(calloutEl);
         const iter = infos.iter(pos);
         if (iter.from !== pos)
@@ -3220,10 +3266,10 @@ function insertTagInMathText(text, tagContent, lineByLine) {
       const { which, env } = result.groups;
       if (which === "begin")
         envStack.push(env);
-      else if (envStack.last() === env)
+      else if (envStack[envStack.length - 1] === env)
         envStack.pop();
     }
-    if (envStack.length || !alignLine.trim() || alignLine.contains("\\nonumber"))
+    if (envStack.length || !alignLine.trim() || alignLine.includes("\nonumber"))
       return alignLine;
     return alignLine + `\\tag{${tagContent}-${index++}}`;
   }).join("\\\\");
@@ -3530,33 +3576,52 @@ var MathPreviewWidget = class extends import_view3.WidgetType {
   constructor(info) {
     super();
     this.info = info;
+    this.dom = null;
+    this.editButtonEl = null;
+  }
+  eq(other) {
+    return other instanceof MathPreviewWidget && this.info.display == other.info.display && this.info.mathText == other.info.mathText && this.info.from == other.info.from && this.info.to == other.info.to && this.info.insideCallout == other.info.insideCallout;
+  }
+  ensureEditButton(view) {
+    if (!this.editButtonEl) {
+      return;
+    }
+    this.editButtonEl.onclick = (ev) => {
+      ev.stopPropagation();
+      view.dispatch({ selection: { anchor: this.info.from + 2, head: this.info.to - 2 } });
+    };
   }
   toDOM(view) {
     this.info.mathEl.classList.add("math-booster-preview");
     if (this.info.display) {
-      const containerEl = createDiv({
-        cls: ["HyperMD-quote", "HyperMD-quote-1", "HyperMD-quote-lazy", "cm-line", "math-booster-preview-container"]
-      });
-      containerEl.createEl("img", {
-        cls: "cm-widgetBuffer",
-        attr: { "aria-hidden": "true" }
-      });
-      const cmEmbedBlockEl = containerEl.createDiv({
-        cls: ["math", "math-block", "cm-embed-block"],
-        attr: {
-          contenteditable: false
-        }
-      });
-      cmEmbedBlockEl.appendChild(this.info.mathEl);
-      const editButton = new import_obsidian23.ExtraButtonComponent(cmEmbedBlockEl).setIcon("code-2").setTooltip("Edit this block");
-      editButton.extraSettingsEl.addEventListener("click", (ev) => {
-        ev.stopPropagation();
-        view.dispatch({ selection: { anchor: this.info.from + 2, head: this.info.to - 2 } });
-      });
-      editButton.extraSettingsEl.classList.add("math-booster-preview-edit-button");
-      return containerEl;
+      if (!this.dom) {
+        // 【修复 Bug 2】：移除 "cm-line", "HyperMD-quote" 等破坏原生 DOM 结构的类名
+        const containerEl = createDiv({
+          cls: ["math-booster-preview-container"]
+        });
+        containerEl.style.display = "block"; // 保证其作为块级元素独占一行
+        containerEl.style.width = "100%";
+        
+        const cmEmbedBlockEl = containerEl.createDiv({
+          cls: ["math", "math-block", "cm-embed-block"],
+          attr: {
+            contenteditable: false
+          }
+        });
+        cmEmbedBlockEl.appendChild(this.info.mathEl);
+        const editButton = new import_obsidian23.ExtraButtonComponent(cmEmbedBlockEl).setIcon("code-2").setTooltip("Edit this block");
+        this.editButtonEl = editButton.extraSettingsEl;
+        this.editButtonEl.classList.add("math-booster-preview-edit-button");
+        this.dom = containerEl;
+      } else if (this.info.mathEl.parentElement == null) {
+        const cmEmbedBlockEl = this.dom.querySelector(".math.math-block.cm-embed-block");
+        cmEmbedBlockEl == null ? void 0 : cmEmbedBlockEl.appendChild(this.info.mathEl);
+      }
+      this.ensureEditButton(view);
+      return this.dom;
     }
-    return this.info.mathEl;
+    this.dom = this.info.mathEl;
+    return this.dom;
   }
   ignoreEvent(event) {
     return false;
@@ -3586,7 +3651,7 @@ var MathInfo = class extends import_state3.RangeValue {
       widget: this.toWidget(),
       block: this.display,
       side: which == "widget" ? 1 : void 0
-      // To fix https://github.com/RyotaUshio/obsidian-latex-theorem-equation-referencer/issues/173
+      // To fix https://github.com/RyotaUshio/obsidian-math-booster/issues/173
     });
   }
 };
@@ -3646,14 +3711,15 @@ function buildMathInfoSet(state) {
               mathText += (_b = nodeTextQuoteSymbolTrimmed(node.node.firstChild, state, quoteLevel)) != null ? _b : "";
             }
           } else {
-            if (node.name.contains("math")) {
+            if (node.name.includes("math")) {
               mathText += nodeText(node, state);
             }
           }
         }
       } else {
         const match = (_c = node.node.parent) == null ? void 0 : _c.name.match(BLOCKQUOTE);
-        if (match) {
+        // 【修复 Bug 3】：兼容 Obsidian 1.5+ 语法树变化，增加 insideCallout 作为识别标记
+        if (match || insideCallout) {
           if (node.name == DISPLAY_MATH_BEGIN) {
             insideMath = true;
             display = true;
@@ -3716,7 +3782,15 @@ var mathPreviewInfoField = import_state3.StateField.define({
         mathInfoSet = buildMathInfoSet(transaction.state);
         rerendered = true;
       } else if (transaction.docChanged) {
-        if (involvesDollar(transaction) || hasOverlappingDisplayMath) {
+        if (hasOverlappingMath) {
+          // 【修复 Bug 3】：当用户正在编辑行间公式时，强制重新解析，让下方预览实时刷新
+          if (hasOverlappingDisplayMath || involvesDollar(transaction)) {
+              mathInfoSet = buildMathInfoSet(transaction.state);
+              rerendered = true;
+          } else {
+              mathInfoSet = prev.mathInfoSet.map(transaction.changes.desc);
+          }
+        } else if (involvesDollar(transaction) || hasOverlappingDisplayMath) {
           mathInfoSet = buildMathInfoSet(transaction.state);
           rerendered = true;
         } else {
@@ -3806,8 +3880,11 @@ var displayMathPreviewForCallout = import_state3.StateField.define({
             if (value2.insideCallout && field.isInCalloutsOrQuotes) {
               builder.add(from, to, value2.toDecoration("replace"));
             }
-          } else {
-            builder.add(to, to, value2.toDecoration("widget"));
+            } else { 
+            // 【修复 Bug 3】：当光标在公式内时，强制保留下方的实时预览 widget，不允许其消失
+            if (value2.insideCallout && field.isInCalloutsOrQuotes) {
+              builder.add(to, to, value2.toDecoration("widget"));
+            }
           }
         }
       }
@@ -3834,7 +3911,7 @@ var hideDisplayMathPreviewInQuote = import_view3.ViewPlugin.fromClass(
         const pos = view.posAtDOM(vanillaObsidianMathPreview);
         if (rangeSetSome(field.mathInfoSet, (info) => info.from - 1 <= pos && pos <= info.to)) {
           const cmWidgetBuffer = vanillaObsidianMathPreview.previousSibling;
-          if (cmWidgetBuffer instanceof HTMLElement && cmWidgetBuffer.matches(".cm-widget-buffer")) {
+          if (cmWidgetBuffer instanceof HTMLElement && cmWidgetBuffer.matches(".cm-widgetBuffer, .cm-widget-buffer")) {
             cmWidgetBuffer.remove();
           }
           vanillaObsidianMathPreview.remove();
@@ -3865,8 +3942,8 @@ function involvesDollar(transaction) {
   transaction.changes.iterChanges(
     (fromA, toA, fromB, toB, inserted) => {
       const textBefore = transaction.startState.sliceDoc(fromA, toA);
-      const dollarEdited = textBefore.contains("$");
-      const dollarInserted = inserted.toString().contains("$");
+      const dollarEdited = textBefore.includes("$");
+      const dollarInserted = inserted.toString().includes("$");
       ret = ret || dollarEdited || dollarInserted;
     }
   );
@@ -4026,7 +4103,7 @@ function inlineWorker(scriptText) {
 
 // src/index/web-worker/importer.worker.ts
 function Worker2() {
-  return inlineWorker('var de=Object.create;var te=Object.defineProperty;var ye=Object.getOwnPropertyDescriptor;var me=Object.getOwnPropertyNames;var ge=Object.getPrototypeOf,ve=Object.prototype.hasOwnProperty;var ke=(r,e)=>()=>(e||r((e={exports:{}}).exports,e),e.exports);var be=(r,e,t,n)=>{if(e&&typeof e=="object"||typeof e=="function")for(let i of me(e))!ve.call(r,i)&&i!==t&&te(r,i,{get:()=>e[i],enumerable:!(n=ye(e,i))||n.enumerable});return r};var xe=(r,e,t)=>(t=r!=null?de(ge(r)):{},be(e||!r||!r.__esModule?te(t,"default",{value:r,enumerable:!0}):t,r));var ae=ke(L=>{"use strict";var we=L&&L.__extends||function(){var r=function(e,t){return r=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(n,i){n.__proto__=i}||function(n,i){for(var o in i)Object.prototype.hasOwnProperty.call(i,o)&&(n[o]=i[o])},r(e,t)};return function(e,t){if(typeof t!="function"&&t!==null)throw new TypeError("Class extends value "+String(t)+" is not a constructor or null");r(e,t);function n(){this.constructor=e}e.prototype=t===null?Object.create(t):(n.prototype=t.prototype,new n)}}();Object.defineProperty(L,"__esModule",{value:!0});L.EmptyBTree=L.asSet=L.simpleComparator=L.defaultComparator=void 0;function ie(r,e){if(Number.isFinite(r)&&Number.isFinite(e))return r-e;var t=typeof r,n=typeof e;if(t!==n)return t<n?-1:1;if(t==="object"){if(r===null)return e===null?0:-1;if(e===null)return 1;if(r=r.valueOf(),e=e.valueOf(),t=typeof r,n=typeof e,t!==n)return t<n?-1:1}return r<e?-1:r>e?1:r===e?0:Number.isNaN(r)?Number.isNaN(e)?0:-1:Number.isNaN(e)?1:Array.isArray(r)?0:Number.NaN}L.defaultComparator=ie;function Ee(r,e){return r>e?1:r<e?-1:0}L.simpleComparator=Ee;var P=function(){function r(e,t,n){this._root=J,this._size=0,this._maxNodeSize=n>=4?Math.min(n,256):32,this._compare=t||ie,e&&this.setPairs(e)}return Object.defineProperty(r.prototype,"size",{get:function(){return this._size},enumerable:!1,configurable:!0}),Object.defineProperty(r.prototype,"length",{get:function(){return this._size},enumerable:!1,configurable:!0}),Object.defineProperty(r.prototype,"isEmpty",{get:function(){return this._size===0},enumerable:!1,configurable:!0}),r.prototype.clear=function(){this._root=J,this._size=0},r.prototype.forEach=function(e,t){var n=this;return t!==void 0&&(e=e.bind(t)),this.forEachPair(function(i,o){return e(o,i,n)})},r.prototype.forEachPair=function(e,t){var n=this.minKey(),i=this.maxKey();return this.forRange(n,i,!0,e,t)},r.prototype.get=function(e,t){return this._root.get(e,t,this)},r.prototype.set=function(e,t,n){this._root.isShared&&(this._root=this._root.clone());var i=this._root.set(e,t,n,this);return i===!0||i===!1?i:(this._root=new Oe([this._root,i]),!0)},r.prototype.has=function(e){return this.forRange(e,e,!0,void 0)!==0},r.prototype.delete=function(e){return this.editRange(e,e,!0,ne)!==0},r.prototype.with=function(e,t,n){var i=this.clone();return i.set(e,t,n)||n?i:this},r.prototype.withPairs=function(e,t){var n=this.clone();return n.setPairs(e,t)!==0||t?n:this},r.prototype.withKeys=function(e,t){for(var n=this.clone(),i=!1,o=0;o<e.length;o++)i=n.set(e[o],void 0,!1)||i;return t&&!i?this:n},r.prototype.without=function(e,t){return this.withoutRange(e,e,!0,t)},r.prototype.withoutKeys=function(e,t){var n=this.clone();return n.deleteKeys(e)||!t?n:this},r.prototype.withoutRange=function(e,t,n,i){var o=this.clone();return o.deleteRange(e,t,n)===0&&i?this:o},r.prototype.filter=function(e,t){var n=this.greedyClone(),i;return n.editAll(function(o,s,a){if(!e(o,s,a))return i=se}),!i&&t?this:n},r.prototype.mapValues=function(e){var t={},n=this.greedyClone();return n.editAll(function(i,o,s){return t.value=e(o,i,s),t}),n},r.prototype.reduce=function(e,t){for(var n=0,i=t,o=this.entries(this.minKey(),j),s;!(s=o.next()).done;)i=e(i,s.value,n++,this);return i},r.prototype.entries=function(e,t){var n=this.findPath(e);if(n===void 0)return N();var i=n.nodequeue,o=n.nodeindex,s=n.leaf,a=t!==void 0?1:0,f=e===void 0?-1:s.indexOf(e,0,this._compare)-1;return N(function(){e:for(;;)switch(a){case 0:if(++f<s.keys.length)return{done:!1,value:[s.keys[f],s.values[f]]};a=2;continue;case 1:if(++f<s.keys.length)return t[0]=s.keys[f],t[1]=s.values[f],{done:!1,value:t};a=2;case 2:for(var l=-1;;){if(++l>=i.length){a=3;continue e}if(++o[l]<i[l].length)break}for(;l>0;l--)i[l-1]=i[l][o[l]].children,o[l-1]=0;s=i[0][o[0]],f=-1,a=t!==void 0?1:0;continue;case 3:return{done:!0,value:void 0}}})},r.prototype.entriesReversed=function(e,t,n){if(e===void 0&&(e=this.maxKey(),n=void 0,e===void 0))return N();var i=this.findPath(e)||this.findPath(this.maxKey()),o=i.nodequeue,s=i.nodeindex,a=i.leaf;O(!o[0]||a===o[0][s[0]],"wat!");var f=a.indexOf(e,0,this._compare);!n&&f<a.keys.length&&this._compare(a.keys[f],e)<=0&&f++;var l=t!==void 0?1:0;return N(function(){e:for(;;)switch(l){case 0:if(--f>=0)return{done:!1,value:[a.keys[f],a.values[f]]};l=2;continue;case 1:if(--f>=0)return t[0]=a.keys[f],t[1]=a.values[f],{done:!1,value:t};l=2;case 2:for(var c=-1;;){if(++c>=o.length){l=3;continue e}if(--s[c]>=0)break}for(;c>0;c--)o[c-1]=o[c][s[c]].children,s[c-1]=o[c-1].length-1;a=o[0][s[0]],f=a.keys.length,l=t!==void 0?1:0;continue;case 3:return{done:!0,value:void 0}}})},r.prototype.findPath=function(e){var t=this._root,n,i;if(t.isLeaf)n=re,i=re;else{n=[],i=[];for(var o=0;!t.isLeaf;o++){if(n[o]=t.children,i[o]=e===void 0?0:t.indexOf(e,0,this._compare),i[o]>=n[o].length)return;t=n[o][i[o]]}n.reverse(),i.reverse()}return{nodequeue:n,nodeindex:i,leaf:t}},r.prototype.diffAgainst=function(e,t,n,i){if(e._compare!==this._compare)throw new Error("Tree comparators are not the same.");if(this.isEmpty||e.isEmpty)return this.isEmpty&&e.isEmpty?void 0:this.isEmpty?n===void 0?void 0:r.stepToEnd(r.makeDiffCursor(e),n):t===void 0?void 0:r.stepToEnd(r.makeDiffCursor(this),t);for(var o=this._compare,s=r.makeDiffCursor(this),a=r.makeDiffCursor(e),f=!0,l=!0,c=r.compare(s,a,o);f&&l;){var p=r.compare(s,a,o),v=s.leaf,d=s.internalSpine,x=s.levelIndices,k=a.leaf,y=a.internalSpine,u=a.levelIndices;if(v||k){if(c!==0){if(p===0){if(v&&k&&i){var h=v.values[x[x.length-1]],b=k.values[u[u.length-1]];if(!Object.is(h,b)){var m=i(s.currentKey,h,b);if(m&&m.break)return m.break}}}else if(p>0){if(k&&n){var g=k.values[u[u.length-1]],m=n(a.currentKey,g);if(m&&m.break)return m.break}}else if(t&&v&&c!==0){var h=v.values[x[x.length-1]],m=t(s.currentKey,h);if(m&&m.break)return m.break}}}else if(!v&&!k&&p===0){var E=d.length-1,T=y.length-1,_=d[E][x[E]],S=y[T][u[T]];if(S===_){c=0,f=r.step(s,!0),l=r.step(a,!0);continue}}c=p,p<0?f=r.step(s):l=r.step(a)}if(f&&t)return r.finishCursorWalk(s,a,o,t);if(l&&n)return r.finishCursorWalk(a,s,o,n)},r.finishCursorWalk=function(e,t,n,i){var o=r.compare(e,t,n);if(o===0){if(!r.step(e))return}else o<0&&O(!1,"cursor walk terminated early");return r.stepToEnd(e,i)},r.stepToEnd=function(e,t){for(var n=!0;n;){var i=e.leaf,o=e.levelIndices,s=e.currentKey;if(i){var a=i.values[o[o.length-1]],f=t(s,a);if(f&&f.break)return f.break}n=r.step(e)}},r.makeDiffCursor=function(e){var t=e._root,n=e.height;return{height:n,internalSpine:[[t]],levelIndices:[0],leaf:void 0,currentKey:t.maxKey()}},r.step=function(e,t){var n=e.internalSpine,i=e.levelIndices,o=e.leaf;if(t===!0||o){var s=i.length;if(t===!0||i[s-1]===0){var a=n.length;if(a===0)return!1;for(var f=a-1,l=f;l>=0;){if(i[l]>0)return l<s-1&&(e.leaf=void 0,i.pop()),l<f&&(e.internalSpine=n.slice(0,l+1)),e.currentKey=n[l][--i[l]].maxKey(),!0;l--}return!1}else{var c=--i[s-1];return e.currentKey=o.keys[c],!0}}else{var p=n.length,v=p-1,d=n[v][i[v]];if(d.isLeaf){e.leaf=d;var c=i[p]=d.values.length-1;e.currentKey=d.keys[c]}else{var x=d.children;n[p]=x;var k=x.length-1;i[p]=k,e.currentKey=x[k].maxKey()}return!0}},r.compare=function(e,t,n){var i=e.height,o=e.currentKey,s=e.levelIndices,a=t.height,f=t.currentKey,l=t.levelIndices,c=n(f,o);if(c!==0)return c;var p=i<a?i:a,v=s.length-(i-p),d=l.length-(a-p);return v-d},r.prototype.keys=function(e){var t=this.entries(e,j);return N(function(){var n=t.next();return n.value&&(n.value=n.value[0]),n})},r.prototype.values=function(e){var t=this.entries(e,j);return N(function(){var n=t.next();return n.value&&(n.value=n.value[1]),n})},Object.defineProperty(r.prototype,"maxNodeSize",{get:function(){return this._maxNodeSize},enumerable:!1,configurable:!0}),r.prototype.minKey=function(){return this._root.minKey()},r.prototype.maxKey=function(){return this._root.maxKey()},r.prototype.clone=function(){this._root.isShared=!0;var e=new r(void 0,this._compare,this._maxNodeSize);return e._root=this._root,e._size=this._size,e},r.prototype.greedyClone=function(e){var t=new r(void 0,this._compare,this._maxNodeSize);return t._root=this._root.greedyClone(e),t._size=this._size,t},r.prototype.toArray=function(e){e===void 0&&(e=2147483647);var t=this.minKey(),n=this.maxKey();return t!==void 0?this.getRange(t,n,!0,e):[]},r.prototype.keysArray=function(){var e=[];return this._root.forRange(this.minKey(),this.maxKey(),!0,!1,this,0,function(t,n){e.push(t)}),e},r.prototype.valuesArray=function(){var e=[];return this._root.forRange(this.minKey(),this.maxKey(),!0,!1,this,0,function(t,n){e.push(n)}),e},r.prototype.toString=function(){return this.toArray().toString()},r.prototype.setIfNotPresent=function(e,t){return this.set(e,t,!1)},r.prototype.nextHigherPair=function(e,t){return t=t||[],e===void 0?this._root.minPair(t):this._root.getPairOrNextHigher(e,this._compare,!1,t)},r.prototype.nextHigherKey=function(e){var t=this.nextHigherPair(e,j);return t&&t[0]},r.prototype.nextLowerPair=function(e,t){return t=t||[],e===void 0?this._root.maxPair(t):this._root.getPairOrNextLower(e,this._compare,!1,t)},r.prototype.nextLowerKey=function(e){var t=this.nextLowerPair(e,j);return t&&t[0]},r.prototype.getPairOrNextLower=function(e,t){return this._root.getPairOrNextLower(e,this._compare,!0,t||[])},r.prototype.getPairOrNextHigher=function(e,t){return this._root.getPairOrNextHigher(e,this._compare,!0,t||[])},r.prototype.changeIfPresent=function(e,t){return this.editRange(e,e,!0,function(n,i){return{value:t}})!==0},r.prototype.getRange=function(e,t,n,i){i===void 0&&(i=67108863);var o=[];return this._root.forRange(e,t,n,!1,this,0,function(s,a){return o.push([s,a]),o.length>i?Le:void 0}),o},r.prototype.setPairs=function(e,t){for(var n=0,i=0;i<e.length;i++)this.set(e[i][0],e[i][1],t)&&n++;return n},r.prototype.forRange=function(e,t,n,i,o){var s=this._root.forRange(e,t,n,!1,this,o||0,i);return typeof s=="number"?s:s.break},r.prototype.editRange=function(e,t,n,i,o){var s=this._root;s.isShared&&(this._root=s=s.clone());try{var a=s.forRange(e,t,n,!0,this,o||0,i);return typeof a=="number"?a:a.break}finally{for(var f=void 0;s.keys.length<=1&&!s.isLeaf;)f||(f=s.isShared),this._root=s=s.keys.length===0?J:s.children[0];f&&(s.isShared=!0)}},r.prototype.editAll=function(e,t){return this.editRange(this.minKey(),this.maxKey(),!0,e,t)},r.prototype.deleteRange=function(e,t,n){return this.editRange(e,t,n,ne)},r.prototype.deleteKeys=function(e){for(var t=0,n=0;t<e.length;t++)this.delete(e[t])&&n++;return n},Object.defineProperty(r.prototype,"height",{get:function(){for(var e=this._root,t=-1;e;)t++,e=e.isLeaf?void 0:e.children[0];return t},enumerable:!1,configurable:!0}),r.prototype.freeze=function(){var e=this;e.clear=e.set=e.editRange=function(){throw new Error("Attempted to modify a frozen BTree")}},r.prototype.unfreeze=function(){delete this.clear,delete this.set,delete this.editRange},Object.defineProperty(r.prototype,"isFrozen",{get:function(){return this.hasOwnProperty("editRange")},enumerable:!1,configurable:!0}),r.prototype.checkValid=function(){var e=this._root.checkValid(0,this,0);O(e===this.size,"size mismatch: counted ",e,"but stored",this.size)},r}();L.default=P;function Te(r){return r}L.asSet=Te;Symbol&&Symbol.iterator&&(P.prototype[Symbol.iterator]=P.prototype.entries);P.prototype.where=P.prototype.filter;P.prototype.setRange=P.prototype.setPairs;P.prototype.add=P.prototype.set;function N(r){r===void 0&&(r=function(){return{done:!0,value:void 0}});var e={next:r};return Symbol&&Symbol.iterator&&(e[Symbol.iterator]=function(){return this}),e}var oe=function(){function r(e,t){e===void 0&&(e=[]),this.keys=e,this.values=t||w,this.isShared=void 0}return Object.defineProperty(r.prototype,"isLeaf",{get:function(){return this.children===void 0},enumerable:!1,configurable:!0}),r.prototype.maxKey=function(){return this.keys[this.keys.length-1]},r.prototype.indexOf=function(e,t,n){for(var i=this.keys,o=0,s=i.length,a=s>>1;o<s;){var f=n(i[a],e);if(f<0)o=a+1;else if(f>0)s=a;else{if(f===0)return a;if(e===e)return i.length;throw new Error("BTree: NaN was used as a key")}a=o+s>>1}return a^t},r.prototype.minKey=function(){return this.keys[0]},r.prototype.minPair=function(e){if(this.keys.length!==0)return e[0]=this.keys[0],e[1]=this.values[0],e},r.prototype.maxPair=function(e){if(this.keys.length!==0){var t=this.keys.length-1;return e[0]=this.keys[t],e[1]=this.values[t],e}},r.prototype.clone=function(){var e=this.values;return new r(this.keys.slice(0),e===w?e:e.slice(0))},r.prototype.greedyClone=function(e){return this.isShared&&!e?this:this.clone()},r.prototype.get=function(e,t,n){var i=this.indexOf(e,-1,n._compare);return i<0?t:this.values[i]},r.prototype.getPairOrNextLower=function(e,t,n,i){var o=this.indexOf(e,-1,t),s=o<0?~o-1:n?o:o-1;if(s>=0)return i[0]=this.keys[s],i[1]=this.values[s],i},r.prototype.getPairOrNextHigher=function(e,t,n,i){var o=this.indexOf(e,-1,t),s=o<0?~o:n?o:o+1,a=this.keys;if(s<a.length)return i[0]=a[s],i[1]=this.values[s],i},r.prototype.checkValid=function(e,t,n){var i=this.keys.length,o=this.values.length;return O(this.values===w?i<=o:i===o,"keys/values length mismatch: depth",e,"with lengths",i,o,"and baseIndex",n),O(e==0||i>0,"empty leaf at depth",e,"and baseIndex",n),i},r.prototype.set=function(e,t,n,i){var o=this.indexOf(e,-1,i._compare);if(o<0){if(o=~o,i._size++,this.keys.length<i._maxNodeSize)return this.insertInLeaf(o,e,t,i);var s=this.splitOffRightSide(),a=this;return o>this.keys.length&&(o-=this.keys.length,a=s),a.insertInLeaf(o,e,t,i),s}else return n!==!1&&(t!==void 0&&this.reifyValues(),this.keys[o]=e,this.values[o]=t),!1},r.prototype.reifyValues=function(){return this.values===w?this.values=this.values.slice(0,this.keys.length):this.values},r.prototype.insertInLeaf=function(e,t,n,i){if(this.keys.splice(e,0,t),this.values===w){for(;w.length<i._maxNodeSize;)w.push(void 0);if(n===void 0)return!0;this.values=w.slice(0,this.keys.length-1)}return this.values.splice(e,0,n),!0},r.prototype.takeFromRight=function(e){var t=this.values;e.values===w?t!==w&&t.push(void 0):(t=this.reifyValues(),t.push(e.values.shift())),this.keys.push(e.keys.shift())},r.prototype.takeFromLeft=function(e){var t=this.values;e.values===w?t!==w&&t.unshift(void 0):(t=this.reifyValues(),t.unshift(e.values.pop())),this.keys.unshift(e.keys.pop())},r.prototype.splitOffRightSide=function(){var e=this.keys.length>>1,t=this.keys.splice(e),n=this.values===w?w:this.values.splice(e);return new r(t,n)},r.prototype.forRange=function(e,t,n,i,o,s,a){var f=o._compare,l,c;if(t===e){if(!n||(c=(l=this.indexOf(e,-1,f))+1,l<0))return s}else l=this.indexOf(e,0,f),c=this.indexOf(t,-1,f),c<0?c=~c:n===!0&&c++;var p=this.keys,v=this.values;if(a!==void 0)for(var d=l;d<c;d++){var x=p[d],k=a(x,v[d],s++);if(k!==void 0){if(i===!0){if(x!==p[d]||this.isShared===!0)throw new Error("BTree illegally changed or cloned in editRange");k.delete?(this.keys.splice(d,1),this.values!==w&&this.values.splice(d,1),o._size--,d--,c--):k.hasOwnProperty("value")&&(v[d]=k.value)}if(k.break!==void 0)return k}}else s+=c-l;return s},r.prototype.mergeSibling=function(e,t){if(this.keys.push.apply(this.keys,e.keys),this.values===w){if(e.values===w)return;this.values=this.values.slice(0,this.keys.length)}this.values.push.apply(this.values,e.reifyValues())},r}(),Oe=function(r){we(e,r);function e(t,n){var i=this;if(!n){n=[];for(var o=0;o<t.length;o++)n[o]=t[o].maxKey()}return i=r.call(this,n)||this,i.children=t,i}return e.prototype.clone=function(){for(var t=this.children.slice(0),n=0;n<t.length;n++)t[n].isShared=!0;return new e(t,this.keys.slice(0))},e.prototype.greedyClone=function(t){if(this.isShared&&!t)return this;for(var n=new e(this.children.slice(0),this.keys.slice(0)),i=0;i<n.children.length;i++)n.children[i]=n.children[i].greedyClone(t);return n},e.prototype.minKey=function(){return this.children[0].minKey()},e.prototype.minPair=function(t){return this.children[0].minPair(t)},e.prototype.maxPair=function(t){return this.children[this.children.length-1].maxPair(t)},e.prototype.get=function(t,n,i){var o=this.indexOf(t,0,i._compare),s=this.children;return o<s.length?s[o].get(t,n,i):void 0},e.prototype.getPairOrNextLower=function(t,n,i,o){var s=this.indexOf(t,0,n),a=this.children;if(s>=a.length)return this.maxPair(o);var f=a[s].getPairOrNextLower(t,n,i,o);return f===void 0&&s>0?a[s-1].maxPair(o):f},e.prototype.getPairOrNextHigher=function(t,n,i,o){var s=this.indexOf(t,0,n),a=this.children,f=a.length;if(!(s>=f)){var l=a[s].getPairOrNextHigher(t,n,i,o);return l===void 0&&s<f-1?a[s+1].minPair(o):l}},e.prototype.checkValid=function(t,n,i){var o=this.keys.length,s=this.children.length;O(o===s,"keys/children length mismatch: depth",t,"lengths",o,s,"baseIndex",i),O(o>1||t>0,"internal node has length",o,"at depth",t,"baseIndex",i);for(var a=0,f=this.children,l=this.keys,c=0,p=0;p<s;p++)a+=f[p].checkValid(t+1,n,i+a),c+=f[p].keys.length,O(a>=c,"wtf",i),O(p===0||f[p-1].constructor===f[p].constructor,"type mismatch, baseIndex:",i),f[p].maxKey()!=l[p]&&O(!1,"keys[",p,"] =",l[p],"is wrong, should be ",f[p].maxKey(),"at depth",t,"baseIndex",i),p===0||n._compare(l[p-1],l[p])<0||O(!1,"sort violation at depth",t,"index",p,"keys",l[p-1],l[p]);var v=c===0;return(v||c>n.maxNodeSize*s)&&O(!1,v?"too few":"too many","children (",c,a,") at depth",t,"maxNodeSize:",n.maxNodeSize,"children.length:",s,"baseIndex:",i),a},e.prototype.set=function(t,n,i,o){var s=this.children,a=o._maxNodeSize,f=o._compare,l=Math.min(this.indexOf(t,0,f),s.length-1),c=s[l];if(c.isShared&&(s[l]=c=c.clone()),c.keys.length>=a){var p;l>0&&(p=s[l-1]).keys.length<a&&f(c.keys[0],t)<0?(p.isShared&&(s[l-1]=p=p.clone()),p.takeFromRight(c),this.keys[l-1]=p.maxKey()):(p=s[l+1])!==void 0&&p.keys.length<a&&f(c.maxKey(),t)<0&&(p.isShared&&(s[l+1]=p=p.clone()),p.takeFromLeft(c),this.keys[l]=s[l].maxKey())}var v=c.set(t,n,i,o);if(v===!1)return!1;if(this.keys[l]=c.maxKey(),v===!0)return!0;if(this.keys.length<a)return this.insert(l+1,v),!0;var d=this.splitOffRightSide(),x=this;return f(v.maxKey(),this.maxKey())>0&&(x=d,l-=this.keys.length),x.insert(l+1,v),d},e.prototype.insert=function(t,n){this.children.splice(t,0,n),this.keys.splice(t,0,n.maxKey())},e.prototype.splitOffRightSide=function(){var t=this.children.length>>1;return new e(this.children.splice(t),this.keys.splice(t))},e.prototype.takeFromRight=function(t){this.keys.push(t.keys.shift()),this.children.push(t.children.shift())},e.prototype.takeFromLeft=function(t){this.keys.unshift(t.keys.pop()),this.children.unshift(t.children.pop())},e.prototype.forRange=function(t,n,i,o,s,a,f){var l=s._compare,c=this.keys,p=this.children,v=this.indexOf(t,0,l),d=v,x=Math.min(n===t?v:this.indexOf(n,0,l),c.length-1);if(o){if(d<=x)try{for(;d<=x;d++){p[d].isShared&&(p[d]=p[d].clone());var k=p[d].forRange(t,n,i,o,s,a,f);if(c[d]=p[d].maxKey(),typeof k!="number")return k;a=k}}finally{var y=s._maxNodeSize>>1;for(v>0&&v--,d=x;d>=v;d--)p[d].keys.length<=y&&(p[d].keys.length!==0?this.tryMerge(d,s._maxNodeSize):(c.splice(d,1),p.splice(d,1)));p.length!==0&&p[0].keys.length===0&&O(!1,"emptiness bug")}}else for(;d<=x;d++){var k=p[d].forRange(t,n,i,o,s,a,f);if(typeof k!="number")return k;a=k}return a},e.prototype.tryMerge=function(t,n){var i=this.children;return t>=0&&t+1<i.length&&i[t].keys.length+i[t+1].keys.length<=n?(i[t].isShared&&(i[t]=i[t].clone()),i[t].mergeSibling(i[t+1],n),i.splice(t+1,1),this.keys.splice(t+1,1),this.keys[t]=i[t].maxKey(),!0):!1},e.prototype.mergeSibling=function(t,n){var i=this.keys.length;this.keys.push.apply(this.keys,t.keys);var o=t.children;if(this.children.push.apply(this.children,o),t.isShared&&!this.isShared)for(var s=0;s<o.length;s++)o[s].isShared=!0;this.tryMerge(i-1,n)},e}(oe),w=[],se={delete:!0},ne=function(){return se},Le={break:!0},J=function(){var r=new oe;return r.isShared=!0,r}(),re=[],j=[];function O(r){for(var e=[],t=1;t<arguments.length;t++)e[t-1]=arguments[t];if(!r)throw e.unshift("B+ tree"),new Error(e.join(" "))}L.EmptyBTree=function(){var r=new P;return r.freeze(),r}()});function M(r){return r.includes("/")&&(r=r.substring(r.lastIndexOf("/")+1)),r.endsWith(".md")&&(r=r.substring(0,r.length-3)),r}var $=class r{static file(e,t=!1,n){return new r({path:e,embed:t,display:n,subpath:void 0,type:"file"})}static infer(e,t=!1,n){if(e.includes("#^")){let i=e.split("#^");return r.block(i[0],i[1],t,n)}else if(e.includes("#")){let i=e.split("#");return r.header(i[0],i[1],t,n)}else return r.file(e,t,n)}static header(e,t,n,i){return new r({path:e,embed:n,display:i,subpath:t,type:"header"})}static block(e,t,n,i){return new r({path:e,embed:n,display:i,subpath:t,type:"block"})}static fromObject(e){return new r(e)}static parseInner(e){let[t,n]=_e(e);return r.infer(t,!1,n)}constructor(e){Object.assign(this,e)}withPath(e){return new r(Object.assign({},this,{path:e}))}withDisplay(e){return new r(Object.assign({},this,{display:e}))}withEmbed(e){return this.embed==e?this:new r(Object.assign({},this,{embed:e}))}withHeader(e){return r.header(this.path,e,this.embed,this.display)}withBlock(e){return r.block(this.path,e,this.embed,this.display)}equals(e){return e==null||e==null?!1:this.path==e.path&&this.type==e.type&&this.subpath==e.subpath}toString(){return this.markdown()}toObject(){return{path:this.path,type:this.type,subpath:this.subpath,display:this.display,embed:this.embed}}toFile(){return r.file(this.path,this.embed,this.display)}toEmbed(){return this.withEmbed(!0)}fromEmbed(){return this.withEmbed(!1)}markdown(){let e=(this.embed?"!":"")+"[["+this.obsidianLink();return e+=this.displayOrDefault(),e+="]]",e}displayOrDefault(){if(this.display)return this.display;{let e=M(this.path);return(this.type=="header"||this.type=="block")&&(e+=" > "+this.subpath),e}}obsidianLink(){var t,n;let e=this.path.replace("|","\\\\|");return this.type=="header"?e+"#"+((t=this.subpath)==null?void 0:t.replace("|","\\\\|")):this.type=="block"?e+"#^"+((n=this.subpath)==null?void 0:n.replace("|","\\\\|")):e}fileName(){return M(this.path)}};function _e(r){let e=-1;for(;(e=r.indexOf("|",e+1))>=0;)if(!(e>0&&r[e-1]=="\\\\"))return[r.substring(0,e).replace(/\\\\\\|/g,"|"),r.substring(e+1)];return[r.replace(/\\\\\\|/g,"|"),void 0]}var W=xe(ae());var C=["axiom","definition","lemma","proposition","theorem","corollary","claim","assumption","example","exercise","conjecture","hypothesis","remark"],Se=["proof","solution"],De=[...C,...Se],I=["axm","def","lem","prp","thm","cor","clm","asm","exm","exr","cnj","hyp","rmk"],Pe={};C.forEach((r,e)=>{Pe[r]={id:r,prefix:I[e]}});var q={};I.forEach((r,e)=>{q[r]=C[e]});var Re={};C.forEach((r,e)=>{Re[r]=I[e]});var $e=new RegExp(`> *\\\\[\\\\! *(?<type>${C.join("|")}|${I.join("|")}|math) *(\\\\|(?<number>.*?))?\\\\](?<fold>[+-])?(?<title> .*)?`,"i");function Ne(r){let e=r.trim();return e?e==="*"&&(e=""):e="auto",e}function ue(r,e=!1){var a,f,l,c,p;let t=(a=r.match($e))==null?void 0:a.groups;if(!t)return;let n=t.type.trim().toLowerCase();if(n==="math"&&t.number){let v=JSON.parse(t.number);return v.legacy=!0,v}if(e&&n==="example")return;n.length<=4&&(n=q[n]);let i=Ne((f=t.number)!=null?f:""),o=(l=t.title)==null?void 0:l.trim();o===""&&(o=void 0);let s=(p=(c=t.fold)==null?void 0:c.trim())!=null?p:"";return{type:n,number:i,title:o,fold:s,legacy:!1}}function le(r){var e,t;return(t=(e=r.match(/\\$\\$([\\s\\S]*)\\$\\$/))==null?void 0:e[1].trim())!=null?t:r}function fe(r){let e=r.match(new RegExp("(?<!\\\\\\\\)%"));return(e==null?void 0:e.index)!==void 0?{nonComment:r.substring(0,e.index),comment:r.substring(e.index+1)}:{nonComment:r,comment:""}}function pe(r){let e=[],t=/%%([\\s\\S]*?)%%/g,n;for(;n=t.exec(r);)for(let i of n[1].split(`\n`))i=i.trim(),i&&e.push(i);return e}function G(r){var t;let e=(t=r.match(new RegExp("^(?<key>.*?):(?<value>.*)$")))==null?void 0:t.groups;return e?{[e.key.trim()]:e.value.trim()}:null}function ce(r,e,t,n){var v,d,x,k;let i=e.split(`\n`),o=!i.some(y=>y.trim()!==""),s=(v=t.headings)!=null?v:[];s.sort((y,u)=>y.position.start.line-u.position.start.line);let a=new W.default(void 0,(y,u)=>y-u);for(let y=0;y<s.length;y++){let u=s[y],h=u.position.start.line,b=y==s.length-1?i.length-1:s[y+1].position.start.line-1;a.set(h,{$ordinal:y+1,$title:u.heading,$level:u.level,$position:{start:h,end:b},$blocks:[],$links:[]})}let f=a.getPairOrNextHigher(0);if(!f&&!o||f&&!Ce(i,0,f[1].$position.start)){let y=f?f[1].$position.start-1:i.length;a.set(0,{$ordinal:0,$title:M(r),$level:1,$position:{start:0,end:y},$blocks:[],$links:[]})}let l=new W.default(void 0,(y,u)=>y-u),c=1;for(let y of t.sections||[]){if(y.type==="heading")continue;let u=y.position.start.line,h=y.position.end.line,b=null,m=!1;if(y.type==="callout"){let g=ue(i[u],n);b=g!=null?g:null,m=!!(g!=null&&g.legacy)}if(y.type==="math"){let g=le(Ke(e,y)),E=g.match(/\\\\tag\\{(.*)\\}/),T={};for(let _ of g.split(`\n`)){let{comment:S}=fe(_);S&&Object.assign(T,G(S))}l.set(u,{$ordinal:c++,$position:{start:u,end:h},$pos:y.position,$links:[],$blockId:y.id,$manualTag:(d=E==null?void 0:E[1])!=null?d:null,$mathText:g,$type:"equation",$label:T.label,$display:T.display})}else if(b){let g=i.slice(u+1,h+1).join(`\n`),E=pe(g),T={};for(let _ of E)_.startsWith(">")&&(_=_.slice(1).trim()),_&&(_==="main"?T.main="true":Object.assign(T,G(_)));l.set(u,{$ordinal:c++,$position:{start:u,end:h},$pos:y.position,$links:[],$blockId:y.id,$settings:b,$type:"theorem",$label:T.label,$display:T.display,$main:T.main==="true",$v1:m})}else l.set(u,{$ordinal:c++,$position:{start:u,end:h},$pos:y.position,$links:[],$blockId:y.id,$type:y.type})}for(let y of l.values()){let u=a.getPairOrNextLower(y.$position.start);u&&u[1].$position.end>=y.$position.end&&u[1].$blocks.push(y)}let p=[];for(let y of(x=t.links)!=null?x:[]){let u=$.infer(y.link),h=y.position.start.line;F(p,u);let b=a.getPairOrNextLower(h);b&&b[1].$position.end>=h&&F(b[1].$links,u);let m=l.getPairOrNextLower(h);m&&m[1].$position.end>=h&&F(m[1].$links,u);let g=l.getPairOrNextHigher(h);g&&g[1].$position.end>=h&&F(g[1].$links,u)}for(let y of(k=t.frontmatterLinks)!=null?k:[]){let u=$.infer(y.link,!1,y.displayText);F(p,u)}return{$path:r,$links:p,$sections:a.valuesArray(),$extension:"md",$position:{start:0,end:i.length}}}function Ce(r,e,t){for(let n=e;n<t;n++)if(r[n].trim()!=="")return!1;return!0}function F(r,e){r.find(t=>t.equals(e))||r.push(e)}function Ke(r,e){return r.slice(e.position.start.offset,e.position.end.offset)}var z;(y=>{y.DEFAULT_TO_STRING={nullRepresentation:"-",dateFormat:"MMMM dd, yyyy",dateTimeFormat:"h:mm a - MMMM dd, yyyy"};function e(u,h=y.DEFAULT_TO_STRING,b=!1){let m=t(u);if(!m)return h.nullRepresentation;switch(m.type){case"null":return h.nullRepresentation;case"string":return m.value;case"number":case"boolean":return""+m.value;case"link":return m.value.markdown();case"function":return"<function>";case"array":let g="";return b&&(g+="["),g+=m.value.map(E=>e(E,h,!0)).join(", "),b&&(g+="]"),g;case"object":return"{ "+Object.entries(m.value).map(E=>E[0]+": "+e(E[1],h,!0)).join(", ")+" }"}}y.toString=e;function t(u){return c(u)?{type:"null",value:u}:l(u)?{type:"number",value:u}:f(u)?{type:"string",value:u}:v(u)?{type:"boolean",value:u}:p(u)?{type:"array",value:u}:d(u)?{type:"link",value:u}:k(u)?{type:"function",value:u}:x(u)?{type:"object",value:u}:void 0}y.wrapValue=t;function n(u,h){if(x(u)){let b={};for(let[m,g]of Object.entries(u))b[m]=n(g,h);return b}else if(p(u)){let b=[];for(let m of u)b.push(n(m,h));return b}else return h(u)}y.mapLeaves=n;function i(u,h,b){var E,T;if(u===void 0&&(u=null),h===void 0&&(h=null),u===null&&h===null)return 0;if(u===null)return-1;if(h===null)return 1;let m=t(u),g=t(h);if(m===void 0&&g===void 0)return 0;if(m===void 0)return-1;if(g===void 0)return 1;if(m.type!=g.type)return m.type.localeCompare(g.type);if(m.value===g.value)return 0;switch(m.type){case"string":return m.value.localeCompare(g.value);case"number":return m.value<g.value?-1:m.value==g.value?0:1;case"null":return 0;case"boolean":return m.value==g.value?0:m.value?1:-1;case"link":let _=m.value,S=g.value,A=b!=null?b:R=>R,U=A(_.path).localeCompare(A(S.path));if(U!=0)return U;let X=_.type.localeCompare(S.type);return X!=0?X:_.subpath&&!S.subpath?1:!_.subpath&&S.subpath?-1:!_.subpath&&!S.subpath?0:((E=_.subpath)!=null?E:"").localeCompare((T=S.subpath)!=null?T:"");case"array":let V=m.value,H=g.value;for(let R=0;R<Math.min(V.length,H.length);R++){let K=i(V[R],H[R]);if(K!=0)return K}return V.length-H.length;case"object":let Y=m.value,Q=g.value,B=Array.from(Object.keys(Y)),Z=Array.from(Object.keys(Q));B.sort(),Z.sort();let ee=i(B,Z);if(ee!=0)return ee;for(let R of B){let K=i(Y[R],Q[R]);if(K!=0)return K}return 0;case"function":return 0}}y.compare=i;function o(u){var h;return(h=t(u))==null?void 0:h.type}y.typeOf=o;function s(u){let h=t(u);if(!h)return!1;switch(h.type){case"number":return h.value!=0;case"string":return h.value.length>0;case"boolean":return h.value;case"link":return!!h.value.path;case"object":return Object.keys(h.value).length>0;case"array":return h.value.length>0;case"null":return!1;case"function":return!0}}y.isTruthy=s;function a(u){if(u==null)return u;if(y.isArray(u))return[].concat(u.map(h=>a(h)));if(y.isObject(u)){let h={};for(let[b,m]of Object.entries(u))h[b]=a(m);return h}else return u}y.deepCopy=a;function f(u){return typeof u=="string"}y.isString=f;function l(u){return typeof u=="number"}y.isNumber=l;function c(u){return u==null}y.isNull=c;function p(u){return Array.isArray(u)}y.isArray=p;function v(u){return typeof u=="boolean"}y.isBoolean=v;function d(u){return u instanceof $}y.isLink=d;function x(u){return u!==void 0&&typeof u=="object"&&!p(u)&&!d(u)&&!c(u)}y.isObject=x;function k(u){return typeof u=="function"}y.isFunction=k})(z||(z={}));var he;(n=>{function r(i){return z.isObject(i)&&Object.keys(i).length==2&&"key"in i&&"rows"in i}n.isElementGroup=r;function e(i){for(let o of i)if(!r(o))return!1;return!0}n.isGrouping=e;function t(i){if(e(i)){let o=0;for(let s of i)o+=t(s.rows);return o}else return i.length}n.count=t})(he||(he={}));var D;(t=>{function r(n){if(n instanceof Map){let o=new Map;for(let[s,a]of n.entries())o.set(r(s),r(a));return o}else if(n instanceof Set){let o=new Set;for(let s of n)o.add(r(s));return o}let i=z.wrapValue(n);if(i===void 0)throw Error("Unrecognized transferable value: "+n);switch(i.type){case"null":case"number":case"string":case"boolean":return i.value;case"array":return i.value.map(s=>r(s));case"link":return{"$transfer-type":"link",value:r(i.value.toObject())};case"object":let o={};for(let s of Object.getOwnPropertyNames(i.value))o[s]=r(i.value[s]);return o}}t.transferable=r;function e(n){if(n===null)return null;if(n===void 0)return;if(n instanceof Map){let i=new Map;for(let[o,s]of n.entries())i.set(e(o),e(s));return i}else if(n instanceof Set){let i=new Set;for(let o of n)i.add(e(o));return i}else{if(Array.isArray(n))return n.map(i=>e(i));if(typeof n=="object"){if("$transfer-type"in n)switch(n["$transfer-type"]){case"link":return $.fromObject(e(n.value));default:throw Error(`Unrecognized transfer type \'${n["$transfer-type"]}\'`)}let i={};for(let[o,s]of Object.entries(n))i[o]=e(s);return i}}return n}t.value=e})(D||(D={}));onmessage=r=>{try{let e=D.value(r.data);if(e.type==="markdown"){let t=ce(e.path,e.contents,e.metadata,e.excludeExampleCallout);postMessage(D.transferable({type:"markdown",result:t}))}else postMessage({$error:"Unsupported import method."})}catch(e){postMessage({$error:e.message})}};\n');
+  return inlineWorker('var de=Object.create;var te=Object.defineProperty;var ye=Object.getOwnPropertyDescriptor;var me=Object.getOwnPropertyNames;var ge=Object.getPrototypeOf,ve=Object.prototype.hasOwnProperty;var ke=(r,e)=>()=>(e||r((e={exports:{}}).exports,e),e.exports);var be=(r,e,t,n)=>{if(e&&typeof e=="object"||typeof e=="function")for(let i of me(e))!ve.call(r,i)&&i!==t&&te(r,i,{get:()=>e[i],enumerable:!(n=ye(e,i))||n.enumerable});return r};var xe=(r,e,t)=>(t=r!=null?de(ge(r)):{},be(e||!r||!r.__esModule?te(t,"default",{value:r,enumerable:!0}):t,r));var ae=ke(L=>{"use strict";var we=L&&L.__extends||function(){var r=function(e,t){return r=Object.setPrototypeOf||{__proto__:[]}instanceof Array&&function(n,i){n.__proto__=i}||function(n,i){for(var o in i)Object.prototype.hasOwnProperty.call(i,o)&&(n[o]=i[o])},r(e,t)};return function(e,t){if(typeof t!="function"&&t!==null)throw new TypeError("Class extends value "+String(t)+" is not a constructor or null");r(e,t);function n(){this.constructor=e}e.prototype=t===null?Object.create(t):(n.prototype=t.prototype,new n)}}();Object.defineProperty(L,"__esModule",{value:!0});L.EmptyBTree=L.asSet=L.simpleComparator=L.defaultComparator=void 0;function ie(r,e){if(Number.isFinite(r)&&Number.isFinite(e))return r-e;var t=typeof r,n=typeof e;if(t!==n)return t<n?-1:1;if(t==="object"){if(r===null)return e===null?0:-1;if(e===null)return 1;if(r=r.valueOf(),e=e.valueOf(),t=typeof r,n=typeof e,t!==n)return t<n?-1:1}return r<e?-1:r>e?1:r===e?0:Number.isNaN(r)?Number.isNaN(e)?0:-1:Number.isNaN(e)?1:Array.isArray(r)?0:Number.NaN}L.defaultComparator=ie;function Ee(r,e){return r>e?1:r<e?-1:0}L.simpleComparator=Ee;var P=function(){function r(e,t,n){this._root=J,this._size=0,this._maxNodeSize=n>=4?Math.min(n,256):32,this._compare=t||ie,e&&this.setPairs(e)}return Object.defineProperty(r.prototype,"size",{get:function(){return this._size},enumerable:!1,configurable:!0}),Object.defineProperty(r.prototype,"length",{get:function(){return this._size},enumerable:!1,configurable:!0}),Object.defineProperty(r.prototype,"isEmpty",{get:function(){return this._size===0},enumerable:!1,configurable:!0}),r.prototype.clear=function(){this._root=J,this._size=0},r.prototype.forEach=function(e,t){var n=this;return t!==void 0&&(e=e.bind(t)),this.forEachPair(function(i,o){return e(o,i,n)})},r.prototype.forEachPair=function(e,t){var n=this.minKey(),i=this.maxKey();return this.forRange(n,i,!0,e,t)},r.prototype.get=function(e,t){return this._root.get(e,t,this)},r.prototype.set=function(e,t,n){this._root.isShared&&(this._root=this._root.clone());var i=this._root.set(e,t,n,this);return i===!0||i===!1?i:(this._root=new Oe([this._root,i]),!0)},r.prototype.has=function(e){return this.forRange(e,e,!0,void 0)!==0},r.prototype.delete=function(e){return this.editRange(e,e,!0,ne)!==0},r.prototype.with=function(e,t,n){var i=this.clone();return i.set(e,t,n)||n?i:this},r.prototype.withPairs=function(e,t){var n=this.clone();return n.setPairs(e,t)!==0||t?n:this},r.prototype.withKeys=function(e,t){for(var n=this.clone(),i=!1,o=0;o<e.length;o++)i=n.set(e[o],void 0,!1)||i;return t&&!i?this:n},r.prototype.without=function(e,t){return this.withoutRange(e,e,!0,t)},r.prototype.withoutKeys=function(e,t){var n=this.clone();return n.deleteKeys(e)||!t?n:this},r.prototype.withoutRange=function(e,t,n,i){var o=this.clone();return o.deleteRange(e,t,n)===0&&i?this:o},r.prototype.filter=function(e,t){var n=this.greedyClone(),i;return n.editAll(function(o,s,a){if(!e(o,s,a))return i=se}),!i&&t?this:n},r.prototype.mapValues=function(e){var t={},n=this.greedyClone();return n.editAll(function(i,o,s){return t.value=e(o,i,s),t}),n},r.prototype.reduce=function(e,t){for(var n=0,i=t,o=this.entries(this.minKey(),j),s;!(s=o.next()).done;)i=e(i,s.value,n++,this);return i},r.prototype.entries=function(e,t){var n=this.findPath(e);if(n===void 0)return N();var i=n.nodequeue,o=n.nodeindex,s=n.leaf,a=t!==void 0?1:0,f=e===void 0?-1:s.indexOf(e,0,this._compare)-1;return N(function(){e:for(;;)switch(a){case 0:if(++f<s.keys.length)return{done:!1,value:[s.keys[f],s.values[f]]};a=2;continue;case 1:if(++f<s.keys.length)return t[0]=s.keys[f],t[1]=s.values[f],{done:!1,value:t};a=2;case 2:for(var l=-1;;){if(++l>=i.length){a=3;continue e}if(++o[l]<i[l].length)break}for(;l>0;l--)i[l-1]=i[l][o[l]].children,o[l-1]=0;s=i[0][o[0]],f=-1,a=t!==void 0?1:0;continue;case 3:return{done:!0,value:void 0}}})},r.prototype.entriesReversed=function(e,t,n){if(e===void 0&&(e=this.maxKey(),n=void 0,e===void 0))return N();var i=this.findPath(e)||this.findPath(this.maxKey()),o=i.nodequeue,s=i.nodeindex,a=i.leaf;O(!o[0]||a===o[0][s[0]],"wat!");var f=a.indexOf(e,0,this._compare);!n&&f<a.keys.length&&this._compare(a.keys[f],e)<=0&&f++;var l=t!==void 0?1:0;return N(function(){e:for(;;)switch(l){case 0:if(--f>=0)return{done:!1,value:[a.keys[f],a.values[f]]};l=2;continue;case 1:if(--f>=0)return t[0]=a.keys[f],t[1]=a.values[f],{done:!1,value:t};l=2;case 2:for(var c=-1;;){if(++c>=o.length){l=3;continue e}if(--s[c]>=0)break}for(;c>0;c--)o[c-1]=o[c][s[c]].children,s[c-1]=o[c-1].length-1;a=o[0][s[0]],f=a.keys.length,l=t!==void 0?1:0;continue;case 3:return{done:!0,value:void 0}}})},r.prototype.findPath=function(e){var t=this._root,n,i;if(t.isLeaf)n=re,i=re;else{n=[],i=[];for(var o=0;!t.isLeaf;o++){if(n[o]=t.children,i[o]=e===void 0?0:t.indexOf(e,0,this._compare),i[o]>=n[o].length)return;t=n[o][i[o]]}n.reverse(),i.reverse()}return{nodequeue:n,nodeindex:i,leaf:t}},r.prototype.diffAgainst=function(e,t,n,i){if(e._compare!==this._compare)throw new Error("Tree comparators are not the same.");if(this.isEmpty||e.isEmpty)return this.isEmpty&&e.isEmpty?void 0:this.isEmpty?n===void 0?void 0:r.stepToEnd(r.makeDiffCursor(e),n):t===void 0?void 0:r.stepToEnd(r.makeDiffCursor(this),t);for(var o=this._compare,s=r.makeDiffCursor(this),a=r.makeDiffCursor(e),f=!0,l=!0,c=r.compare(s,a,o);f&&l;){var p=r.compare(s,a,o),v=s.leaf,d=s.internalSpine,x=s.levelIndices,k=a.leaf,y=a.internalSpine,u=a.levelIndices;if(v||k){if(c!==0){if(p===0){if(v&&k&&i){var h=v.values[x[x.length-1]],b=k.values[u[u.length-1]];if(!Object.is(h,b)){var m=i(s.currentKey,h,b);if(m&&m.break)return m.break}}}else if(p>0){if(k&&n){var g=k.values[u[u.length-1]],m=n(a.currentKey,g);if(m&&m.break)return m.break}}else if(t&&v&&c!==0){var h=v.values[x[x.length-1]],m=t(s.currentKey,h);if(m&&m.break)return m.break}}}else if(!v&&!k&&p===0){var E=d.length-1,T=y.length-1,_=d[E][x[E]],S=y[T][u[T]];if(S===_){c=0,f=r.step(s,!0),l=r.step(a,!0);continue}}c=p,p<0?f=r.step(s):l=r.step(a)}if(f&&t)return r.finishCursorWalk(s,a,o,t);if(l&&n)return r.finishCursorWalk(a,s,o,n)},r.finishCursorWalk=function(e,t,n,i){var o=r.compare(e,t,n);if(o===0){if(!r.step(e))return}else o<0&&O(!1,"cursor walk terminated early");return r.stepToEnd(e,i)},r.stepToEnd=function(e,t){for(var n=!0;n;){var i=e.leaf,o=e.levelIndices,s=e.currentKey;if(i){var a=i.values[o[o.length-1]],f=t(s,a);if(f&&f.break)return f.break}n=r.step(e)}},r.makeDiffCursor=function(e){var t=e._root,n=e.height;return{height:n,internalSpine:[[t]],levelIndices:[0],leaf:void 0,currentKey:t.maxKey()}},r.step=function(e,t){var n=e.internalSpine,i=e.levelIndices,o=e.leaf;if(t===!0||o){var s=i.length;if(t===!0||i[s-1]===0){var a=n.length;if(a===0)return!1;for(var f=a-1,l=f;l>=0;){if(i[l]>0)return l<s-1&&(e.leaf=void 0,i.pop()),l<f&&(e.internalSpine=n.slice(0,l+1)),e.currentKey=n[l][--i[l]].maxKey(),!0;l--}return!1}else{var c=--i[s-1];return e.currentKey=o.keys[c],!0}}else{var p=n.length,v=p-1,d=n[v][i[v]];if(d.isLeaf){e.leaf=d;var c=i[p]=d.values.length-1;e.currentKey=d.keys[c]}else{var x=d.children;n[p]=x;var k=x.length-1;i[p]=k,e.currentKey=x[k].maxKey()}return!0}},r.compare=function(e,t,n){var i=e.height,o=e.currentKey,s=e.levelIndices,a=t.height,f=t.currentKey,l=t.levelIndices,c=n(f,o);if(c!==0)return c;var p=i<a?i:a,v=s.length-(i-p),d=l.length-(a-p);return v-d},r.prototype.keys=function(e){var t=this.entries(e,j);return N(function(){var n=t.next();return n.value&&(n.value=n.value[0]),n})},r.prototype.values=function(e){var t=this.entries(e,j);return N(function(){var n=t.next();return n.value&&(n.value=n.value[1]),n})},Object.defineProperty(r.prototype,"maxNodeSize",{get:function(){return this._maxNodeSize},enumerable:!1,configurable:!0}),r.prototype.minKey=function(){return this._root.minKey()},r.prototype.maxKey=function(){return this._root.maxKey()},r.prototype.clone=function(){this._root.isShared=!0;var e=new r(void 0,this._compare,this._maxNodeSize);return e._root=this._root,e._size=this._size,e},r.prototype.greedyClone=function(e){var t=new r(void 0,this._compare,this._maxNodeSize);return t._root=this._root.greedyClone(e),t._size=this._size,t},r.prototype.toArray=function(e){e===void 0&&(e=2147483647);var t=this.minKey(),n=this.maxKey();return t!==void 0?this.getRange(t,n,!0,e):[]},r.prototype.keysArray=function(){var e=[];return this._root.forRange(this.minKey(),this.maxKey(),!0,!1,this,0,function(t,n){e.push(t)}),e},r.prototype.valuesArray=function(){var e=[];return this._root.forRange(this.minKey(),this.maxKey(),!0,!1,this,0,function(t,n){e.push(n)}),e},r.prototype.toString=function(){return this.toArray().toString()},r.prototype.setIfNotPresent=function(e,t){return this.set(e,t,!1)},r.prototype.nextHigherPair=function(e,t){return t=t||[],e===void 0?this._root.minPair(t):this._root.getPairOrNextHigher(e,this._compare,!1,t)},r.prototype.nextHigherKey=function(e){var t=this.nextHigherPair(e,j);return t&&t[0]},r.prototype.nextLowerPair=function(e,t){return t=t||[],e===void 0?this._root.maxPair(t):this._root.getPairOrNextLower(e,this._compare,!1,t)},r.prototype.nextLowerKey=function(e){var t=this.nextLowerPair(e,j);return t&&t[0]},r.prototype.getPairOrNextLower=function(e,t){return this._root.getPairOrNextLower(e,this._compare,!0,t||[])},r.prototype.getPairOrNextHigher=function(e,t){return this._root.getPairOrNextHigher(e,this._compare,!0,t||[])},r.prototype.changeIfPresent=function(e,t){return this.editRange(e,e,!0,function(n,i){return{value:t}})!==0},r.prototype.getRange=function(e,t,n,i){i===void 0&&(i=67108863);var o=[];return this._root.forRange(e,t,n,!1,this,0,function(s,a){return o.push([s,a]),o.length>i?Le:void 0}),o},r.prototype.setPairs=function(e,t){for(var n=0,i=0;i<e.length;i++)this.set(e[i][0],e[i][1],t)&&n++;return n},r.prototype.forRange=function(e,t,n,i,o){var s=this._root.forRange(e,t,n,!1,this,o||0,i);return typeof s=="number"?s:s.break},r.prototype.editRange=function(e,t,n,i,o){var s=this._root;s.isShared&&(this._root=s=s.clone());try{var a=s.forRange(e,t,n,!0,this,o||0,i);return typeof a=="number"?a:a.break}finally{for(var f=void 0;s.keys.length<=1&&!s.isLeaf;)f||(f=s.isShared),this._root=s=s.keys.length===0?J:s.children[0];f&&(s.isShared=!0)}},r.prototype.editAll=function(e,t){return this.editRange(this.minKey(),this.maxKey(),!0,e,t)},r.prototype.deleteRange=function(e,t,n){return this.editRange(e,t,n,ne)},r.prototype.deleteKeys=function(e){for(var t=0,n=0;t<e.length;t++)this.delete(e[t])&&n++;return n},Object.defineProperty(r.prototype,"height",{get:function(){for(var e=this._root,t=-1;e;)t++,e=e.isLeaf?void 0:e.children[0];return t},enumerable:!1,configurable:!0}),r.prototype.freeze=function(){var e=this;e.clear=e.set=e.editRange=function(){throw new Error("Attempted to modify a frozen BTree")}},r.prototype.unfreeze=function(){delete this.clear,delete this.set,delete this.editRange},Object.defineProperty(r.prototype,"isFrozen",{get:function(){return this.hasOwnProperty("editRange")},enumerable:!1,configurable:!0}),r.prototype.checkValid=function(){var e=this._root.checkValid(0,this,0);O(e===this.size,"size mismatch: counted ",e,"but stored",this.size)},r}();L.default=P;function Te(r){return r}L.asSet=Te;Symbol&&Symbol.iterator&&(P.prototype[Symbol.iterator]=P.prototype.entries);P.prototype.where=P.prototype.filter;P.prototype.setRange=P.prototype.setPairs;P.prototype.add=P.prototype.set;function N(r){r===void 0&&(r=function(){return{done:!0,value:void 0}});var e={next:r};return Symbol&&Symbol.iterator&&(e[Symbol.iterator]=function(){return this}),e}var oe=function(){function r(e,t){e===void 0&&(e=[]),this.keys=e,this.values=t||w,this.isShared=void 0}return Object.defineProperty(r.prototype,"isLeaf",{get:function(){return this.children===void 0},enumerable:!1,configurable:!0}),r.prototype.maxKey=function(){return this.keys[this.keys.length-1]},r.prototype.indexOf=function(e,t,n){for(var i=this.keys,o=0,s=i.length,a=s>>1;o<s;){var f=n(i[a],e);if(f<0)o=a+1;else if(f>0)s=a;else{if(f===0)return a;if(e===e)return i.length;throw new Error("BTree: NaN was used as a key")}a=o+s>>1}return a^t},r.prototype.minKey=function(){return this.keys[0]},r.prototype.minPair=function(e){if(this.keys.length!==0)return e[0]=this.keys[0],e[1]=this.values[0],e},r.prototype.maxPair=function(e){if(this.keys.length!==0){var t=this.keys.length-1;return e[0]=this.keys[t],e[1]=this.values[t],e}},r.prototype.clone=function(){var e=this.values;return new r(this.keys.slice(0),e===w?e:e.slice(0))},r.prototype.greedyClone=function(e){return this.isShared&&!e?this:this.clone()},r.prototype.get=function(e,t,n){var i=this.indexOf(e,-1,n._compare);return i<0?t:this.values[i]},r.prototype.getPairOrNextLower=function(e,t,n,i){var o=this.indexOf(e,-1,t),s=o<0?~o-1:n?o:o-1;if(s>=0)return i[0]=this.keys[s],i[1]=this.values[s],i},r.prototype.getPairOrNextHigher=function(e,t,n,i){var o=this.indexOf(e,-1,t),s=o<0?~o:n?o:o+1,a=this.keys;if(s<a.length)return i[0]=a[s],i[1]=this.values[s],i},r.prototype.checkValid=function(e,t,n){var i=this.keys.length,o=this.values.length;return O(this.values===w?i<=o:i===o,"keys/values length mismatch: depth",e,"with lengths",i,o,"and baseIndex",n),O(e==0||i>0,"empty leaf at depth",e,"and baseIndex",n),i},r.prototype.set=function(e,t,n,i){var o=this.indexOf(e,-1,i._compare);if(o<0){if(o=~o,i._size++,this.keys.length<i._maxNodeSize)return this.insertInLeaf(o,e,t,i);var s=this.splitOffRightSide(),a=this;return o>this.keys.length&&(o-=this.keys.length,a=s),a.insertInLeaf(o,e,t,i),s}else return n!==!1&&(t!==void 0&&this.reifyValues(),this.keys[o]=e,this.values[o]=t),!1},r.prototype.reifyValues=function(){return this.values===w?this.values=this.values.slice(0,this.keys.length):this.values},r.prototype.insertInLeaf=function(e,t,n,i){if(this.keys.splice(e,0,t),this.values===w){for(;w.length<i._maxNodeSize;)w.push(void 0);if(n===void 0)return!0;this.values=w.slice(0,this.keys.length-1)}return this.values.splice(e,0,n),!0},r.prototype.takeFromRight=function(e){var t=this.values;e.values===w?t!==w&&t.push(void 0):(t=this.reifyValues(),t.push(e.values.shift())),this.keys.push(e.keys.shift())},r.prototype.takeFromLeft=function(e){var t=this.values;e.values===w?t!==w&&t.unshift(void 0):(t=this.reifyValues(),t.unshift(e.values.pop())),this.keys.unshift(e.keys.pop())},r.prototype.splitOffRightSide=function(){var e=this.keys.length>>1,t=this.keys.splice(e),n=this.values===w?w:this.values.splice(e);return new r(t,n)},r.prototype.forRange=function(e,t,n,i,o,s,a){var f=o._compare,l,c;if(t===e){if(!n||(c=(l=this.indexOf(e,-1,f))+1,l<0))return s}else l=this.indexOf(e,0,f),c=this.indexOf(t,-1,f),c<0?c=~c:n===!0&&c++;var p=this.keys,v=this.values;if(a!==void 0)for(var d=l;d<c;d++){var x=p[d],k=a(x,v[d],s++);if(k!==void 0){if(i===!0){if(x!==p[d]||this.isShared===!0)throw new Error("BTree illegally changed or cloned in editRange");k.delete?(this.keys.splice(d,1),this.values!==w&&this.values.splice(d,1),o._size--,d--,c--):k.hasOwnProperty("value")&&(v[d]=k.value)}if(k.break!==void 0)return k}}else s+=c-l;return s},r.prototype.mergeSibling=function(e,t){if(this.keys.push.apply(this.keys,e.keys),this.values===w){if(e.values===w)return;this.values=this.values.slice(0,this.keys.length)}this.values.push.apply(this.values,e.reifyValues())},r}(),Oe=function(r){we(e,r);function e(t,n){var i=this;if(!n){n=[];for(var o=0;o<t.length;o++)n[o]=t[o].maxKey()}return i=r.call(this,n)||this,i.children=t,i}return e.prototype.clone=function(){for(var t=this.children.slice(0),n=0;n<t.length;n++)t[n].isShared=!0;return new e(t,this.keys.slice(0))},e.prototype.greedyClone=function(t){if(this.isShared&&!t)return this;for(var n=new e(this.children.slice(0),this.keys.slice(0)),i=0;i<n.children.length;i++)n.children[i]=n.children[i].greedyClone(t);return n},e.prototype.minKey=function(){return this.children[0].minKey()},e.prototype.minPair=function(t){return this.children[0].minPair(t)},e.prototype.maxPair=function(t){return this.children[this.children.length-1].maxPair(t)},e.prototype.get=function(t,n,i){var o=this.indexOf(t,0,i._compare),s=this.children;return o<s.length?s[o].get(t,n,i):void 0},e.prototype.getPairOrNextLower=function(t,n,i,o){var s=this.indexOf(t,0,n),a=this.children;if(s>=a.length)return this.maxPair(o);var f=a[s].getPairOrNextLower(t,n,i,o);return f===void 0&&s>0?a[s-1].maxPair(o):f},e.prototype.getPairOrNextHigher=function(t,n,i,o){var s=this.indexOf(t,0,n),a=this.children,f=a.length;if(!(s>=f)){var l=a[s].getPairOrNextHigher(t,n,i,o);return l===void 0&&s<f-1?a[s+1].minPair(o):l}},e.prototype.checkValid=function(t,n,i){var o=this.keys.length,s=this.children.length;O(o===s,"keys/children length mismatch: depth",t,"lengths",o,s,"baseIndex",i),O(o>1||t>0,"internal node has length",o,"at depth",t,"baseIndex",i);for(var a=0,f=this.children,l=this.keys,c=0,p=0;p<s;p++)a+=f[p].checkValid(t+1,n,i+a),c+=f[p].keys.length,O(a>=c,"wtf",i),O(p===0||f[p-1].constructor===f[p].constructor,"type mismatch, baseIndex:",i),f[p].maxKey()!=l[p]&&O(!1,"keys[",p,"] =",l[p],"is wrong, should be ",f[p].maxKey(),"at depth",t,"baseIndex",i),p===0||n._compare(l[p-1],l[p])<0||O(!1,"sort violation at depth",t,"index",p,"keys",l[p-1],l[p]);var v=c===0;return(v||c>n.maxNodeSize*s)&&O(!1,v?"too few":"too many","children (",c,a,") at depth",t,"maxNodeSize:",n.maxNodeSize,"children.length:",s,"baseIndex:",i),a},e.prototype.set=function(t,n,i,o){var s=this.children,a=o._maxNodeSize,f=o._compare,l=Math.min(this.indexOf(t,0,f),s.length-1),c=s[l];if(c.isShared&&(s[l]=c=c.clone()),c.keys.length>=a){var p;l>0&&(p=s[l-1]).keys.length<a&&f(c.keys[0],t)<0?(p.isShared&&(s[l-1]=p=p.clone()),p.takeFromRight(c),this.keys[l-1]=p.maxKey()):(p=s[l+1])!==void 0&&p.keys.length<a&&f(c.maxKey(),t)<0&&(p.isShared&&(s[l+1]=p=p.clone()),p.takeFromLeft(c),this.keys[l]=s[l].maxKey())}var v=c.set(t,n,i,o);if(v===!1)return!1;if(this.keys[l]=c.maxKey(),v===!0)return!0;if(this.keys.length<a)return this.insert(l+1,v),!0;var d=this.splitOffRightSide(),x=this;return f(v.maxKey(),this.maxKey())>0&&(x=d,l-=this.keys.length),x.insert(l+1,v),d},e.prototype.insert=function(t,n){this.children.splice(t,0,n),this.keys.splice(t,0,n.maxKey())},e.prototype.splitOffRightSide=function(){var t=this.children.length>>1;return new e(this.children.splice(t),this.keys.splice(t))},e.prototype.takeFromRight=function(t){this.keys.push(t.keys.shift()),this.children.push(t.children.shift())},e.prototype.takeFromLeft=function(t){this.keys.unshift(t.keys.pop()),this.children.unshift(t.children.pop())},e.prototype.forRange=function(t,n,i,o,s,a,f){var l=s._compare,c=this.keys,p=this.children,v=this.indexOf(t,0,l),d=v,x=Math.min(n===t?v:this.indexOf(n,0,l),c.length-1);if(o){if(d<=x)try{for(;d<=x;d++){p[d].isShared&&(p[d]=p[d].clone());var k=p[d].forRange(t,n,i,o,s,a,f);if(c[d]=p[d].maxKey(),typeof k!="number")return k;a=k}}finally{var y=s._maxNodeSize>>1;for(v>0&&v--,d=x;d>=v;d--)p[d].keys.length<=y&&(p[d].keys.length!==0?this.tryMerge(d,s._maxNodeSize):(c.splice(d,1),p.splice(d,1)));p.length!==0&&p[0].keys.length===0&&O(!1,"emptiness bug")}}else for(;d<=x;d++){var k=p[d].forRange(t,n,i,o,s,a,f);if(typeof k!="number")return k;a=k}return a},e.prototype.tryMerge=function(t,n){var i=this.children;return t>=0&&t+1<i.length&&i[t].keys.length+i[t+1].keys.length<=n?(i[t].isShared&&(i[t]=i[t].clone()),i[t].mergeSibling(i[t+1],n),i.splice(t+1,1),this.keys.splice(t+1,1),this.keys[t]=i[t].maxKey(),!0):!1},e.prototype.mergeSibling=function(t,n){var i=this.keys.length;this.keys.push.apply(this.keys,t.keys);var o=t.children;if(this.children.push.apply(this.children,o),t.isShared&&!this.isShared)for(var s=0;s<o.length;s++)o[s].isShared=!0;this.tryMerge(i-1,n)},e}(oe),w=[],se={delete:!0},ne=function(){return se},Le={break:!0},J=function(){var r=new oe;return r.isShared=!0,r}(),re=[],j=[];function O(r){for(var e=[],t=1;t<arguments.length;t++)e[t-1]=arguments[t];if(!r)throw e.unshift("B+ tree"),new Error(e.join(" "))}L.EmptyBTree=function(){var r=new P;return r.freeze(),r}()});function M(r){return r.includes("/")&&(r=r.substring(r.lastIndexOf("/")+1)),r.endsWith(".md")&&(r=r.substring(0,r.length-3)),r}var $=class r{static file(e,t=!1,n){return new r({path:e,embed:t,display:n,subpath:void 0,type:"file"})}static infer(e,t=!1,n){if(e.includes("#^")){let i=e.split("#^");return r.block(i[0],i[1],t,n)}else if(e.includes("#")){let i=e.split("#");return r.header(i[0],i[1],t,n)}else return r.file(e,t,n)}static header(e,t,n,i){return new r({path:e,embed:n,display:i,subpath:t,type:"header"})}static block(e,t,n,i){return new r({path:e,embed:n,display:i,subpath:t,type:"block"})}static fromObject(e){return new r(e)}static parseInner(e){let[t,n]=_e(e);return r.infer(t,!1,n)}constructor(e){Object.assign(this,e)}withPath(e){return new r(Object.assign({},this,{path:e}))}withDisplay(e){return new r(Object.assign({},this,{display:e}))}withEmbed(e){return this.embed==e?this:new r(Object.assign({},this,{embed:e}))}withHeader(e){return r.header(this.path,e,this.embed,this.display)}withBlock(e){return r.block(this.path,e,this.embed,this.display)}equals(e){return e==null||e==null?!1:this.path==e.path&&this.type==e.type&&this.subpath==e.subpath}toString(){return this.markdown()}toObject(){return{path:this.path,type:this.type,subpath:this.subpath,display:this.display,embed:this.embed}}toFile(){return r.file(this.path,this.embed,this.display)}toEmbed(){return this.withEmbed(!0)}fromEmbed(){return this.withEmbed(!1)}markdown(){let e=(this.embed?"!":"")+"[["+this.obsidianLink();return e+=this.displayOrDefault(),e+="]]",e}displayOrDefault(){if(this.display)return this.display;{let e=M(this.path);return(this.type=="header"||this.type=="block")&&(e+=" > "+this.subpath),e}}obsidianLink(){var t,n;let e=this.path.replace("|","\\\\|");return this.type=="header"?e+"#"+((t=this.subpath)==null?void 0:t.replace("|","\\\\|")):this.type=="block"?e+"#^"+((n=this.subpath)==null?void 0:n.replace("|","\\\\|")):e}fileName(){return M(this.path)}};function _e(r){let e=-1;for(;(e=r.indexOf("|",e+1))>=0;)if(!(e>0&&r[e-1]=="\\\\"))return[r.substring(0,e).replace(/\\\\\\|/g,"|"),r.substring(e+1)];return[r.replace(/\\\\\\|/g,"|"),void 0]}var W=xe(ae());var C=["axiom","definition","lemma","proposition","theorem","corollary","claim","assumption","example","exercise","conjecture","hypothesis","remark","question"],Se=["proof","solution"],De=[...C,...Se],I=["axm","def","lem","prp","thm","cor","clm","asm","exm","exr","cnj","hyp","rmk","qst"],Pe={};C.forEach((r,e)=>{Pe[r]={id:r,prefix:I[e]}});var q={};I.forEach((r,e)=>{q[r]=C[e]});var Re={};C.forEach((r,e)=>{Re[r]=I[e]});var $e=new RegExp(`> *\\\\[\\\\! *(?<type>${C.join("|")}|${I.join("|")}|math) *(\\\\|(?<number>.*?))?\\\\](?<fold>[+-])?(?<title> .*)?`,"i");function Ne(r){let e=r.trim();return e?e==="*"&&(e=""):e="auto",e}function ue(r,e=!1){var a,f,l,c,p;let t=(a=r.match($e))==null?void 0:a.groups;if(!t)return;let n=t.type.trim().toLowerCase();if(n==="math"&&t.number){let v=JSON.parse(t.number);return v.legacy=!0,v}if(e&&n==="example")return;n.length<=4&&(n=q[n]);let i=Ne((f=t.number)!=null?f:""),o=(l=t.title)==null?void 0:l.trim();o===""&&(o=void 0);let s=(p=(c=t.fold)==null?void 0:c.trim())!=null?p:"";return{type:n,number:i,title:o,fold:s,legacy:!1}}function le(r){var e,t;return(t=(e=r.match(/\\$\\$([\\s\\S]*)\\$\\$/))==null?void 0:e[1].trim())!=null?t:r}function fe(r){let e=r.match(new RegExp("(?<!\\\\\\\\)%"));return(e==null?void 0:e.index)!==void 0?{nonComment:r.substring(0,e.index),comment:r.substring(e.index+1)}:{nonComment:r,comment:""}}function pe(r){let e=[],t=/%%([\\s\\S]*?)%%/g,n;for(;n=t.exec(r);)for(let i of n[1].split(`\n`))i=i.trim(),i&&e.push(i);return e}function G(r){var t;let e=(t=r.match(new RegExp("^(?<key>.*?):(?<value>.*)$")))==null?void 0:t.groups;return e?{[e.key.trim()]:e.value.trim()}:null}function ce(r,e,t,n){var v,d,x,k;let i=e.split(`\n`),o=!i.some(y=>y.trim()!==""),s=(v=t.headings)!=null?v:[];s.sort((y,u)=>y.position.start.line-u.position.start.line);let a=new W.default(void 0,(y,u)=>y-u);for(let y=0;y<s.length;y++){let u=s[y],h=u.position.start.line,b=y==s.length-1?i.length-1:s[y+1].position.start.line-1;a.set(h,{$ordinal:y+1,$title:u.heading,$level:u.level,$position:{start:h,end:b},$blocks:[],$links:[]})}let f=a.getPairOrNextHigher(0);if(!f&&!o||f&&!Ce(i,0,f[1].$position.start)){let y=f?f[1].$position.start-1:i.length;a.set(0,{$ordinal:0,$title:M(r),$level:1,$position:{start:0,end:y},$blocks:[],$links:[]})}let l=new W.default(void 0,(y,u)=>y-u),c=1;for(let y of t.sections||[]){if(y.type==="heading")continue;let u=y.position.start.line,h=y.position.end.line,b=null,m=!1;if(y.type==="callout"){let g=ue(i[u],n);b=g!=null?g:null,m=!!(g!=null&&g.legacy)}if(y.type==="math"){let g=le(Ke(e,y)),E=g.match(/\\\\tag\\{(.*)\\}/),T={};for(let _ of g.split(`\n`)){let{comment:S}=fe(_);S&&Object.assign(T,G(S))}l.set(u,{$ordinal:c++,$position:{start:u,end:h},$pos:y.position,$links:[],$blockId:y.id,$manualTag:(d=E==null?void 0:E[1])!=null?d:null,$mathText:g,$type:"equation",$label:T.label,$display:T.display})}else if(b){let g=i.slice(u+1,h+1).join(`\n`),E=pe(g),T={};for(let _ of E)_.startsWith(">")&&(_=_.slice(1).trim()),_&&(_==="main"?T.main="true":Object.assign(T,G(_)));l.set(u,{$ordinal:c++,$position:{start:u,end:h},$pos:y.position,$links:[],$blockId:y.id,$settings:b,$type:"theorem",$label:T.label,$display:T.display,$main:T.main==="true",$v1:m})}else l.set(u,{$ordinal:c++,$position:{start:u,end:h},$pos:y.position,$links:[],$blockId:y.id,$type:y.type})}for(let y of l.values()){let u=a.getPairOrNextLower(y.$position.start);u&&u[1].$position.end>=y.$position.end&&u[1].$blocks.push(y)}let p=[];for(let y of(x=t.links)!=null?x:[]){let u=$.infer(y.link),h=y.position.start.line;F(p,u);let b=a.getPairOrNextLower(h);b&&b[1].$position.end>=h&&F(b[1].$links,u);let m=l.getPairOrNextLower(h);m&&m[1].$position.end>=h&&F(m[1].$links,u);let g=l.getPairOrNextHigher(h);g&&g[1].$position.end>=h&&F(g[1].$links,u)}for(let y of(k=t.frontmatterLinks)!=null?k:[]){let u=$.infer(y.link,!1,y.displayText);F(p,u)}return{$path:r,$links:p,$sections:a.valuesArray(),$extension:"md",$position:{start:0,end:i.length}}}function Ce(r,e,t){for(let n=e;n<t;n++)if(r[n].trim()!=="")return!1;return!0}function F(r,e){r.find(t=>t.equals(e))||r.push(e)}function Ke(r,e){return r.slice(e.position.start.offset,e.position.end.offset)}var z;(y=>{y.DEFAULT_TO_STRING={nullRepresentation:"-",dateFormat:"MMMM dd, yyyy",dateTimeFormat:"h:mm a - MMMM dd, yyyy"};function e(u,h=y.DEFAULT_TO_STRING,b=!1){let m=t(u);if(!m)return h.nullRepresentation;switch(m.type){case"null":return h.nullRepresentation;case"string":return m.value;case"number":case"boolean":return""+m.value;case"link":return m.value.markdown();case"function":return"<function>";case"array":let g="";return b&&(g+="["),g+=m.value.map(E=>e(E,h,!0)).join(", "),b&&(g+="]"),g;case"object":return"{ "+Object.entries(m.value).map(E=>E[0]+": "+e(E[1],h,!0)).join(", ")+" }"}}y.toString=e;function t(u){return c(u)?{type:"null",value:u}:l(u)?{type:"number",value:u}:f(u)?{type:"string",value:u}:v(u)?{type:"boolean",value:u}:p(u)?{type:"array",value:u}:d(u)?{type:"link",value:u}:k(u)?{type:"function",value:u}:x(u)?{type:"object",value:u}:void 0}y.wrapValue=t;function n(u,h){if(x(u)){let b={};for(let[m,g]of Object.entries(u))b[m]=n(g,h);return b}else if(p(u)){let b=[];for(let m of u)b.push(n(m,h));return b}else return h(u)}y.mapLeaves=n;function i(u,h,b){var E,T;if(u===void 0&&(u=null),h===void 0&&(h=null),u===null&&h===null)return 0;if(u===null)return-1;if(h===null)return 1;let m=t(u),g=t(h);if(m===void 0&&g===void 0)return 0;if(m===void 0)return-1;if(g===void 0)return 1;if(m.type!=g.type)return m.type.localeCompare(g.type);if(m.value===g.value)return 0;switch(m.type){case"string":return m.value.localeCompare(g.value);case"number":return m.value<g.value?-1:m.value==g.value?0:1;case"null":return 0;case"boolean":return m.value==g.value?0:m.value?1:-1;case"link":let _=m.value,S=g.value,A=b!=null?b:R=>R,U=A(_.path).localeCompare(A(S.path));if(U!=0)return U;let X=_.type.localeCompare(S.type);return X!=0?X:_.subpath&&!S.subpath?1:!_.subpath&&S.subpath?-1:!_.subpath&&!S.subpath?0:((E=_.subpath)!=null?E:"").localeCompare((T=S.subpath)!=null?T:"");case"array":let V=m.value,H=g.value;for(let R=0;R<Math.min(V.length,H.length);R++){let K=i(V[R],H[R]);if(K!=0)return K}return V.length-H.length;case"object":let Y=m.value,Q=g.value,B=Array.from(Object.keys(Y)),Z=Array.from(Object.keys(Q));B.sort(),Z.sort();let ee=i(B,Z);if(ee!=0)return ee;for(let R of B){let K=i(Y[R],Q[R]);if(K!=0)return K}return 0;case"function":return 0}}y.compare=i;function o(u){var h;return(h=t(u))==null?void 0:h.type}y.typeOf=o;function s(u){let h=t(u);if(!h)return!1;switch(h.type){case"number":return h.value!=0;case"string":return h.value.length>0;case"boolean":return h.value;case"link":return!!h.value.path;case"object":return Object.keys(h.value).length>0;case"array":return h.value.length>0;case"null":return!1;case"function":return!0}}y.isTruthy=s;function a(u){if(u==null)return u;if(y.isArray(u))return[].concat(u.map(h=>a(h)));if(y.isObject(u)){let h={};for(let[b,m]of Object.entries(u))h[b]=a(m);return h}else return u}y.deepCopy=a;function f(u){return typeof u=="string"}y.isString=f;function l(u){return typeof u=="number"}y.isNumber=l;function c(u){return u==null}y.isNull=c;function p(u){return Array.isArray(u)}y.isArray=p;function v(u){return typeof u=="boolean"}y.isBoolean=v;function d(u){return u instanceof $}y.isLink=d;function x(u){return u!==void 0&&typeof u=="object"&&!p(u)&&!d(u)&&!c(u)}y.isObject=x;function k(u){return typeof u=="function"}y.isFunction=k})(z||(z={}));var he;(n=>{function r(i){return z.isObject(i)&&Object.keys(i).length==2&&"key"in i&&"rows"in i}n.isElementGroup=r;function e(i){for(let o of i)if(!r(o))return!1;return!0}n.isGrouping=e;function t(i){if(e(i)){let o=0;for(let s of i)o+=t(s.rows);return o}else return i.length}n.count=t})(he||(he={}));var D;(t=>{function r(n){if(n instanceof Map){let o=new Map;for(let[s,a]of n.entries())o.set(r(s),r(a));return o}else if(n instanceof Set){let o=new Set;for(let s of n)o.add(r(s));return o}let i=z.wrapValue(n);if(i===void 0)throw Error("Unrecognized transferable value: "+n);switch(i.type){case"null":case"number":case"string":case"boolean":return i.value;case"array":return i.value.map(s=>r(s));case"link":return{"$transfer-type":"link",value:r(i.value.toObject())};case"object":let o={};for(let s of Object.getOwnPropertyNames(i.value))o[s]=r(i.value[s]);return o}}t.transferable=r;function e(n){if(n===null)return null;if(n===void 0)return;if(n instanceof Map){let i=new Map;for(let[o,s]of n.entries())i.set(e(o),e(s));return i}else if(n instanceof Set){let i=new Set;for(let o of n)i.add(e(o));return i}else{if(Array.isArray(n))return n.map(i=>e(i));if(typeof n=="object"){if("$transfer-type"in n)switch(n["$transfer-type"]){case"link":return $.fromObject(e(n.value));default:throw Error(`Unrecognized transfer type \'${n["$transfer-type"]}\'`)}let i={};for(let[o,s]of Object.entries(n))i[o]=e(s);return i}}return n}t.value=e})(D||(D={}));onmessage=r=>{try{let e=D.value(r.data);if(e.type==="markdown"){let t=ce(e.path,e.contents,e.metadata,e.excludeExampleCallout);postMessage(D.transferable({type:"markdown",result:t}))}else postMessage({$error:"Unsupported import method."})}catch(e){postMessage({$error:e.message})}};\n');
 }
 
 // src/index/web-worker/importer.ts
@@ -4284,7 +4361,7 @@ var MathIndex = class {
   /** Add the given indexable to the appropriate indices. */
   _index(object) {
     this.types.set(object.$id, object.$types);
-    if (object.$types.contains(LINKBEARING_TYPE) && iterableExists(object, "$links")) {
+    if (object.$types.includes(LINKBEARING_TYPE) && iterableExists(object, "$links")) {
       this.links.set(
         object.$id,
         object.$links.map((link) => link.obsidianLink())
@@ -4294,7 +4371,7 @@ var MathIndex = class {
   /** Remove the given indexable from all indices. */
   _unindex(object) {
     this.types.delete(object.$id, object.$types);
-    if (object.$types.contains(LINKBEARING_TYPE) && iterableExists(object, "$links")) {
+    if (object.$types.includes(LINKBEARING_TYPE) && iterableExists(object, "$links")) {
       this.links.delete(
         object.$id,
         object.$links.map((link) => link.obsidianLink())
@@ -4487,7 +4564,7 @@ var MathIndexManager = class extends import_obsidian25.Component {
       this.removeChild(init);
       const durationSecs = (stats.durationMs / 1e3).toFixed(3);
       console.log(
-        `${this.plugin.manifest.name}: Imported all theorems and equations in the vault in ${durationSecs}s (${stats.imported} notes imported, ${stats.skipped} notes skipped).`
+        `Math Booster: Imported all theorems and equations in the vault in ${durationSecs}s (${stats.imported} notes imported, ${stats.skipped} notes skipped).`
       );
       this.index.touch();
       this.trigger("update", this.revision);
@@ -4672,7 +4749,7 @@ var _MathIndexInitializer = class _MathIndexInitializer extends import_obsidian2
       await this.manager.reload(file);
       return { status: "imported" };
     } catch (ex) {
-      console.log(`${this.manager.plugin.manifest.name}: Failed to import file: `, ex);
+      console.log("Math Booster: Failed to import file: ", ex);
       return { status: "skipped" };
     }
   }
@@ -4683,42 +4760,6 @@ var MathIndexInitializer = _MathIndexInitializer;
 
 // src/notice.ts
 var import_obsidian27 = require("obsidian");
-var RenameNoticeModal = class extends import_obsidian27.Modal {
-  constructor(plugin) {
-    super(plugin.app);
-    this.plugin = plugin;
-    this.component = new import_obsidian27.Component();
-  }
-  onOpen() {
-    this.plugin.addChild(this.component);
-    const { contentEl, titleEl } = this;
-    contentEl.empty();
-    titleEl.setText("Math Booster has been renamed");
-    import_obsidian27.MarkdownRenderer.render(
-      this.app,
-      `Starting from version 2.2.0, Math Booster has been renamed to ***LaTeX-like Theorem & Equation Referencer*** for better clarity and discoverability.
-
-While the display name in the community plugin browser may still reflect the previous version, it will be updated shortly.
-
-A big thank you for those who shared their ideas [here](https://github.com/RyotaUshio/obsidian-math-booster/issues/210)!
-
-> [!warning]
-> If you have custom CSS snippets with CSS classes <code>.math-booster-&#42</code>, don't worry, they still work!
-> 
-> But I do recommend you to replace them with <code>.latex-referencer-&#42</code> as the old class names might be removed in the future.`,
-      contentEl,
-      "",
-      this.component
-    );
-    new import_obsidian27.Setting(contentEl).addButton((button) => {
-      button.setCta().setButtonText("Okay, I got it").onClick(() => this.close());
-    }).then((setting) => setting.settingEl.style.border = "none");
-  }
-  onClose() {
-    this.contentEl.empty();
-    this.component.unload();
-  }
-};
 var DependencyNotificationModal = class extends import_obsidian27.Modal {
   constructor(plugin, dependenciesOK, v1) {
     super(plugin.app);
@@ -4726,9 +4767,9 @@ var DependencyNotificationModal = class extends import_obsidian27.Modal {
     this.dependenciesOK = dependenciesOK;
     this.v1 = v1;
     this.component = new import_obsidian27.Component();
+    this.plugin.addChild(this.component);
   }
   async onOpen() {
-    this.plugin.addChild(this.component);
     const { contentEl, titleEl } = this;
     contentEl.empty();
     titleEl.setText(`${this.plugin.manifest.name} ${this.plugin.manifest.version}`);
@@ -4763,9 +4804,9 @@ var DependencyNotificationModal = class extends import_obsidian27.Modal {
     this.contentEl.createEl("h3", { text: "Migration from version 1" });
     import_obsidian27.MarkdownRenderer.render(
       this.app,
-      `LaTeX-like Theorem & Equation Referencer (formerly called Math Booster) version 2 introduces a [new format for theorem callouts](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/theorem-callouts/theorem-callouts.html). 
+      `Math Booster introduces a [new format for theorem callouts](https://ryotaushio.github.io/obsidian-math-booster/theorem-callouts/theorem-callouts.html). 
 
-To fully enjoy version 2, click the button below to convert the old theorem format to the new one. Alternatively, you can do it later by running the command "Migrate from version 1".`,
+To fully enjoy Math Booster v2, click the button below to convert the old theorem format to the new one. Alternatively, you can do it later by running the command "Migrate from version 1".`,
       this.contentEl.createDiv(),
       "",
       this.component
@@ -4781,7 +4822,7 @@ To fully enjoy version 2, click the button below to convert the old theorem form
       this.app,
       `### What's new in version 2
 
-- [New format for theorem callouts](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/theorem-callouts/theorem-callouts.html):
+- [New format for theorem callouts](https://ryotaushio.github.io/obsidian-math-booster/theorem-callouts/theorem-callouts.html):
     -   *much cleaner*,
     -   *more intuitive*,
     -   *more keyboard-friendly*,
@@ -4789,11 +4830,11 @@ To fully enjoy version 2, click the button below to convert the old theorem form
 -   New indexing mechanism:
     -   no longer blocks UI
     -   no longer hard-codes theorem indices in notes directly
--   [Enhancing Obsidian's built-in link autocomplete](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/search-&-link-autocomplete/enhancing-obsidian's-built-in-link-autocomplete.html): now equations are rendered in the built-in autocomplete as well.
--   [Custom link autocomplete](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/search-&-link-autocomplete/custom-link-autocomplete.html) improvements: filter theorems & equations (*entire vault/recent notes/active note*)
--   [Search modal](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/search-&-link-autocomplete/search-modal.html): more control & flexibility than editor autocomplete, including *Dataview queries*
--   Adding metadata to [theorems](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/theorem-callouts/theorem-callouts.html) and [equations](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/equations.html) with comments
-- Theorem numbers and [equation numbers](https://ryotaushio.github.io/obsidian-latex-theorem-equation-referencer/equations.html) now can be displayed *almost everywhere*:
+-   [Enhancing Obsidian's built-in link autocomplete](https://ryotaushio.github.io/obsidian-math-booster/search-&-link-autocomplete/enhancing-obsidian's-built-in-link-autocomplete.html): now equations are rendered in the built-in autocomplete as well.
+-   [Custom link autocomplete](https://ryotaushio.github.io/obsidian-math-booster/search-&-link-autocomplete/custom-link-autocomplete.html) improvements: filter theorems & equations (*entire vault/recent notes/active note*)
+-   [Search modal](https://ryotaushio.github.io/obsidian-math-booster/search-&-link-autocomplete/search-modal.html): more control & flexibility than editor autocomplete, including *Dataview queries*
+-   Adding metadata to [theorems](https://ryotaushio.github.io/obsidian-math-booster/theorem-callouts/theorem-callouts.html) and [equations](https://ryotaushio.github.io/obsidian-math-booster/equations.html) with comments
+- Theorem numbers and [equation numbers](https://ryotaushio.github.io/obsidian-math-booster/equations.html) now can be displayed *almost everywhere*:
         
 ##### Version 1:
 
@@ -4817,9 +4858,9 @@ To fully enjoy version 2, click the button below to convert the old theorem form
 
 ### No longer supported
 
-- ["Show backlinks" right-click menu](https://github.com/RyotaUshio/obsidian-latex-theorem-equation-referencer/blob/1.0.4/docs/backlinks.md)
+- ["Show backlinks" right-click menu](https://github.com/RyotaUshio/obsidian-math-booster/blob/1.0.4/docs/backlinks.md)
     - Use [Strange New Worlds](https://github.com/TfTHacker/obsidian42-strange-new-worlds) instead.
-- [Projects](https://github.com/RyotaUshio/obsidian-latex-theorem-equation-referencer/blob/1.0.4/docs/projects.md)
+- [Projects](https://github.com/RyotaUshio/obsidian-math-booster/blob/1.0.4/docs/projects.md)
     - might be supported later with some improvements
 
 `,
@@ -4851,7 +4892,7 @@ var MigrationModal = class extends import_obsidian27.Modal {
     await import_obsidian27.MarkdownRenderer.render(
       this.app,
       `
-In order to enjoy LaTeX-like Theorem & Equation Referencer, you need to convert the old theorem format from Math Booster version 1:
+In order to enjoy Math Booster v2, you need to convert the old theorem format:
 
 \`\`\`md
 > [!math|{"type":"theorem","number":"auto","title":"Main result","label":"main-result","_index":0}] Theorem 1 (Main result).
@@ -4924,14 +4965,55 @@ to the new format:
 };
 
 // src/search/editor-suggest.ts
-var import_obsidian32 = require("obsidian");
+var import_obsidian29 = require("obsidian");
+var LinkAutocomplete = class extends import_obsidian29.EditorSuggest {
+  /**
+   * @param type The type of the block to search for. See: index/typings/markdown.ts
+   */
+  constructor(plugin, triggerGetter, coreCreator) {
+    super(plugin.app);
+    this.plugin = plugin;
+    this.triggerGetter = triggerGetter;
+    this.core = coreCreator(this);
+    this.core.setScope();
+  }
+  getContext() {
+    return this.context;
+  }
+  getSelectedItem() {
+    return this.suggestions.values[this.suggestions.selectedItem];
+  }
+  onTrigger(cursor, editor) {
+    const trigger = this.triggerGetter();
+    const text = editor.getLine(cursor.line);
+    const index = text.lastIndexOf(trigger);
+    if (index < 0)
+      return null;
+    const query = text.slice(index + trigger.length);
+    this.limit = this.plugin.extraSettings.suggestNumber;
+    return !query.startsWith("[[") ? {
+      start: { line: cursor.line, ch: index },
+      end: cursor,
+      query
+    } : null;
+  }
+  getSuggestions(context) {
+    return this.core.getSuggestions(context.query);
+  }
+  renderSuggestion(block, el) {
+    this.core.renderSuggestion(block, el);
+  }
+  selectSuggestion(item, evt) {
+    this.core.selectSuggestion(item, evt);
+  }
+};
 
 // src/search/core.ts
-var import_obsidian30 = require("obsidian");
+var import_obsidian31 = require("obsidian");
 
 // src/search/modal.ts
-var import_obsidian29 = require("obsidian");
-var MathSearchModal = class extends import_obsidian29.SuggestModal {
+var import_obsidian30 = require("obsidian");
+var MathSearchModal = class extends import_obsidian30.SuggestModal {
   constructor(plugin) {
     super(plugin.app);
     this.plugin = plugin;
@@ -4945,7 +5027,7 @@ var MathSearchModal = class extends import_obsidian29.SuggestModal {
     this.modalEl.insertBefore(this.topEl, this.modalEl.firstChild);
     this.inputEl.addClass("math-booster-search-input");
     this.limit = this.plugin.extraSettings.suggestNumber;
-    new import_obsidian29.Setting(this.topEl).setName("Query type").addDropdown((dropdown) => {
+    new import_obsidian30.Setting(this.topEl).setName("Query type").addDropdown((dropdown) => {
       dropdown.addOption("both", "Theorems and equations").addOption("theorem", "Theorems").addOption("equation", "Equations");
       dropdown.setValue(this.plugin.extraSettings.searchModalQueryType);
       dropdown.onChange((value) => {
@@ -4956,7 +5038,7 @@ var MathSearchModal = class extends import_obsidian29.SuggestModal {
         this.plugin.saveSettings();
       });
     });
-    new import_obsidian29.Setting(this.topEl).setName("Search range").addDropdown((dropdown) => {
+    new import_obsidian30.Setting(this.topEl).setName("Search range").addDropdown((dropdown) => {
       dropdown.addOption("vault", "Vault").addOption("recent", "Recent notes").addOption("active", "Active note").addOption("dataview", "Dataview query");
       dropdown.setValue(this.plugin.extraSettings.searchModalRange);
       dropdown.onChange((value) => {
@@ -4967,7 +5049,7 @@ var MathSearchModal = class extends import_obsidian29.SuggestModal {
         this.plugin.saveSettings();
       });
     });
-    this.dvQueryField = new import_obsidian29.Setting(this.topEl).setName("Dataview query").setDesc("Only LIST queries are supported.").then((setting) => {
+    this.dvQueryField = new import_obsidian30.Setting(this.topEl).setName("Dataview query").setDesc("Only LIST query is supported.").then((setting) => {
       setting.controlEl.style.width = "60%";
     }).addTextArea((text) => {
       text.inputEl.addClass("math-booster-dv-query");
@@ -4985,23 +5067,34 @@ var MathSearchModal = class extends import_obsidian29.SuggestModal {
     this.resetCore();
   }
   resetCore() {
-    const core = MathSearchCore.getCore(this);
-    if (core)
-      this.core = core;
+    var _a;
     if (this.range === "dataview") {
-      if (!core) {
+      const dv = (_a = this.app.plugins.plugins.dataview) == null ? void 0 : _a.api;
+      if (!dv) {
         this.dvQueryField.setDisabled(true);
         this.dvQueryField.setDesc("Retry after enabling Dataview.").then((setting) => setting.descEl.style.color = "#ea5555");
+        this.dvQueryField.settingEl.show();
+        return;
       }
+      this.core = new DataviewQuerySearchCore(this, this.queryType, dv, this.dvQueryField.components[0].getValue());
       this.dvQueryField.settingEl.show();
-    } else
-      this.dvQueryField.settingEl.hide();
-  }
-  get dvQuery() {
-    return this.dvQueryField.components[0].getValue();
+      return;
+    }
+    this.dvQueryField.settingEl.hide();
+    if (this.range === "vault") {
+      if (this.queryType === "both")
+        this.core = new WholeVaultTheoremEquationSearchCore(this);
+      else if (this.queryType === "theorem")
+        this.core = new WholeVaultTheoremSearchCore(this);
+      else if (this.queryType === "equation")
+        this.core = new WholeVaultEquationSearchCore(this);
+    } else if (this.range === "recent")
+      this.core = new RecentNotesSearchCore(this, this.queryType);
+    else if (this.range === "active")
+      this.core = new ActiveNoteSearchCore(this, this.queryType);
   }
   getContext() {
-    const view = this.app.workspace.getActiveViewOfType(import_obsidian29.MarkdownView);
+    const view = this.app.workspace.getActiveViewOfType(import_obsidian30.MarkdownView);
     if (!(view == null ? void 0 : view.file))
       return null;
     const start = view.editor.getCursor("from");
@@ -5009,6 +5102,8 @@ var MathSearchModal = class extends import_obsidian29.SuggestModal {
     return { file: view.file, editor: view.editor, start, end };
   }
   getSelectedItem() {
+    if (!this.chooser.values)
+      throw Error("Math Booster: chooser is not ready.");
     return this.chooser.values[this.chooser.selectedItem];
   }
   getSuggestions(query) {
@@ -5031,28 +5126,6 @@ var MathSearchCore = class {
     this.index = this.plugin.indexManager.index;
     this.scope = parent.scope;
   }
-  static getCore(parent) {
-    var _a;
-    const { app, range, queryType, dvQuery } = parent;
-    if (range === "dataview") {
-      const dv = (_a = app.plugins.plugins.dataview) == null ? void 0 : _a.api;
-      if (!dv)
-        return null;
-      return new DataviewQuerySearchCore(parent, queryType, dv, dvQuery);
-    }
-    if (range === "vault") {
-      if (queryType === "both")
-        return new WholeVaultTheoremEquationSearchCore(parent);
-      else if (queryType === "theorem")
-        return new WholeVaultTheoremSearchCore(parent);
-      else if (queryType === "equation")
-        return new WholeVaultEquationSearchCore(parent);
-    } else if (range === "recent")
-      return new RecentNotesSearchCore(parent, queryType);
-    else if (range === "active")
-      return new ActiveNoteSearchCore(parent, queryType);
-    return null;
-  }
   setScope() {
     this.scope.register([this.plugin.extraSettings.modifierToJump], "Enter", () => {
       const context = this.parent.getContext();
@@ -5062,7 +5135,7 @@ var MathSearchCore = class {
       }
       const item = this.parent.getSelectedItem();
       const file = this.app.vault.getAbstractFileByPath(item.$file);
-      if (!(file instanceof import_obsidian30.TFile))
+      if (!(file instanceof import_obsidian31.TFile))
         return;
       openFileAndSelectPosition(this.app, file, item.$pos, ...LEAF_OPTION_TO_ARGS[this.plugin.extraSettings.suggestLeafOption]);
       if (this.parent instanceof MathSearchModal)
@@ -5089,14 +5162,14 @@ var MathSearchCore = class {
     const ids = await this.getUnsortedSuggestions();
     const results = this.gradeSuggestions(ids, query);
     this.postProcessResults(results);
-    (0, import_obsidian30.sortSearchResults)(results);
+    (0, import_obsidian31.sortSearchResults)(results);
     return results.map((result) => result.block);
   }
   postProcessResults(results) {
   }
   gradeSuggestions(ids, query) {
     var _a;
-    const callback = (this.plugin.extraSettings.searchMethod == "Fuzzy" ? import_obsidian30.prepareFuzzySearch : import_obsidian30.prepareSimpleSearch)(query);
+    const callback = (this.plugin.extraSettings.searchMethod == "Fuzzy" ? import_obsidian31.prepareFuzzySearch : import_obsidian31.prepareSimpleSearch)(query);
     const results = [];
     for (const id of ids) {
       const block = this.index.load(id);
@@ -5105,7 +5178,7 @@ var MathSearchCore = class {
         text += ` ${block.$settings.type}`;
         if (this.plugin.extraSettings.searchLabel) {
           const file = this.app.vault.getAbstractFileByPath(block.$file);
-          if (file instanceof import_obsidian30.TFile) {
+          if (file instanceof import_obsidian31.TFile) {
             const resolvedSettings = resolveSettings(block.$settings, this.plugin, file);
             text += ` ${(_a = formatLabel(resolvedSettings)) != null ? _a : ""}`;
           }
@@ -5135,7 +5208,7 @@ var MathSearchCore = class {
     );
     if (block.$type === "equation") {
       if (this.plugin.extraSettings.renderMathInSuggestion) {
-        const mjxContainerEl = (0, import_obsidian30.renderMath)(block.$mathText, true);
+        const mjxContainerEl = (0, import_obsidian31.renderMath)(block.$mathText, true);
         baseEl.insertBefore(mjxContainerEl, smallEl);
       } else {
         const mathTextEl = createDiv({ text: block.$mathText });
@@ -5145,7 +5218,7 @@ var MathSearchCore = class {
   }
   selectSuggestion(item, evt) {
     this.selectSuggestionImpl(item, false);
-    (0, import_obsidian30.finishRenderMath)();
+    (0, import_obsidian31.finishRenderMath)();
   }
   async selectSuggestionImpl(block, insertNoteLink) {
     const context = this.parent.getContext();
@@ -5153,7 +5226,7 @@ var MathSearchCore = class {
       return;
     const fileContainingBlock = this.app.vault.getAbstractFileByPath(block.$file);
     const cache = this.app.metadataCache.getCache(block.$file);
-    if (!(fileContainingBlock instanceof import_obsidian30.TFile) || !cache)
+    if (!(fileContainingBlock instanceof import_obsidian31.TFile) || !cache)
       return;
     const { editor, start, end, file } = context;
     const settings = resolveSettings(void 0, this.plugin, file);
@@ -5182,14 +5255,14 @@ var MathSearchCore = class {
       success = true;
     }
     if (!success) {
-      new import_obsidian30.Notice(`${this.plugin.manifest.name}: Failed to read cache. Retry again later.`, 5e3);
+      new import_obsidian31.Notice(`${this.plugin.manifest.name}: Failed to read cache. Retry again later.`, 5e3);
     }
   }
 };
 var WholeVaultSearchCore = class extends MathSearchCore {
   postProcessResults(results) {
     results.forEach((result) => {
-      if (this.app.workspace.getLastOpenFiles().contains(result.block.$file)) {
+      if (this.app.workspace.getLastOpenFiles().includes(result.block.$file)) {
         result.match.score += this.plugin.extraSettings.upWeightRecent;
       }
     });
@@ -5220,7 +5293,7 @@ var PartialSearchCore = class extends MathSearchCore {
       return TheoremCalloutBlock.isTheoremCalloutBlock(block);
     if (this.type === "equation")
       return EquationBlock.isEquationBlock(block);
-    return MathBlock.isMathBlock(block);
+    return MathBoosterBlock.isMathBoosterBlock(block);
   }
   async getUnsortedSuggestions() {
     const ids = [];
@@ -5266,142 +5339,8 @@ var DataviewQuerySearchCore = class extends PartialSearchCore {
   }
 };
 
-// src/search/editor-suggest.ts
-var LinkAutocomplete = class extends import_obsidian32.EditorSuggest {
-  /**
-   * @param type The type of the block to search for. See: index/typings/markdown.ts
-   */
-  constructor(plugin) {
-    super(plugin.app);
-    this.plugin = plugin;
-    this.setTriggers();
-    this.core = new WholeVaultTheoremEquationSearchCore(this);
-    this.core.setScope();
-  }
-  get dvQuery() {
-    return this.plugin.extraSettings.autocompleteDvQuery;
-  }
-  getContext() {
-    return this.context;
-  }
-  getSelectedItem() {
-    return this.suggestions.values[this.suggestions.selectedItem];
-  }
-  onTrigger(cursor, editor) {
-    for (const [trigger, { range, queryType }] of this.triggers) {
-      const text = editor.getLine(cursor.line);
-      const index = text.lastIndexOf(trigger);
-      if (index >= 0) {
-        const query = text.slice(index + trigger.length);
-        if (query.startsWith("[["))
-          return null;
-        this.queryType = queryType;
-        this.range = range;
-        const core = MathSearchCore.getCore(this);
-        if (!core)
-          return null;
-        this.core = core;
-        this.limit = this.plugin.extraSettings.suggestNumber;
-        return {
-          start: { line: cursor.line, ch: index },
-          end: cursor,
-          query
-        };
-      }
-    }
-    return null;
-  }
-  getSuggestions(context) {
-    return this.core.getSuggestions(context.query);
-  }
-  renderSuggestion(block, el) {
-    this.core.renderSuggestion(block, el);
-  }
-  selectSuggestion(item, evt) {
-    this.core.selectSuggestion(item, evt);
-  }
-  setTriggers() {
-    const unsortedTriggers = {};
-    if (this.plugin.extraSettings.enableSuggest) {
-      unsortedTriggers[this.plugin.extraSettings.triggerSuggest] = { range: "vault", queryType: "both" };
-    }
-    if (this.plugin.extraSettings.enableTheoremSuggest) {
-      unsortedTriggers[this.plugin.extraSettings.triggerTheoremSuggest] = { range: "vault", queryType: "theorem" };
-    }
-    if (this.plugin.extraSettings.enableEquationSuggest) {
-      unsortedTriggers[this.plugin.extraSettings.triggerEquationSuggest] = { range: "vault", queryType: "equation" };
-    }
-    if (this.plugin.extraSettings.enableSuggestRecentNotes) {
-      unsortedTriggers[this.plugin.extraSettings.triggerSuggestRecentNotes] = { range: "recent", queryType: "both" };
-    }
-    if (this.plugin.extraSettings.enableTheoremSuggestRecentNotes) {
-      unsortedTriggers[this.plugin.extraSettings.triggerTheoremSuggestRecentNotes] = { range: "recent", queryType: "theorem" };
-    }
-    if (this.plugin.extraSettings.enableEquationSuggestRecentNotes) {
-      unsortedTriggers[this.plugin.extraSettings.triggerEquationSuggestRecentNotes] = { range: "recent", queryType: "equation" };
-    }
-    if (this.plugin.extraSettings.enableSuggestActiveNote) {
-      unsortedTriggers[this.plugin.extraSettings.triggerSuggestActiveNote] = { range: "active", queryType: "both" };
-    }
-    if (this.plugin.extraSettings.enableTheoremSuggestActiveNote) {
-      unsortedTriggers[this.plugin.extraSettings.triggerTheoremSuggestActiveNote] = { range: "active", queryType: "theorem" };
-    }
-    if (this.plugin.extraSettings.enableEquationSuggestActiveNote) {
-      unsortedTriggers[this.plugin.extraSettings.triggerEquationSuggestActiveNote] = { range: "active", queryType: "equation" };
-    }
-    if (this.plugin.extraSettings.enableSuggestDataview) {
-      unsortedTriggers[this.plugin.extraSettings.triggerSuggestDataview] = { range: "dataview", queryType: "both" };
-    }
-    if (this.plugin.extraSettings.enableTheoremSuggestDataview) {
-      unsortedTriggers[this.plugin.extraSettings.triggerTheoremSuggestDataview] = { range: "dataview", queryType: "theorem" };
-    }
-    if (this.plugin.extraSettings.enableEquationSuggestDataview) {
-      unsortedTriggers[this.plugin.extraSettings.triggerEquationSuggestDataview] = { range: "dataview", queryType: "equation" };
-    }
-    const sortedTriggers = /* @__PURE__ */ new Map();
-    Object.entries(unsortedTriggers).sort((a, b) => b[0].length - a[0].length).forEach(([k, v]) => sortedTriggers.set(k, v));
-    this.triggers = sortedTriggers;
-  }
-};
-
 // src/patches/link-completion.ts
 var import_obsidian33 = require("obsidian");
-
-// node_modules/monkey-around/mjs/index.js
-function around(obj, factories) {
-  const removers = Object.keys(factories).map((key) => around1(obj, key, factories[key]));
-  return removers.length === 1 ? removers[0] : function() {
-    removers.forEach((r) => r());
-  };
-}
-function around1(obj, method, createWrapper) {
-  const original = obj[method], hadOwn = obj.hasOwnProperty(method);
-  let current = createWrapper(original);
-  if (original)
-    Object.setPrototypeOf(current, original);
-  Object.setPrototypeOf(wrapper, current);
-  obj[method] = wrapper;
-  return remove;
-  function wrapper(...args) {
-    if (current === original && obj[method] === wrapper)
-      remove();
-    return current.apply(this, args);
-  }
-  function remove() {
-    if (obj[method] === wrapper) {
-      if (hadOwn)
-        obj[method] = original;
-      else
-        delete obj[method];
-    }
-    if (current === original)
-      return;
-    current = original;
-    Object.setPrototypeOf(wrapper, original || Function);
-  }
-}
-
-// src/patches/link-completion.ts
 var patchLinkCompletion = (plugin) => {
   const suggest = plugin.app.workspace.editorSuggest.suggests[0];
   if (!Object.hasOwn(suggest, "suggestManager"))
@@ -5420,11 +5359,10 @@ var patchLinkCompletion = (plugin) => {
             const block = page.getBlockByLineNumber(item.node.position.start.line - 1);
             if (TheoremCalloutBlock.isTheoremCalloutBlock(block)) {
               renderInSuggestionTitleEl(el, (suggestionTitleEl) => {
-                el.addClass("math-booster", "suggestion-item-theorem-callout");
                 suggestionTitleEl.replaceChildren();
                 const children = renderTextWithMath(block.$printName);
                 suggestionTitleEl.createDiv().replaceChildren(...children);
-                if (plugin.extraSettings.showTheoremContentinBuiltin && content)
+                if (content)
                   suggestionTitleEl.createDiv({ text: content });
               });
               return;
@@ -5437,18 +5375,16 @@ var patchLinkCompletion = (plugin) => {
               title = "";
             const formattedTitle = formatTitle(plugin, item.file, resolveSettings({ type, number, title }, plugin, item.file), true);
             renderInSuggestionTitleEl(el, (suggestionTitleEl) => {
-              el.addClass("math-booster", "suggestion-item-theorem-callout");
               suggestionTitleEl.replaceChildren();
               const children = renderTextWithMath(formattedTitle);
               suggestionTitleEl.createDiv().replaceChildren(...children);
-              if (plugin.extraSettings.showTheoremContentinBuiltin && content)
+              if (content)
                 suggestionTitleEl.createDiv({ text: content });
             });
             return;
           }
         } else if (plugin.extraSettings.renderEquationinBuiltin && item.type === "block" && item.node.type === "math") {
           renderInSuggestionTitleEl(el, (suggestionTitleEl) => {
-            el.addClass("math-booster", "suggestion-item-equation");
             suggestionTitleEl.replaceChildren();
             suggestionTitleEl.appendChild((0, import_obsidian33.renderMath)(item.node.value, true));
           });
@@ -5464,22 +5400,6 @@ function renderInSuggestionTitleEl(el, cb) {
     cb(suggestionTitleEl);
 }
 
-// src/patches/page-preview.ts
-var patchPagePreview = (plugin) => {
-  const { app } = plugin;
-  plugin.register(
-    // @ts-ignore
-    around(app.internalPlugins.plugins["page-preview"].instance.constructor.prototype, {
-      onLinkHover(old) {
-        return function(parent, targetEl, linktext, ...args) {
-          old.call(this, parent, targetEl, linktext, ...args);
-          plugin.lastHoverLinktext = linktext;
-        };
-      }
-    })
-  );
-};
-
 // src/proof/live-preview.ts
 var import_obsidian34 = require("obsidian");
 var import_state4 = require("@codemirror/state");
@@ -5487,20 +5407,21 @@ var import_view4 = require("@codemirror/view");
 var import_language3 = require("@codemirror/language");
 
 // src/proof/common.ts
-function makeProofClasses(which, profile) {
+function makeProofClasses(which, profile, type) {
   return [
-    "math-booster-" + which + "-proof",
-    // deprecated
-    "latex-referencer-" + which + "-proof",
-    ...profile.meta.tags.map((tag) => "math-booster-" + which + "-proof-" + tag),
-    // deprecated
-    ...profile.meta.tags.map((tag) => "latex-referencer-" + which + "-proof-" + tag)
+    "math-booster-" + which + "-" + type,
+    ...profile.meta.tags.map((tag) => "math-booster-" + which + "-" + type + "-" + tag)
   ];
 }
-function makeProofElement(which, profile) {
+
+function makeProofElement(which, profile, type) {
+  // 增加安全检查
+  if (!profile || !profile.body || !profile.body[type]) {
+      return createSpan({ text: `[Math Booster Error: ${type} not found in profile]` });
+  }
   return createSpan({
-    text: profile.body.proof[which],
-    cls: makeProofClasses(which, profile)
+    text: profile.body[type][which],
+    cls: makeProofClasses(which, profile, type)
   });
 }
 
@@ -5510,14 +5431,15 @@ var LINK_BEGIN = "formatting-link_formatting-link-start";
 var LINK = "hmd-internal-link";
 var LINK_END = "formatting-link_formatting-link-end";
 var ProofWidget = class extends import_view4.WidgetType {
-  constructor(plugin, profile) {
+  constructor(plugin, profile, type) {
     super();
     this.plugin = plugin;
     this.profile = profile;
+    this.type = type;
     this.containerEl = null;
   }
   eq(other) {
-    return this.profile.id === other.profile.id;
+    return this.profile.id === other.profile.id && this.type === other.type;
   }
   toDOM() {
     var _a;
@@ -5528,23 +5450,48 @@ var ProofWidget = class extends import_view4.WidgetType {
   }
 };
 var BeginProofWidget = class _BeginProofWidget extends ProofWidget {
-  constructor(plugin, profile, display, linktext, sourcePath) {
-    super(plugin, profile);
+  constructor(plugin, cmView, fromPos, profile, display, linktext, sourcePath, type) {
+    super(plugin, profile, type);
+    this.cmView = cmView;
+    this.fromPos = fromPos;
     this.display = display;
     this.linktext = linktext;
     this.sourcePath = sourcePath;
   }
   eq(other) {
-    return this.profile.id === other.profile.id && this.display === other.display && this.linktext === other.linktext && this.sourcePath == other.sourcePath;
+    return super.eq(other) && this.display === other.display && this.linktext === other.linktext && this.sourcePath == other.sourcePath;
   }
   initDOM() {
-    let display = this.linktext ? `${this.profile.body.proof.linkedBeginPrefix} [[${this.linktext}]]${this.profile.body.proof.linkedBeginSuffix}` : this.display;
+    const bodyConfig = this.profile.body[this.type];
+    if (!bodyConfig) return createSpan({text: "Error: Invalid Type"});
+
+    let display = this.linktext ? `${bodyConfig.linkedBeginPrefix} [[${this.linktext}]]${bodyConfig.linkedBeginSuffix}` : this.display;
+    
     if (display) {
-      const el = createSpan({ cls: makeProofClasses("begin", this.profile) });
+      const el = createSpan({ cls: makeProofClasses("begin", this.profile, this.type) });
       _BeginProofWidget.renderDisplay(el, display, this.sourcePath, this.plugin);
+      el.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        try {
+          const cmView = this.cmView;
+          if (!cmView) return;
+          const prevSel = cmView.state.selection;
+          const safePos = cmView.state.doc.lineAt(this.fromPos).from;
+          cmView.dispatch({ selection: { anchor: safePos, head: safePos } });
+          const lang = import_language3;
+          if (lang && lang.toggleFold) {
+            lang.toggleFold(cmView);
+          } else if (lang && lang.foldCode) {
+            const ok = lang.foldCode(cmView);
+            if (!ok && lang.unfoldCode) lang.unfoldCode(cmView);
+          }
+          cmView.dispatch({ selection: prevSel });
+        } catch (e) {}
+      });
       return el;
     }
-    return makeProofElement("begin", this.profile);
+    return makeProofElement("begin", this.profile, this.type);
   }
   static async renderDisplay(el, display, sourcePath, plugin) {
     const children = await renderMarkdown(display, sourcePath, plugin);
@@ -5554,9 +5501,42 @@ var BeginProofWidget = class _BeginProofWidget extends ProofWidget {
   }
 };
 var EndProofWidget = class extends ProofWidget {
-  initDOM() {
-    return makeProofElement("end", this.profile);
+  constructor(plugin, profile, type) {
+    super(plugin, profile, type);
   }
+  initDOM() {
+    return makeProofElement("end", this.profile, this.type);
+  }
+};
+var createProofFoldService = (plugin) => {
+  if (!import_language3.foldService) return [];
+  return import_language3.foldService.of((state, lineStart, lineEnd) => {
+    var _a;
+    const file = (_a = state.field(import_obsidian34.editorInfoField).file) != null ? _a : plugin.app.vault.getRoot();
+    const settings = resolveSettings(void 0, plugin, file);
+    const line = state.doc.lineAt(lineStart);
+    const text = line.text;
+    let endToken = null;
+    if (text.includes(settings.beginProof)) endToken = settings.endProof;
+    else if (text.includes(settings.beginSolution)) endToken = settings.endSolution;
+    else return null;
+    let pos = line.to + 1;
+    while (pos <= state.doc.length) {
+      const ln = state.doc.lineAt(pos);
+      const t = ln.text;
+      if (t.includes(endToken)) {
+        if (line.to < ln.to) return { from: line.to, to: ln.to };
+        return null;
+      }
+      if (t.includes(settings.beginProof) || t.includes(settings.beginSolution)) {
+        if (line.to < ln.from) return { from: line.to, to: ln.from };
+        return null;
+      }
+      pos = ln.to + 1;
+    }
+    if (line.to < state.doc.length) return { from: line.to, to: state.doc.length };
+    return null;
+  });
 };
 var createProofDecoration = (plugin) => import_view4.ViewPlugin.fromClass(
   class {
@@ -5582,36 +5562,48 @@ var createProofDecoration = (plugin) => import_view4.ViewPlugin.fromClass(
       const sourcePath = (_a = file == null ? void 0 : file.path) != null ? _a : "";
       const settings = resolveSettings(void 0, plugin, file != null ? file : app.vault.getRoot());
       const profile = plugin.extraSettings.profiles[settings.profile];
-      const builder = new import_state4.RangeSetBuilder();
-      for (const { from, to } of view.visibleRanges) {
-        tree.iterate({
-          from,
-          to,
-          enter(node) {
-            var _a2, _b, _c, _d, _e, _f;
-            if (node.name !== INLINE_CODE)
-              return;
-            let start = -1;
-            let end = -1;
-            let display = null;
-            let linktext = null;
-            const text = nodeText(node, state);
-            if (text.startsWith(settings.beginProof)) {
-              const rest = text.slice(settings.beginProof.length);
-              if (!rest) {
+      
+      const decos = [];
+      const tokens = [];
+
+      // 全局扫描文档，确保能正确配对 begin 和 end
+      tree.iterate({
+        from: 0,
+        to: state.doc.length,
+        enter(node) {
+          var _a2, _b, _c, _d, _e, _f;
+          if (node.name !== INLINE_CODE) return;
+          
+          const text = nodeText(node, state);
+          let start = -1;
+          let end = -1;
+          let display = null;
+          let linktext = null;
+
+          let type = null;
+          let trigger = null;
+          if (text.startsWith(settings.beginProof)) {
+              type = "proof";
+              trigger = settings.beginProof;
+          } else if (text.startsWith(settings.beginSolution)) {
+              type = "solution";
+              trigger = settings.beginSolution;
+          }
+
+          if (type) {
+            const rest = text.slice(trigger.length);
+            if (!rest) {
+              start = node.from - 1;
+              end = node.to + 1;
+            } else {
+              const match = rest.match(/^\[(.*)\]$/);
+              if (match) {
                 start = node.from - 1;
                 end = node.to + 1;
-                display = null;
-              } else {
-                const match = rest.match(/^\[(.*)\]$/);
-                if (match) {
-                  start = node.from - 1;
-                  end = node.to + 1;
-                  display = match[1];
-                }
+                display = match[1];
               }
-              if (start === -1 || end === -1)
-                return;
+            }
+            if (start !== -1 && end !== -1) {
               if (state.sliceDoc(node.to + 1, node.to + 2) == "@") {
                 const next = (_a2 = node.node.nextSibling) == null ? void 0 : _a2.nextSibling;
                 const afterNext = (_c = (_b = node.node.nextSibling) == null ? void 0 : _b.nextSibling) == null ? void 0 : _c.nextSibling;
@@ -5621,32 +5613,52 @@ var createProofDecoration = (plugin) => import_view4.ViewPlugin.fromClass(
                   end = afterAfterNext.to;
                 }
               }
-              if (!rangesHaveOverlap(ranges, start, end)) {
-                builder.add(
-                  start,
-                  end,
-                  import_view4.Decoration.replace({
-                    widget: new BeginProofWidget(plugin, profile, display, linktext, sourcePath)
-                  })
-                );
-              }
-            } else if (text === settings.endProof) {
-              start = node.from - 1;
-              end = node.to + 1;
-              if (!rangesHaveOverlap(ranges, start, end)) {
-                builder.add(
-                  start,
-                  end,
-                  import_view4.Decoration.replace({
-                    widget: new EndProofWidget(plugin, profile)
-                  })
-                );
-              }
+              tokens.push({ kind: "begin", env: type, from: start, to: end, display, linktext });
             }
+          } else {
+              let endType = null;
+              if (text === settings.endProof) endType = "proof";
+              else if (text === settings.endSolution) endType = "solution";
+
+              if (endType) {
+                  start = node.from - 1;
+                  end = node.to + 1;
+                  tokens.push({ kind: "end", env: endType, from: start, to: end });
+              }
           }
-        });
+        }
+      });
+
+      tokens.sort((a, b) => a.from - b.from);
+      const stackByType = { proof: [], solution: [] };
+
+      for (const tok of tokens) {
+        if (tok.kind === "begin") {
+          stackByType[tok.env].push(tok.to);
+          if (!rangesHaveOverlap(ranges, tok.from, tok.to)) {
+            decos.push(import_view4.Decoration.replace({
+              widget: new BeginProofWidget(plugin, view, tok.from, profile, tok.display, tok.linktext, sourcePath, tok.env)
+            }).range(tok.from, tok.to));
+          }
+        } else {
+          if (!rangesHaveOverlap(ranges, tok.from, tok.to)) {
+            decos.push(import_view4.Decoration.replace({
+              widget: new EndProofWidget(plugin, profile, tok.env)
+            }).range(tok.from, tok.to));
+          }
+          
+          // 给两个标签中间的正文打上用于改变字体的 mark
+          // 给两个标签中间的正文打上用于改变字体的 mark
+          const lastBeginTo = stackByType[tok.env].pop();
+          // 【新增检测】：如果这一行以 ">" 开头，说明在 Callout 内部，就不添加 mark
+          const isInsideQuote = state.doc.lineAt(tok.from).text.trim().startsWith('>');
+          if (lastBeginTo !== undefined && lastBeginTo < tok.from && !isInsideQuote) {
+            decos.push(import_view4.Decoration.mark({ class: `math-booster-proof-body-${tok.env}` }).range(lastBeginTo, tok.from));
+          }
+        }
       }
-      return builder.finish();
+
+      return import_state4.RangeSet.of(decos, true);
     }
   },
   {
@@ -5657,32 +5669,109 @@ var createProofDecoration = (plugin) => import_view4.ViewPlugin.fromClass(
 // src/proof/reading-view.ts
 var import_obsidian35 = require("obsidian");
 var createProofProcessor = (plugin) => (element, context) => {
-  if (!plugin.extraSettings.enableProof)
-    return;
+  if (!plugin.extraSettings.enableProof) return;
   const { app } = plugin;
   const file = app.vault.getAbstractFileByPath(context.sourcePath);
-  if (!(file instanceof import_obsidian35.TFile))
-    return;
+  if (!(file instanceof import_obsidian35.TFile)) return;
   const settings = resolveSettings(void 0, plugin, file);
-  const codes = element.querySelectorAll("code");
+  
+  const codes = Array.from(element.querySelectorAll("code"));
+  const tokens = [];
+  
+  // 1. 扫描出所有 proof/solution 的起始和结束位置
   for (const code of codes) {
     const text = code.textContent;
-    if (!text)
-      continue;
+    if (!text) continue;
+
     if (text.startsWith(settings.beginProof)) {
-      const rest = text.slice(settings.beginProof.length);
-      let displayMatch;
-      if (!rest) {
-        context.addChild(new ProofRenderer(app, plugin, code, "begin", file));
-      } else if (displayMatch = rest.match(/^\[(.*)\]$/)) {
-        const display = displayMatch[1];
-        context.addChild(new ProofRenderer(app, plugin, code, "begin", file, display));
+      tokens.push({ type: "begin", env: "proof", code, prefix: settings.beginProof });
+    } else if (text.startsWith(settings.beginSolution)) {
+      tokens.push({ type: "begin", env: "solution", code, prefix: settings.beginSolution });
+    } else if (text === settings.endProof) {
+      tokens.push({ type: "end", env: "proof", code });
+    } else if (text === settings.endSolution) {
+      tokens.push({ type: "end", env: "solution", code });
+    }
+  }
+
+  // 2. 立即将 DOM 结构转换为原生的 details / summary 折叠块
+  const stack = { proof: [], solution: [] };
+  for (const tok of tokens) {
+    if (tok.type === "begin") {
+      stack[tok.env].push(tok);
+    } else if (tok.type === "end") {
+      const beginTok = stack[tok.env].pop();
+      if (beginTok) {
+        wrapWithDetails(beginTok.code, tok.code, tok.env);
       }
-    } else if (code.textContent == settings.endProof) {
-      context.addChild(new ProofRenderer(app, plugin, code, "end", file));
+    }
+  }
+
+  // 3. 将修饰器挂载到已经打包好的代码块上
+  for (const tok of tokens) {
+    if (tok.type === "begin") {
+      const rest = tok.code.textContent.slice(tok.prefix.length);
+      let display = undefined;
+      if (rest) {
+        const match = rest.match(/^\[(.*)\]$/);
+        if (match) display = match[1];
+      }
+      context.addChild(new ProofRenderer(app, plugin, tok.code, "begin", file, display, tok.env));
+    } else {
+      context.addChild(new ProofRenderer(app, plugin, tok.code, "end", file, undefined, tok.env));
     }
   }
 };
+
+function wrapWithDetails(beginCode, endCode, env) {
+  // 【新增这一行】：如果是 callout 或 blockquote 内部，直接跳过，不进行 DOM 包装
+  if (beginCode.closest('.callout') || beginCode.closest('blockquote')) return;
+
+  // 防止重复打包 (原本的代码...)
+  if (beginCode.closest(`details.math-booster-proof-details-${env}`)) return;
+
+  const beginP = beginCode.closest("p, ul, ol, blockquote");
+  const endP = endCode.closest("p, ul, ol, blockquote");
+
+  const details = document.createElement("details");
+  details.open = true;
+  details.className = `math-booster-proof-details-${env}`;
+  const summary = document.createElement("summary");
+  summary.style.cursor = "pointer";
+  details.appendChild(summary);
+  const wrapper = document.createElement("div");
+  wrapper.className = `math-booster-proof-body-${env}`;
+  details.appendChild(wrapper);
+
+  // 如果跨越了不同的段落（标准 Markdown 情况）
+  if (beginP && endP && beginP !== endP && beginP.parentNode === endP.parentNode) {
+    const parent = beginP.parentNode;
+    parent.insertBefore(details, beginP);
+    
+    summary.appendChild(beginP);
+    let cur = details.nextSibling;
+    while (cur && cur !== endP) {
+      const next = cur.nextSibling;
+      wrapper.appendChild(cur);
+      cur = next;
+    }
+    if (cur === endP) wrapper.appendChild(endP);
+  } else {
+    // 如果写在了同一个段落里，处理内部节点
+    const parent = beginCode.parentNode;
+    parent.insertBefore(details, beginCode);
+    
+    summary.appendChild(beginCode);
+    let cur = details.nextSibling;
+    while (cur && cur !== endCode) {
+      const next = cur.nextSibling;
+      wrapper.appendChild(cur);
+      cur = next;
+    }
+    if (cur === endCode) wrapper.appendChild(endCode);
+  }
+}
+
 function parseAtSignLink(codeEl) {
   const next = codeEl.nextSibling;
   const afterNext = next == null ? void 0 : next.nextSibling;
@@ -5694,13 +5783,15 @@ function parseAtSignLink(codeEl) {
   }
 }
 var ProofRenderer = class extends import_obsidian35.MarkdownRenderChild {
-  constructor(app, plugin, containerEl, which, file, display) {
+  // 1. Add 'type' parameter to the constructor
+  constructor(app, plugin, containerEl, which, file, display, type) {
     super(containerEl);
     this.app = app;
     this.plugin = plugin;
     this.which = which;
     this.file = file;
     this.display = display;
+    this.type = type; // 2. Store the type ("proof" or "solution")
     this.atSignParseResult = parseAtSignLink(this.containerEl);
   }
   onload() {
@@ -5721,10 +5812,16 @@ var ProofRenderer = class extends import_obsidian35.MarkdownRenderChild {
   update() {
     const settings = resolveSettings(void 0, this.plugin, this.file);
     const profile = this.plugin.extraSettings.profiles[settings.profile];
+    
     if (this.atSignParseResult) {
       const { atSign, links } = this.atSignParseResult;
-      const newEl2 = createSpan({ cls: makeProofClasses(this.which, profile) });
-      newEl2.replaceChildren(profile.body.proof.linkedBeginPrefix, ...links, profile.body.proof.linkedBeginSuffix);
+      // 3. Pass 'this.type' to makeProofClasses
+      const newEl2 = createSpan({ cls: makeProofClasses(this.which, profile, this.type) });
+      
+      // 4. Access the correct body part (proof or solution) dynamically
+      const bodyConfig = profile.body[this.type]; 
+      newEl2.replaceChildren(bodyConfig.linkedBeginPrefix, ...links, bodyConfig.linkedBeginSuffix);
+      
       this.containerEl.replaceWith(newEl2);
       this.containerEl = newEl2;
       atSign.textContent = "";
@@ -5734,7 +5831,8 @@ var ProofRenderer = class extends import_obsidian35.MarkdownRenderChild {
       this.renderDisplay(profile);
       return;
     }
-    const newEl = makeProofElement(this.which, profile);
+    // 5. Pass 'this.type' to makeProofElement
+    const newEl = makeProofElement(this.which, profile, this.type);
     this.containerEl.replaceWith(newEl);
     this.containerEl = newEl;
   }
@@ -5742,7 +5840,8 @@ var ProofRenderer = class extends import_obsidian35.MarkdownRenderChild {
     if (this.display) {
       const children = await renderMarkdown(this.display, this.file.path, this.plugin);
       if (children) {
-        const el = createSpan({ cls: makeProofClasses(this.which, profile) });
+        // 6. Pass 'this.type' to makeProofClasses
+        const el = createSpan({ cls: makeProofClasses(this.which, profile, this.type) });
         el.replaceChildren(...children);
         this.containerEl.replaceWith(el);
         this.containerEl = el;
@@ -5753,7 +5852,7 @@ var ProofRenderer = class extends import_obsidian35.MarkdownRenderChild {
 
 // src/main.ts
 var VAULT_ROOT = "/";
-var LatexReferencer3 = class extends import_obsidian36.Plugin {
+var MathBooster3 = class extends import_obsidian36.Plugin {
   constructor() {
     super(...arguments);
     this.dependencies = {
@@ -5771,9 +5870,6 @@ var LatexReferencer3 = class extends import_obsidian36.Plugin {
       var _a;
       const dependenciesOK = Object.keys(this.dependencies).every((id) => this.checkDependency(id));
       const v1 = !first && ((_a = version == null ? void 0 : version.startsWith("1.")) != null ? _a : true);
-      if (v1 || version.localeCompare("2.2.0", void 0, { numeric: true }) < 0) {
-        new RenameNoticeModal(this).open();
-      }
       if (!dependenciesOK || v1) {
         new DependencyNotificationModal(this, dependenciesOK, v1).open();
       }
@@ -5787,6 +5883,7 @@ var LatexReferencer3 = class extends import_obsidian36.Plugin {
       );
     });
     this.registerEvent(
+      // this.app.metadataCache.on("math-booster:local-settings-updated", async (file) => {
       this.indexManager.on("local-settings-updated", async (file) => {
         this.app.workspace.iterateRootLeaves((leaf) => {
           if (leaf.view instanceof import_obsidian36.MarkdownView) {
@@ -5824,15 +5921,6 @@ var LatexReferencer3 = class extends import_obsidian36.Plugin {
     this.updateEditorExtensions();
     this.updateLinkAutocomplete();
     this.app.workspace.onLayoutReady(() => patchLinkCompletion(this));
-    const itemNormalizer = (item) => {
-      return {
-        linktext: item.$file,
-        sourcePath: "",
-        line: item.$position.start
-      };
-    };
-    registerQuickPreview(this.app, this, LinkAutocomplete, itemNormalizer);
-    registerQuickPreview(this.app, this, MathSearchModal, itemNormalizer);
     this.registerMarkdownPostProcessor(createTheoremCalloutPostProcessor(this));
     this.registerMarkdownPostProcessor(createEquationNumberProcessor(this));
     this.app.workspace.onLayoutReady(() => this.forceRerender());
@@ -5914,7 +6002,96 @@ var LatexReferencer3 = class extends import_obsidian36.Plugin {
       if (suggest instanceof LinkAutocomplete)
         suggestManager.removeSuggest(suggest);
     }
-    this.registerEditorSuggest(new LinkAutocomplete(this));
+    if (this.extraSettings.enableSuggest) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerSuggest) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerSuggest;
+        },
+        (parent) => new WholeVaultTheoremEquationSearchCore(parent)
+      ));
+    }
+    if (this.extraSettings.enableTheoremSuggest) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerTheoremSuggest) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerTheoremSuggest;
+        },
+        (parent) => new WholeVaultTheoremSearchCore(parent)
+      ));
+    }
+    if (this.extraSettings.enableEquationSuggest) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerEquationSuggest) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerEquationSuggest;
+        },
+        (parent) => new WholeVaultEquationSearchCore(parent)
+      ));
+    }
+    if (this.extraSettings.enableSuggestRecentNotes) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerSuggestRecentNotes) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerSuggestRecentNotes;
+        },
+        (parent) => new RecentNotesSearchCore(parent, "both")
+      ));
+    }
+    if (this.extraSettings.enableTheoremSuggestRecentNotes) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerTheoremSuggestRecentNotes) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerTheoremSuggestRecentNotes;
+        },
+        (parent) => new RecentNotesSearchCore(parent, "theorem")
+      ));
+    }
+    if (this.extraSettings.enableEquationSuggestRecentNotes) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerEquationSuggestRecentNotes) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerEquationSuggestRecentNotes;
+        },
+        (parent) => new RecentNotesSearchCore(parent, "equation")
+      ));
+    }
+    if (this.extraSettings.enableSuggestActiveNote) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerSuggestActiveNote) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerSuggestActiveNote;
+        },
+        (parent) => new ActiveNoteSearchCore(parent, "both")
+      ));
+    }
+    if (this.extraSettings.enableTheoremSuggestActiveNote) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerTheoremSuggestActiveNote) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerTheoremSuggestActiveNote;
+        },
+        (parent) => new ActiveNoteSearchCore(parent, "theorem")
+      ));
+    }
+    if (this.extraSettings.enableEquationSuggestActiveNote) {
+      this.registerEditorSuggest(new LinkAutocomplete(
+        this,
+        () => {
+          var _a;
+          return (_a = this.extraSettings.triggerEquationSuggestActiveNote) != null ? _a : DEFAULT_EXTRA_SETTINGS.triggerEquationSuggestActiveNote;
+        },
+        (parent) => new ActiveNoteSearchCore(parent, "equation")
+      ));
+    }
   }
   /**
    * Return true if the required plugin with the specified id is enabled and its version matches the requriement.
@@ -5935,15 +6112,11 @@ var LatexReferencer3 = class extends import_obsidian36.Plugin {
     if (!view.file)
       return;
     const profile = getProfile(this, view.file);
-    const classes = [
-      ...profile.meta.tags.map((tag) => `math-booster-${tag}`),
-      // deprecated
-      ...profile.meta.tags.map((tag) => `latex-referencer-${tag}`)
-    ];
+    const classes = profile.meta.tags.map((tag) => `math-booster-${tag}`);
     for (const el of [getMarkdownSourceViewEl(view), getMarkdownPreviewViewEl(view)]) {
       if (el) {
         el.classList.forEach((cls) => {
-          if (cls.startsWith("math-booster-") || cls.startsWith("latex-referencer-")) {
+          if (cls.startsWith("math-booster-")) {
             el.classList.remove(cls);
           }
         });
@@ -5965,6 +6138,7 @@ var LatexReferencer3 = class extends import_obsidian36.Plugin {
       this.editorExtensions.push(hideDisplayMathPreviewInQuote);
     }
     if (this.extraSettings.enableProof) {
+      this.editorExtensions.push(createProofFoldService(this));
       this.editorExtensions.push(createProofDecoration(this));
     }
     this.app.workspace.updateOptions();
@@ -6040,7 +6214,11 @@ var LatexReferencer3 = class extends import_obsidian36.Plugin {
       for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
         const view = leaf.view;
         const state = view.getEphemeralState();
-        view.previewMode.rerender(true);
+        if (view.previewMode?.rerender) {
+          view.previewMode.rerender(true);
+        } else if (view.currentMode?.rerender) {
+          view.currentMode.rerender(true);
+        }
         view.setEphemeralState(state);
       }
     }, 800);

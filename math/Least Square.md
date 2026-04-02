@@ -1,5 +1,5 @@
 #NumericalLinearAlgebra 
-Prerequisite knowledge: [[Computation]], [[Matrix Operator]], [[QR Factorization]], [[Stability]]
+Prerequisite knowledge: [[Computation]], [[Matrix Operator]], [[Matrix Factorization]], [[Stability]]
 ## Least Square
 > [!Theorem|] Least Square
 > Let $A\in\mathbb{R}^{n, k}$, $b\in \mathbb{R}^{n}$ and $x\in\mathbb{R}^{k}$. $x$ minimizes  $\|b-Ax\|$ iff $A^{\top}Ax=A^{\top}b$.
@@ -52,7 +52,7 @@ Let $P$ be the projection matrix onto $\mathrm{range}(A)$. $\|b-b'\|^{2}=\|b-Pb\
 > [[#^c1790f]] is backward stable.
 
 `\begin{proof}`
-$b=(\tilde Q+\delta Q)(\tilde R+\delta R)\tilde x=\bigl[\tilde Q\tilde R+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ By [[QR Factorization#^cd77ab]], $b=\bigl[A+\delta A+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ Since $\tilde Q\tilde R=A+\delta A$ and $\tilde Q$ is unitary, we have $\frac{\|\tilde R\|}{\|A\|}\le \|\tilde Q^{*}\|\frac{\|A+\delta A\|}{\|A\|}=O(1)$ as $\epsilon_{\text{machine}}\to 0$. This gives us $\frac{\|(\delta Q)\tilde R\|}{\|A\|}\le \|\delta Q\|\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$ and $\frac{\|\tilde Q(\delta R)\|}{\|A\|}\le \|\tilde Q\|\frac{\|\delta R\|}{\|\tilde R\|}\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$. Finally, $\frac{\|(\delta Q)(\delta R)\|}{\|A\|}\le \|\delta Q\|\frac{\|\delta R\|}{\|A\|}=O(\epsilon_{\text{machine}}^{2}).$ The total perturbation $\Delta A$ thus satisfies $\frac{\|\Delta A\|}{\|A\|}\le \frac{\|\delta A\|}{\|A\|}+\frac{\|(\delta Q)\tilde R\|}{\|A\|}+\frac{\|\tilde Q(\delta R)\|}{\|A\|}+\frac{\|(\delta Q)(\delta R)\|}{\|A\|}=O(\epsilon_{\text{machine}})$.
+$b=(\tilde Q+\delta Q)(\tilde R+\delta R)\tilde x=\bigl[\tilde Q\tilde R+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ By [[Matrix Factorization#^cd77ab]], $b=\bigl[A+\delta A+(\delta Q)\tilde R+\tilde Q(\delta R)+(\delta Q)(\delta R)\bigr]\tilde x.$ Since $\tilde Q\tilde R=A+\delta A$ and $\tilde Q$ is unitary, we have $\frac{\|\tilde R\|}{\|A\|}\le \|\tilde Q^{*}\|\frac{\|A+\delta A\|}{\|A\|}=O(1)$ as $\epsilon_{\text{machine}}\to 0$. This gives us $\frac{\|(\delta Q)\tilde R\|}{\|A\|}\le \|\delta Q\|\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$ and $\frac{\|\tilde Q(\delta R)\|}{\|A\|}\le \|\tilde Q\|\frac{\|\delta R\|}{\|\tilde R\|}\frac{\|\tilde R\|}{\|A\|}=O(\epsilon_{\text{machine}})$. Finally, $\frac{\|(\delta Q)(\delta R)\|}{\|A\|}\le \|\delta Q\|\frac{\|\delta R\|}{\|A\|}=O(\epsilon_{\text{machine}}^{2}).$ The total perturbation $\Delta A$ thus satisfies $\frac{\|\Delta A\|}{\|A\|}\le \frac{\|\delta A\|}{\|A\|}+\frac{\|(\delta Q)\tilde R\|}{\|A\|}+\frac{\|\tilde Q(\delta R)\|}{\|A\|}+\frac{\|(\delta Q)(\delta R)\|}{\|A\|}=O(\epsilon_{\text{machine}})$.
 `\end{proof}`
 
 > [!Theorem|]

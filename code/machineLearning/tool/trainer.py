@@ -20,6 +20,7 @@ class Trainer:
         pre_processor: Optional[nn.Module] = None,
         post_processor: Optional[nn.Module] = None,
         config_path: Union[str, Path],
+        save_dir = Optional[Path, str],
         resume: bool = True,
         n_epochs: int,
         device: str,
@@ -27,7 +28,7 @@ class Trainer:
         eval_interval: int = 1,
         save_interval: int = 50,
         verbose: bool = True,
-        save_logs: bool = False,
+        save_logs: bool = True,
         save_outs: bool = False,
     ) -> None:
         """
@@ -88,6 +89,7 @@ class Trainer:
         self.start_epoch = 0
 
         self.verbose = verbose
+        self.save_dir = Path(save_dir).expanduser().resolve()
         self.save_logs = save_logs
         self.save_outs = save_outs
 
@@ -238,7 +240,6 @@ class Trainer:
         scheduler: Optional[object] = None,
         training_loss: nn.Module,
         eval_losses: Dict[str, nn.Module] = {},
-        save_dir: Union[str, Path],
         save_loss: Optional[str] = None,
     ) -> None:
         """
@@ -297,7 +298,6 @@ class Trainer:
         else:
             self.save_loss = save_loss
 
-        self.save_dir = Path(save_dir).expanduser().resolve()
         self.save_dir.mkdir(parents=True, exist_ok=True)
         if self.save_logs:
             log_txt = self.save_dir / "logs.txt"
@@ -481,6 +481,7 @@ class Trainer:
                     outs[loader_name] = combined
 
         if self.save_outs:
+            self.save_dir.mkdir(parents=True, exist_ok=True)
             torch.save(outs, self.save_dir / f"outputs_epoch_{epoch}.pt")
 
         if eval_losses is not None:

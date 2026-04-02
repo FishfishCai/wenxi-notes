@@ -67,7 +67,7 @@ $\lambda_{i}w^{*}v=w^{*}\lambda_{i}v=w^{*}Qv=(Q^{\top}w)^{*}v=(\lambda_{j}^{-1}w
 > Let  $A\in \mathbb{R}^{n,n}$. $\det(A)$ can be interperated as the signed volume of the parallelepiped formed by the columns of $A$.
 
 `\begin{proof}`
-Following [[QR Factorization#^4b5424]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of the $Q$.
+Following [[Matrix Factorization#^4b5424]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of the $Q$.
 `\end{proof}`
 
 ## Spectral Theorem
@@ -105,6 +105,38 @@ This follows from [[#^909e8b]] and [[#^81eb66]] .
 
 > [!remark|]
 > [[#^03854c]], [[#^727a78]], [[#^4c69c4]], [[#^a712cb]], [[#^f47e7a]] and [[#^b5daf5]] follow if $^{\top}$ is changed to $^{*}$.
+
+## Eigenvalue
+> [!theorem|]
+> Let $A, X \in \mathbb{C}^{n, n}$. Assume $X$ is nonsingular. The matrices $A$ and $X^{-1}AX$ have the same characteristic polynomial, eigenvalues, and algebraic and geometric multiplicities.
+
+> [!theorem|]
+> Let $A \in \mathbb{C}^{n, n}$. The algebraic multiplicity of the eigenvalue $\lambda$ is at least as great as its geometric multiplicity.
+
+`\begin{proof}`
+Let $n$ be the geometric multiplicity of $\lambda$ for $A$. Form a matrix $\hat{V} \in \mathbb{C}^{m, n}$ whose $n$ columns constitute an orthonormal basis of the eigenspace $\{x : Ax = \lambda x\}$. Extend $\hat{V}$ to a square unitary matrix $V \in \mathbb{C}^{m, m}$. Then $B = V^* A V = \begin{bmatrix} \lambda I & C \\ 0 & D \end{bmatrix}$, where $I \in \mathbb{F}^{n, n}$ is the identity matrix, $C \in \mathbb{F}^{n, m-n}$, and $D \in \mathbb{F}^{m-n, m-n}$. $\det(zI - B) = \det(zI - \lambda I)\det(zI - D) = (z-\lambda)^n \det(zI - D)$. Therefore the algebraic multiplicity of $\lambda$ as an eigenvalue of $B$ is at least $n$. Since similarity transformations preserve multiplicities, the same is true for $A$.
+`\end{proof}`
+
+> [!Definition|] Defective Eigenvalue
+> Let $A \in \mathbb{C}^{n, n}$ and $\lambda \in \mathbb{F}$. The eigenvalue $\lambda$ is a defective eigenvalue if its algebraic multiplicity exceeds its geometric multiplicity. 
+
+> [!definition|] Defective Matrix
+> Let $A \in \mathbb{C}^{n, n}$. The matrix $A$ is a defective matrix if it has one or more defective eigenvalues.
+
+> [!theorem|]
+> Let $A, X, \Lambda \in \mathbb{C}^{n, n}$. $\Lambda$ is a diagnol matrix. The matrix $A$ is nondefective iff it has an eigenvalue decomposition $A = X \Lambda X^{-1}$.
+
+> [!theorem|]
+> Let $A \in \mathbb{C}^{n, n}$. Let $\lambda_1, \ldots, \lambda_n$ be the eigenvalues of $A$, counted with algebraic multiplicity. $\det(A) = \prod_{j=1}^{n} \lambda_j$ and $\operatorname{tr}(A) = \sum_{j=1}^{n} \lambda_j$.
+
+> [!Definition|] Normal Matrix
+> Let $A \in \mathbb{C}^{n, n}$. The matrix $A$ is a normal matrix if $A^*A = AA^*$.
+
+> [!Theorem|]
+> Let $A \in \mathbb{C}^{n, n}$. The matrix $A$ is unitarily diagonalizable iff it is normal.
+
+> [!Theorem|] Schur Factorization
+> Let $A \in \mathbb{C}^{n, n}$. There exists a unitary matrix $Q$ and an upper-triangular matrix $T$ s.t. $A = Q T Q^*$. Moreover, the eigenvalues of $A$ appear on the diagonal of $T$.
 
 ## Definiteness
 > [!definition|] Symmetric Positive Definite Matrix
