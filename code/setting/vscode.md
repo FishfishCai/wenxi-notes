@@ -15,6 +15,36 @@
             "args": ["-l"]
         }
     },
+
+    // vscode
+    "files.autoSaveDelay": 10000,
+    "editor.fontSize": 15,
+    "editor.minimap.enabled": false,
+    "workbench.sideBar.location": "right",
+    "workbench.statusBar.visible": false,
+    "workbench.startupEditor": "none",
+    "workbench.browser.showInTitleBar": false,
+    "workbench.navigationControl.enabled": false,
+    "workbench.layoutControl.enabled": false,
+    "workbench.activityBar.location": "hidden",
+    "window.commandCenter": false,
+    "window.restoreWindows": "none",
+    "extensions.ignoreRecommendations": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    "explorer.confirmPasteNative": false,
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "update.showReleaseNotes": false,
+    "chat.tips.enabled": false,
+    
+    // git
+    "git.autofetch": true,
+
+    // ssh
+    "remote.SSH.lockfilesInTmp": true,
+    "remote.SSH.remotePlatform": {
+        "server1": "linux"
+    },
     
     // latex
     "latex-workshop.latex.autoBuild.run": "onFileChange",
@@ -136,38 +166,49 @@
     "latex-workshop.latex.recipe.default": "LaTeXmk",
     "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
     "latex-workshop.intellisense.argumentHint.enabled": false,
-
-    // vscode
-    "files.autoSaveDelay": 10000,
-    "editor.fontSize": 15,
-    "editor.minimap.enabled": false,
-    "workbench.sideBar.location": "right",
-    "workbench.statusBar.visible": false,
-    "workbench.startupEditor": "none",
-    "extensions.ignoreRecommendations": true,
-    "security.workspace.trust.untrustedFiles": "open",
-    "window.restoreWindows": "none",
-    "explorer.confirmPasteNative": false,
-    "explorer.confirmDragAndDrop": false,
-    "explorer.confirmDelete": false,
-    "update.showReleaseNotes": false,
+    "workbench.editorAssociations": {
+        "*.pdf": "latex-workshop-pdf-hook"
+    },
 
     // jupyter
     "jupyter.askForKernelRestart": false,
     
-    // ssh
-    "remote.SSH.lockfilesInTmp": true,
-    
-    // git
-    "git.autofetch": true,
-    "workbench.editorAssociations": {
-        "*.pdf": "latex-workshop-pdf-hook"
-    },
-    "cursor.composer.textSizeScale": 1.15,
-    "remote.SSH.remotePlatform": {
-        "server1": "linux",
-        "server2": "linux"
-    },
-    "redhat.telemetry.enabled": false,
+    // java
+    "redhat.telemetry.enabled": false
 }
+```
+
+#### key-binding
+```json
+[
+    {
+        "key": "cmd+m",
+        "command": "opensshremotes.openEmptyWindow"
+    },
+    {
+        "key": "cmd+h",
+        "command": "workbench.action.toggleAuxiliaryBar"
+    },
+    {
+        "key": "cmd+j",
+        "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "cmd+j",
+        "command": "-workbench.action.togglePanel"
+    },
+    {
+        "key": "cmd+n",
+        "command": "workbench.action.togglePanel"
+    },
+    {
+        "key": "cmd+b",
+        "command": "-workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "cmd+b",
+        "command": "workbench.action.terminal.new",
+        "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+    }
+]
 ```

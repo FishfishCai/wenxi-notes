@@ -46,7 +46,7 @@
    - 作为对外稳定 API，便于用户或脚本写做日志、配置、可视化等。
    - 子类 / 外部会覆盖或读取，用于模板方法、测试等。
 9）以下具体变量命名规则必须统一执行：  
-   - 对于 numpy 或 torch 的矩阵/张量变量，“维度数量”对应的变量名必须是 n_dims。  
+   - 对于 numpy 或 torch 的矩阵/张量变量，“维度数量”对应的变量名必须是 n_dims。 
    - 变量名中不要出现 num 或 num_ 前缀；统一改为 n_xxxs 的复数形式（例如 num_layers -> n_layers）；若命名冲突，使用 n_A_xxxs 与 n_B_xxxs 区分。  
    - 对于一维对象/向量，长度变量名使用 dim 表示，优先使用 xxx_dim 格式（例如 seq_dim）。  
    - 对于多维张量对象，先判断其布局属于 (B,C,H,W) 或 (B,C,T,H,W) 或 (B,C,D,H,W)，并统一使用 batch, channel, time或depth, height, width 来指代对应维度；涉及具体变量时使用 xxx_batch / xxx_channel / xxx_time / xxx_height / xxx_width / xxx_depth 这类形式。

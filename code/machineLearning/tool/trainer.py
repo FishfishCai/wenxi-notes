@@ -20,7 +20,7 @@ class Trainer:
         pre_processor: Optional[nn.Module] = None,
         post_processor: Optional[nn.Module] = None,
         config_path: Union[str, Path],
-        save_dir = Optional[Path, str],
+        save_dir: Optional[Union[Path, str]],
         resume: bool = True,
         n_epochs: int,
         device: str,
@@ -30,6 +30,9 @@ class Trainer:
         verbose: bool = True,
         save_logs: bool = True,
         save_outs: bool = False,
+        save_inputs: bool = False,
+        save_gts: bool = False,
+        n_outs: Optional[int] = None,
     ) -> None:
         """
         Build ``self.model`` from ``config_path``, move modules to ``device``, and optionally resume training state.
@@ -61,7 +64,13 @@ class Trainer:
         save_logs : bool, optional
             If True, append lines to ``save_dir / "logs.txt"`` via :meth:`log_train` and :meth:`log_eval`. Default is False.
         save_outs : bool, optional
-            If True, :meth:`evaluate` saves last-batch outputs under ``self.save_dir``. Default is False.
+            If True, :meth:`evaluate` saves outputs under ``self.save_dir``. Default is False.
+        save_inputs : bool, optional
+            If True, :meth:`evaluate` saves inputs under ``self.save_dir``. Default is False.
+        save_gts : bool, optional
+            If True, :meth:`evaluate` saves ground truths under ``self.save_dir``. Default is False.
+        n_outs : int or None, optional
+            Maximum number of samples to keep when saving outputs/inputs/gts. None means no limit. Default is None.
 
         Returns
         -------
@@ -92,9 +101,12 @@ class Trainer:
         self.save_dir = Path(save_dir).expanduser().resolve()
         self.save_logs = save_logs
         self.save_outs = save_outs
+        self.save_inputs = save_inputs
+        self.save_gts = save_gts
+        self.n_outs = n_outs
 
         self.load_config(config_path)
-        if resume:
+        if resume and Path(config_path).suffix == ".pth":
             self.resume_state(config_path)
 
     def load_config(
@@ -189,7 +201,7 @@ class Trainer:
         -------
         None
         """
-        ckpt = torch.load(resume_path.as_posix(), map_location=self.device, weights_only=False)
+        ckpt = torch.load(Path(resume_path).as_posix(), map_location=self.device, weights_only=False)
         if not isinstance(ckpt, dict):
             raise TypeError(f"Checkpoint must be a dict, got {type(ckpt)}")
 
@@ -238,8 +250,9 @@ class Trainer:
         eval_loaders: Dict[str, object] = {},
         optimizer: torch.optim.Optimizer,
         scheduler: Optional[object] = None,
-        training_loss: nn.Module,
-        eval_losses: Dict[str, nn.Module] = {},
+        train_losses: Union[nn.Module, Dict[str, nn.Module]],
+        backward_loss: Optional[str] = None,
+        eval_losses: Union[nn.Module, Dict[str, nn.Module]] = {},
         save_loss: Optional[str] = None,
     ) -> None:
         """
@@ -255,12 +268,14 @@ class Trainer:
             Optimizer stepped in :meth:`_train_one_batch` / :meth:`train_one_epoch`.
         scheduler : object or None, optional
             ``ReduceLROnPlateau`` is stepped with the mean batch loss; any other non-None scheduler is stepped once per epoch. Default is None.
-        training_loss : torch.nn.Module
-            Scalar loss ``training_loss(**outputs, **gts)``; terms should sum over the batch dimension.
-        eval_losses : dict of str to torch.nn.Module
-            Metric names to scalar losses ``(**outputs, **gts)``.
-        save_dir : str or pathlib.Path
-            Directory for ``.pth`` checkpoints, optional ``logs.txt``, and ``outputs_epoch_*.pt`` when ``save_outs``.
+        train_losses : torch.nn.Module or dict of str to torch.nn.Module
+            A single loss module or named loss modules ``loss(**outputs, **gts)``; all are computed and logged each batch.
+            A single module is wrapped as ``{"loss": module}``.
+        backward_loss : str or None, optional
+            Key in ``train_losses`` whose output is back-propagated. If None, defaults to the first key. Default is None.
+        eval_losses : torch.nn.Module or dict of str to torch.nn.Module
+            A single metric module or named metric modules ``(**outputs, **gts)``.
+            A single module is wrapped as ``{"loss": module}``.
         save_loss : str or None, optional
             Key ``f"{loader}_{loss_name}"`` used for the best checkpoint; if None and ``eval_loaders`` is non-empty, defaults to the first loader and first metric. Default is None.
 
@@ -271,14 +286,28 @@ class Trainer:
         self.optimizer = optimizer
         self.scheduler = scheduler
 
+        if isinstance(train_losses, nn.Module):
+            train_losses = {"loss": train_losses}
+        if isinstance(eval_losses, nn.Module):
+            eval_losses = {"loss": eval_losses}
+
+        if backward_loss is None:
+            backward_loss = next(iter(train_losses))
+        if backward_loss not in train_losses:
+            raise KeyError(
+                f'backward_loss="{backward_loss}" is not a key in train_losses '
+                f"(available: {list(train_losses.keys())})"
+            )
+
         # ``reduction="mean"`` conflicts with trainer batch-sum convention
-        if hasattr(training_loss, "reduction"):
-            if training_loss.reduction == "mean":
-                warnings.warn(
-                    f"{training_loss.reduction=}. This means that the loss is "
-                    "initialized to average across the batch dim. The Trainer "
-                    "expects losses to sum across the batch dim."
-                )
+        for train_loss in train_losses.values():
+            if hasattr(train_loss, "reduction"):
+                if train_loss.reduction == "mean":
+                    warnings.warn(
+                        f"{train_loss.reduction=}. This means that the loss is "
+                        "initialized to average across the batch dim. The Trainer "
+                        "expects losses to sum across the batch dim."
+                    )
         for eval_loss in eval_losses.values():
             if hasattr(eval_loss, "reduction"):
                 if eval_loss.reduction == "mean":
@@ -319,7 +348,7 @@ class Trainer:
 
         # Epoch loop with eval and checkpoints
         for epoch in range(self.start_epoch, self.n_epochs):
-            self.train_one_epoch(epoch, train_loader, training_loss)
+            self.train_one_epoch(epoch, train_loader, train_losses, backward_loss)
 
             if epoch % self.eval_interval == 0 and len(eval_loaders) > 0:
                 eval_metrics = self.evaluate(
@@ -353,10 +382,11 @@ class Trainer:
         self,
         epoch: int,
         train_loader: object,
-        training_loss: nn.Module,
+        train_losses: Dict[str, nn.Module],
+        backward_loss: str,
     ) -> None:
         """
-        Run one epoch: accumulate mean batch loss and mean per-sample loss, step the scheduler, then log.
+        Run one epoch: accumulate per-loss metrics, step the scheduler with the backward loss, then log.
 
         Parameters
         ----------
@@ -364,14 +394,16 @@ class Trainer:
             Epoch index passed to :meth:`print_train` and :meth:`log_train`.
         train_loader : object
             Iterable of ``(inputs, gts)`` batches; ``len(train_loader)`` normalizes the mean batch loss.
-        training_loss : torch.nn.Module
-            Loss module used in :meth:`_train_one_batch`.
+        train_losses : dict of str to torch.nn.Module
+            Named loss modules used in :meth:`_train_one_batch`.
+        backward_loss : str
+            Key in ``train_losses`` whose output is back-propagated.
 
         Returns
         -------
         None
         """
-        avg_loss = 0
+        avg_losses = {name: 0.0 for name in train_losses}
         train_err = 0.0
         t0 = default_timer()
         self.n_samples = 0
@@ -383,7 +415,7 @@ class Trainer:
             self.post_processor.train()
 
         for sample in train_loader:
-            loss = self._train_one_batch(sample, training_loss)
+            loss, step_losses = self._train_one_batch(sample, train_losses, backward_loss)
             if self.scaler is not None:
                 self.scaler.scale(loss).backward()
                 self.scaler.step(self.optimizer)
@@ -392,12 +424,13 @@ class Trainer:
                 loss.backward()
                 self.optimizer.step()
 
-            train_err += loss.item()
-            with torch.no_grad():
-                avg_loss += loss.item()
+            train_err += step_losses[backward_loss]
+            for name, val in step_losses.items():
+                avg_losses[name] += val
 
         train_err /= len(train_loader)
-        avg_loss /= self.n_samples
+        for name in avg_losses:
+            avg_losses[name] /= self.n_samples
 
         if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
             self.scheduler.step(train_err)
@@ -410,14 +443,14 @@ class Trainer:
         for pg in self.optimizer.param_groups:
             lr = pg["lr"]
         if self.verbose:
-            self.print_train(epoch, epoch_train_time, avg_loss, train_err, lr)
+            self.print_train(epoch, epoch_train_time, avg_losses, train_err, lr)
         if self.save_logs:
-            self.log_train(epoch, epoch_train_time, avg_loss, train_err, lr)
+            self.log_train(epoch, epoch_train_time, avg_losses, train_err, lr)
 
     def evaluate(
         self,
         eval_loaders: Dict[str, object],
-        eval_losses: Optional[Dict[str, nn.Module]] = None,
+        eval_losses: Optional[Union[nn.Module, Dict[str, nn.Module]]] = None,
         epoch: Optional[int] = None,
         eval_iter: Optional[Callable[..., Any]] = None,
     ) -> Dict[str, float]:
@@ -428,8 +461,9 @@ class Trainer:
         ----------
         eval_loaders : dict of str to object
             Loader names to iterables of ``(inputs, gts)`` batches.
-        eval_losses : dict of str to torch.nn.Module or None, optional
-            Metric modules; if None, metrics are not accumulated. Default is None.
+        eval_losses : torch.nn.Module, dict of str to torch.nn.Module, or None, optional
+            A single metric module, named metric modules, or None to skip metrics.
+            A single module is wrapped as ``{"loss": module}``. Default is None.
         epoch : int or None, optional
             Epoch index for logging and for ``outputs_epoch_{epoch}.pt`` when ``save_outs``. Default is None.
         eval_iter : callable or None, optional
@@ -440,6 +474,9 @@ class Trainer:
         eval_metrics : dict of str to float
             Keys ``f"{loader_name}_{loss_name}"`` mapping to mean loss per sample for that loader.
         """
+        if isinstance(eval_losses, nn.Module):
+            eval_losses = {"loss": eval_losses}
+
         self.model.eval()
         if self.pre_processor is not None:
             self.pre_processor.eval()
@@ -451,38 +488,62 @@ class Trainer:
             for loader_name in eval_loaders.keys():
                 for loss_name in eval_losses.keys():
                     eval_metrics[f"{loader_name}_{loss_name}"] = 0.0
-        outs = {}
+        all_inputs = {}
+        all_outs = {}
+        all_gts = {}
+
+        def _stack_batches(batch_list, n=None):
+            combined = {}
+            for k in batch_list[0]:
+                vals = [b[k] for b in batch_list]
+                if torch.is_tensor(vals[0]):
+                    combined[k] = torch.cat(vals, dim=0) if n is None else torch.cat(vals, dim=0)[:n]
+                else:
+                    combined[k] = vals if n is None else vals[:n]
+            return combined
 
         with torch.no_grad():
             for loader_name, eval_loader in eval_loaders.items():
                 self.n_samples = 0
                 batch_outs = []
+                batch_inputs = []
+                batch_gts = []
                 for sample in eval_loader:
-                    eval_step_losses, out = self._eval_one_batch(
+                    eval_step_losses, out, inp, gt = self._eval_one_batch(
                         sample,
                         eval_losses,
                         return_output=self.save_outs,
+                        return_inputs=self.save_inputs,
+                        return_gts=self.save_gts,
                         eval_iter=eval_iter,
                     )
                     if out is not None:
                         batch_outs.append(out)
+                    if inp is not None:
+                        batch_inputs.append(inp)
+                    if gt is not None:
+                        batch_gts.append(gt)
                     for loss_name, val_loss in eval_step_losses.items():
                         eval_metrics[f"{loader_name}_{loss_name}"] += val_loss
                 for loss_name in eval_losses.keys():
                     eval_metrics[f"{loader_name}_{loss_name}"] /= self.n_samples
                 if batch_outs:
-                    combined = {}
-                    for k in batch_outs[0]:
-                        vals = [b[k] for b in batch_outs]
-                        if torch.is_tensor(vals[0]):
-                            combined[k] = torch.cat(vals, dim=0)
-                        else:
-                            combined[k] = vals
-                    outs[loader_name] = combined
+                    all_outs[loader_name] = _stack_batches(batch_outs, self.n_outs)
+                if batch_inputs:
+                    all_inputs[loader_name] = _stack_batches(batch_inputs, self.n_outs)
+                if batch_gts:
+                    all_gts[loader_name] = _stack_batches(batch_gts, self.n_outs)
 
-        if self.save_outs:
+        if self.save_outs or self.save_inputs or self.save_gts:
+            save_data = {}
+            if self.save_inputs:
+                save_data["inputs"] = all_inputs
+            if self.save_outs:
+                save_data["outputs"] = all_outs
+            if self.save_gts:
+                save_data["gts"] = all_gts
             self.save_dir.mkdir(parents=True, exist_ok=True)
-            torch.save(outs, self.save_dir / f"outputs_epoch_{epoch}.pt")
+            torch.save(save_data, self.save_dir / f"eval_epoch_{epoch}.pt")
 
         if eval_losses is not None:
             if self.verbose:
@@ -494,22 +555,28 @@ class Trainer:
     def _train_one_batch(
         self,
         sample: object,
-        training_loss: nn.Module,
-    ) -> torch.Tensor:
+        train_losses: Dict[str, nn.Module],
+        backward_loss: str,
+    ) -> Tuple[torch.Tensor, Dict[str, float]]:
         """
-        Transfer a batch to ``device``, optionally run processors, forward the model, and return a scalar loss.
+        Transfer a batch to ``device``, optionally run processors, forward the model, compute all losses,
+        and return the backward-loss tensor together with all per-loss scalar values.
 
         Parameters
         ----------
         sample : object
             Pair ``(inputs, gts)`` of dicts; batch size is taken from dimension 0 of the first tensor in ``inputs``.
-        training_loss : torch.nn.Module
-            Callable as ``training_loss(**outputs, **gts)`` returning a scalar tensor.
+        train_losses : dict of str to torch.nn.Module
+            Named loss modules ``loss(**outputs, **gts)``.
+        backward_loss : str
+            Key in ``train_losses`` whose tensor is returned for back-propagation.
 
         Returns
         -------
         loss : torch.Tensor
             Scalar tensor (shape ``()``) for ``backward`` in the training loop.
+        step_losses : dict of str to float
+            All loss values as Python floats for logging.
         """
         self.optimizer.zero_grad(set_to_none=True)
 
@@ -530,30 +597,37 @@ class Trainer:
         if self.pre_processor is not None:
             inputs, gts = self.pre_processor(inputs, gts)
 
-        # Forward, optional post-processor and loss under autocast
         if self.mixed_precision:
             with torch.autocast(device_type=self.autocast_device_type):
                 outputs = self.model(**inputs)
                 if self.post_processor is not None:
                     outputs = self.post_processor(outputs)
-                loss = training_loss(**outputs, **gts)
+                loss_tensors = {
+                    name: fn(**outputs, **gts) for name, fn in train_losses.items()
+                }
         else:
             outputs = self.model(**inputs)
             if self.post_processor is not None:
                 outputs = self.post_processor(outputs)
-            loss = training_loss(**outputs, **gts)
+            loss_tensors = {
+                name: fn(**outputs, **gts) for name, fn in train_losses.items()
+            }
 
-        return loss
+        loss = loss_tensors[backward_loss]
+        step_losses = {name: t.item() for name, t in loss_tensors.items()}
+        return loss, step_losses
 
     def _eval_one_batch(
         self,
         sample: object,
         eval_losses: Dict[str, nn.Module],
         return_output: bool = False,
+        return_inputs: bool = False,
+        return_gts: bool = False,
         eval_iter: Optional[Callable[..., Any]] = None,
-    ) -> Tuple[Dict[str, float], Optional[Dict[str, Any]]]:
+    ) -> Tuple[Dict[str, float], Optional[Dict[str, Any]], Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
         """
-        Evaluate one batch without gradients, record metric values, and optionally return CPU outputs.
+        Evaluate one batch without gradients, record metric values, and optionally return CPU inputs/outputs/gts.
 
         Parameters
         ----------
@@ -563,6 +637,10 @@ class Trainer:
             Metric names to scalar loss modules; must match keys used in :meth:`evaluate`.
         return_output : bool, optional
             If True, detach outputs to CPU in the second return value. Default is False.
+        return_inputs : bool, optional
+            If True, detach inputs to CPU in the third return value. Default is False.
+        return_gts : bool, optional
+            If True, detach gts to CPU in the fourth return value. Default is False.
         eval_iter : callable or None, optional
             If None, call ``self.model(**inputs)``; otherwise ``eval_iter(self.model, **inputs)``. Default is None.
 
@@ -572,6 +650,10 @@ class Trainer:
             Per-metric batch total as a Python float from ``.item()``.
         outputs : dict or None
             CPU-side postprocessed outputs if ``return_output`` is True; otherwise None.
+        inputs : dict or None
+            CPU-side inputs if ``return_inputs`` is True; otherwise None.
+        gts : dict or None
+            CPU-side ground truths if ``return_gts`` is True; otherwise None.
         """
         inputs, gts = sample[0], sample[1]
         for k, v in inputs.items():
@@ -586,6 +668,13 @@ class Trainer:
             raise ValueError("The first input values must be torch Tensors.")
         batch_dim = int(first_tensor.shape[0])
         self.n_samples += batch_dim
+
+        ret_inputs = None
+        if return_inputs:
+            ret_inputs = {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in inputs.items()}
+        ret_gts = None
+        if return_gts:
+            ret_gts = {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in gts.items()}
 
         if self.pre_processor is not None:
             inputs, gts = self.pre_processor(inputs, gts)
@@ -614,17 +703,16 @@ class Trainer:
                 for loss_name, loss in eval_losses.items()
             }
 
+        ret_outputs = None
         if return_output:
-            outputs = {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in outputs.items()}
-            return eval_step_losses, outputs
-        else:
-            return eval_step_losses, None
+            ret_outputs = {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in outputs.items()}
+        return eval_step_losses, ret_outputs, ret_inputs, ret_gts
 
     def print_train(
         self,
         epoch: int,
         epoch_time: float,
-        avg_loss: float,
+        avg_losses: Dict[str, float],
         train_err: float,
         lr: Optional[float] = None,
     ) -> None:
@@ -637,10 +725,10 @@ class Trainer:
             Epoch index in the leading bracket.
         epoch_time : float
             Wall-clock seconds spent in the epoch.
-        avg_loss : float
-            Mean loss per sample (sum of batch losses divided by ``self.n_samples``).
+        avg_losses : dict of str to float
+            Mean per-sample loss for each named training loss.
         train_err : float
-            Mean of per-batch ``loss.item()`` values over batches.
+            Mean of per-batch backward-loss values over batches (used by scheduler).
         lr : float or None, optional
             Last optimizer param-group learning rate, or None to print ``lr=N/A``. Default is None.
 
@@ -649,7 +737,8 @@ class Trainer:
         None
         """
         msg = f"[{epoch}] time={epoch_time:.2f}, "
-        msg += f"avg_loss={avg_loss:.4f}, "
+        for name, val in avg_losses.items():
+            msg += f"{name}={val:.4f}, "
         msg += f"train_err={train_err:.4f}, "
         msg += f"lr={lr:.3e}" if lr is not None else "lr=N/A"
         print(msg)
@@ -689,7 +778,7 @@ class Trainer:
         self,
         epoch: int,
         epoch_time: float,
-        avg_loss: float,
+        avg_losses: Dict[str, float],
         train_err: float,
         lr: Optional[float] = None,
     ) -> None:
@@ -702,10 +791,10 @@ class Trainer:
             Epoch index in the log line.
         epoch_time : float
             Wall-clock seconds for the epoch.
-        avg_loss : float
-            Mean loss per sample for the epoch.
+        avg_losses : dict of str to float
+            Mean per-sample loss for each named training loss.
         train_err : float
-            Mean per-batch loss for the epoch.
+            Mean per-batch backward-loss value for the epoch.
         lr : float or None, optional
             Learning rate formatted like :meth:`print_train`. Default is None.
 
@@ -714,7 +803,8 @@ class Trainer:
         None
         """
         msg = f"[{epoch}] time={epoch_time:.2f}, "
-        msg += f"avg_loss={avg_loss:.4f}, "
+        for name, val in avg_losses.items():
+            msg += f"{name}={val:.4f}, "
         msg += f"train_err={train_err:.4f}, "
         msg += f"lr={lr:.3e}" if lr is not None else "lr=N/A"
         with self.log_dir.open("a", encoding="utf-8") as f:
