@@ -4,6 +4,7 @@ import warnings
 from pathlib import Path
 from timeit import default_timer
 from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
+
 import torch
 from torch import nn
 
@@ -30,7 +31,7 @@ class Trainer:
         verbose: bool = True,
         save_logs: bool = True,
         save_outs: bool = False,
-        save_inputs: bool = False,
+        save_inps: bool = False,
         save_gts: bool = False,
         n_outs: Optional[int] = None,
     ) -> None:
@@ -65,7 +66,7 @@ class Trainer:
             If True, append lines to ``save_dir / "logs.txt"`` via :meth:`log_train` and :meth:`log_eval`. Default is False.
         save_outs : bool, optional
             If True, :meth:`evaluate` saves outputs under ``self.save_dir``. Default is False.
-        save_inputs : bool, optional
+        save_inps : bool, optional
             If True, :meth:`evaluate` saves inputs under ``self.save_dir``. Default is False.
         save_gts : bool, optional
             If True, :meth:`evaluate` saves ground truths under ``self.save_dir``. Default is False.
@@ -99,9 +100,14 @@ class Trainer:
 
         self.verbose = verbose
         self.save_dir = Path(save_dir).expanduser().resolve()
+        self.save_dir.mkdir(parents=True, exist_ok=True)
         self.save_logs = save_logs
+        if self.save_logs:
+            self.log_dir = self.save_dir / "logs.txt"
+            if not self.log_dir.is_file():
+                self.log_dir.touch()
         self.save_outs = save_outs
-        self.save_inputs = save_inputs
+        self.save_inps = save_inps
         self.save_gts = save_gts
         self.n_outs = n_outs
 
@@ -190,7 +196,9 @@ class Trainer:
         resume_path: Union[str, Path],
     ) -> None:
         """
-        Load a ``.pth`` checkpoint and restore ``start_epoch`` and any ``model``, ``optimizer``, ``scheduler``, and ``scaler`` state.
+        Load a ``.pth`` checkpoint and restore ``start_epoch``, ``model``, and ``scaler`` state immediately.
+        ``optimizer`` and ``scheduler`` state dicts are cached in ``self.pending``
+        because these objects may not exist yet (they are created later in :meth:`train`).
 
         Parameters
         ----------
@@ -202,46 +210,22 @@ class Trainer:
         None
         """
         ckpt = torch.load(Path(resume_path).as_posix(), map_location=self.device, weights_only=False)
-        if not isinstance(ckpt, dict):
-            raise TypeError(f"Checkpoint must be a dict, got {type(ckpt)}")
 
-        # ``epoch`` -> ``self.start_epoch``
         epoch = ckpt.get("epoch")
         if epoch is not None:
             print(f"Loading checkpoint from epoch {epoch}.")
             self.start_epoch = int(epoch) + 1
 
-        if "model" in ckpt:
-            if getattr(self, "model", None) is None:
-                raise ValueError(
-                    'Checkpoint has "model" but self.model is None. '
-                    "Create model before calling resume_state()."
-                )
-            self.model.load_state_dict(ckpt["model"])
+        self.model.load_state_dict(ckpt["model"])
 
-        if "optimizer" in ckpt:
-            if getattr(self, "optimizer", None) is None:
-                raise ValueError(
-                    'Checkpoint has "optimizer" but self.optimizer is None. '
-                    "Create optimizer before calling resume_state()."
-                )
-            self.optimizer.load_state_dict(ckpt["optimizer"])
-
-        if "scheduler" in ckpt:
-            if getattr(self, "scheduler", None) is None:
-                raise ValueError(
-                    'Checkpoint has "scheduler" but self.scheduler is None. '
-                    "Create scheduler before calling resume_state()."
-                )
-            self.scheduler.load_state_dict(ckpt["scheduler"])
-
-        if "scaler" in ckpt:
-            if getattr(self, "scaler", None) is None:
-                raise ValueError(
-                    'Checkpoint has "scaler" but self.scaler is None. '
-                    "Create scaler before calling resume_state()."
-                )
+        if "scaler" in ckpt and self.scaler is not None:
             self.scaler.load_state_dict(ckpt["scaler"])
+
+        self.pending = {}
+        if "optimizer" in ckpt:
+            self.pending["optimizer"] = ckpt["optimizer"]
+        if "scheduler" in ckpt:
+            self.pending["scheduler"] = ckpt["scheduler"]
 
     def train(
         self,
@@ -277,7 +261,7 @@ class Trainer:
             A single metric module or named metric modules ``(**outputs, **gts)``.
             A single module is wrapped as ``{"loss": module}``.
         save_loss : str or None, optional
-            Key ``f"{loader}_{loss_name}"`` used for the best checkpoint; if None and ``eval_loaders`` is non-empty, defaults to the first loader and first metric. Default is None.
+            Key ``f"{loader}_{loss_name}"`` used for the best checkpoint; if None and ``eval_loaders`` is non-empty, defaults to the first loader and first metric. If ``eval_loaders`` is non-empty, ``eval_losses`` must be non-empty. If ``save_loss`` is set and both dicts are non-empty, it must match one of those keys. Default is None.
 
         Returns
         -------
@@ -285,6 +269,13 @@ class Trainer:
         """
         self.optimizer = optimizer
         self.scheduler = scheduler
+
+        if hasattr(self, "pending"):
+            if "optimizer" in self.pending:
+                self.optimizer.load_state_dict(self.pending["optimizer"])
+            if "scheduler" in self.pending:
+                self.scheduler.load_state_dict(self.pending["scheduler"])
+            del self.pending
 
         if isinstance(train_losses, nn.Module):
             train_losses = {"loss": train_losses}
@@ -298,6 +289,33 @@ class Trainer:
                 f'backward_loss="{backward_loss}" is not a key in train_losses '
                 f"(available: {list(train_losses.keys())})"
             )
+
+        if len(eval_loaders) > 0 and len(eval_losses) == 0:
+            raise ValueError(
+                "eval_loaders is non-empty but eval_losses is empty; "
+                "provide at least one evaluation metric, or use an empty eval_loaders."
+            )
+
+        if save_loss is None:
+            if len(eval_loaders) == 0:
+                self.save_loss = None
+            else:
+                save_loader_name = next(iter(eval_loaders))
+                save_loss_name = next(iter(eval_losses))
+                self.save_loss = f"{save_loader_name}_{save_loss_name}"
+        else:
+            self.save_loss = save_loss
+            if len(eval_loaders) > 0 and len(eval_losses) > 0:
+                valid_keys = {
+                    f"{loader_name}_{loss_name}"
+                    for loader_name in eval_loaders
+                    for loss_name in eval_losses
+                }
+                if self.save_loss not in valid_keys:
+                    raise ValueError(
+                        f'save_loss="{self.save_loss}" is not a valid metric key. '
+                        f"Expected one of: {sorted(valid_keys)}."
+                    )
 
         # ``reduction="mean"`` conflicts with trainer batch-sum convention
         for train_loss in train_losses.values():
@@ -316,23 +334,6 @@ class Trainer:
                         "initialized to average across the batch dim. The Trainer "
                         "expects losses to sum across the batch dim."
                     )
-
-        if save_loss is None:
-            if len(eval_loaders) == 0:
-                self.save_loss = None
-            else:
-                save_loss_name = next(iter(eval_losses))
-                save_loader_name = next(iter(eval_loaders))
-                self.save_loss = f"{save_loader_name}_{save_loss_name}"
-        else:
-            self.save_loss = save_loss
-
-        self.save_dir.mkdir(parents=True, exist_ok=True)
-        if self.save_logs:
-            log_txt = self.save_dir / "logs.txt"
-            if not log_txt.is_file():
-                log_txt.touch()
-            self.log_dir = log_txt
 
         if self.verbose:
             msg = f"Training on {len(train_loader.dataset)} samples, "
@@ -513,7 +514,7 @@ class Trainer:
                         sample,
                         eval_losses,
                         return_output=self.save_outs,
-                        return_inputs=self.save_inputs,
+                        return_inputs=self.save_inps,
                         return_gts=self.save_gts,
                         eval_iter=eval_iter,
                     )
@@ -534,16 +535,15 @@ class Trainer:
                 if batch_gts:
                     all_gts[loader_name] = _stack_batches(batch_gts, self.n_outs)
 
-        if self.save_outs or self.save_inputs or self.save_gts:
+        if self.save_outs or self.save_inps or self.save_gts:
             save_data = {}
-            if self.save_inputs:
+            if self.save_inps:
                 save_data["inputs"] = all_inputs
             if self.save_outs:
                 save_data["outputs"] = all_outs
             if self.save_gts:
                 save_data["gts"] = all_gts
-            self.save_dir.mkdir(parents=True, exist_ok=True)
-            torch.save(save_data, self.save_dir / f"eval_epoch_{epoch}.pt")
+            torch.save(save_data, self.save_dir / f"eval.pt")
 
         if eval_losses is not None:
             if self.verbose:

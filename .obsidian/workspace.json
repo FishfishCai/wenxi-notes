@@ -4,22 +4,19 @@
     "type": "split",
     "children": [
       {
-        "id": "ff3d64f5d57a6ccf",
+        "id": "e358aeaa5e3a20ed",
         "type": "tabs",
         "children": [
           {
-            "id": "63aea027276c2cc0",
+            "id": "0fef5ca1ac29e762",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "vscode-editor",
               "state": {
-                "file": "code/pythonPrompt.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": false
+                "file": "code/machineLearning/visualize/check_outputs.py"
               },
               "icon": "lucide-file",
-              "title": "pythonPrompt"
+              "title": "check_outputs"
             }
           }
         ]
@@ -62,7 +59,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "文件列表"
+              "title": "Files"
             }
           },
           {
@@ -116,21 +113,29 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "obsidian42-brat:BRAT": false,
-      "graph:查看关系图谱": false,
-      "vscode-editor:新建代码文件": false
+      "graph:Open graph view": false,
+      "vscode-editor:Create Code File": false,
+      "obsidian42-brat:BRAT": false
     }
   },
-  "active": "63aea027276c2cc0",
+  "active": "ccea1679418a135c",
   "lastOpenFiles": [
-    "code/tool/conda.md",
-    "code/tool/git.md",
-    "code/tool/ssh.md",
-    "code/tool/nvidia.md",
-    "code/setting/kitty.md",
+    "code/machineLearning/visualize/check_dataset.py",
+    "code/machineLearning/basic/base_model.py",
+    "code/machineLearning/basic/load_args.py",
+    "code/machineLearning/basic/seed.py",
+    "code/machineLearning/basic/trainer.py",
     "code/setting/latexSuite.md",
     "code/setting/vscode.md",
+    "code/latex.md",
+    "code/tool/ssh.md",
+    "code/tool/nvidia.md",
+    "code/tool/git.md",
+    "code/tool/conda.md",
+    "code/promptMath.md",
     "code/pythonPrompt.md",
+    "code/setting/kitty.md",
+    "code/machineLearning/visualize/check_outputs.py",
     "code/machineLearning/tool/base_model.py",
     "math/Matrix Factorization.md",
     "math/Computation.md",
@@ -140,7 +145,6 @@
     "_tem/tem_prompt.md",
     "main.js",
     "styles.css",
-    "code/promptMath.md",
     "_tem/Pasted image 20260331152949.png",
     "math/Vector Space.md",
     "math/Structure.md",
@@ -149,16 +153,9 @@
     "math/Matrix Operator.md",
     "math/Machine Learning.md",
     "code/machineLearning/tool/trainer.py",
-    "code/machineLearning/tool/load_args.py",
     "code/tool/wandb.md",
-    "_tem/~$1.21.11.xlsx",
-    "code/latex.md",
     "README.md",
     "math/Least Square.md",
-    "untitled folder",
-    "code/machineLearning/tool",
-    "code/machineLearning/untitled folder",
-    "code/machineLearning",
     "_tem/images/Pasted image 20260205004425.png",
     "_tem/images/Pasted image 20260205010053.png",
     "_tem/Pasted image 20260225041550.png",

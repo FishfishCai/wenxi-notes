@@ -251,5 +251,5 @@ class _Viewer:
         plt.show()
 
 
-data_path = Path("./data/test_kolmogorov2d.npy")
+data_path = Path("")
 check_dataset(data_path)

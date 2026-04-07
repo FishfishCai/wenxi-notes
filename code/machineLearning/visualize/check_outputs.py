@@ -622,5 +622,5 @@ class _Viewer:
         plt.show()
 
 
-outs_path = "baseline/fno/ckpt/eval.pt"
+outs_path = ""
 check_outputs(outs_path)
