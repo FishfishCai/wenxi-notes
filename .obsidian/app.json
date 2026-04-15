@@ -23,5 +23,7 @@
   "foldHeading": false,
   "foldIndent": false,
   "propertiesInDocument": "hidden",
-  "autoConvertHtml": true
+  "autoConvertHtml": true,
+  "useTab": true,
+  "autoPairMarkdown": true
 }

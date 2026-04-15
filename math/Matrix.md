@@ -107,6 +107,25 @@ This follows from [[#^909e8b]] and [[#^81eb66]] .
 > [[#^03854c]], [[#^727a78]], [[#^4c69c4]], [[#^a712cb]], [[#^f47e7a]] and [[#^b5daf5]] follow if $^{\top}$ is changed to $^{*}$.
 
 ## Eigenvalue
+
+> [!definition|] Eigenspace
+> Let $A \in \mathbb{C}^{n, n}$ and $\lambda \in \mathbb{C}$. $\lambda$ is an eigenvalue of $A$. The eigenspace corresponding to $\lambda$ is $E_{\lambda} = \{x \in \mathbb{C}^{n} : Ax = \lambda x\}$.
+
+> [!definition|] Characteristic Polynomial
+> Let $A \in \mathbb{C}^{n, n}$. The characteristic polynomial of $A$ is $p_A(z) = \det(zI - A)$.
+
+> [!theorem|]
+> Let $A \in \mathbb{C}^{n, n}$ and $\lambda \in \mathbb{C}$. $\lambda$ is an eigenvalue of $A$ iff $p_A(\lambda) = 0$.
+
+> [!theorem|]
+> Let $A \in \mathbb{C}^{n, n}$. $A$ has $n$ eigenvalues, counted with algebraic multiplicity. In particular, if the roots of $p_A$ are simple, $A$ has $n$ distinct eigenvalues.
+
+> [!definition|] Simple Eigenvalue
+> Let $A \in \mathbb{C}^{n, n}$ and $\lambda \in \mathbb{C}$. $\lambda$ is an eigenvalue of $A$. The eigenvalue $\lambda$ is a simple eigenvalue if its algebraic multiplicity is $1$.
+
+> [!definition|] Similarity Transformation
+> Let $A, X \in \mathbb{C}^{n, n}$. $X$ is nonsingular. The similarity transformation of $A$ by $X$ is the map $A \mapsto X^{-1}AX$.
+
 > [!theorem|]
 > Let $A, X \in \mathbb{C}^{n, n}$. Assume $X$ is nonsingular. The matrices $A$ and $X^{-1}AX$ have the same characteristic polynomial, eigenvalues, and algebraic and geometric multiplicities.
 
@@ -126,8 +145,17 @@ Let $n$ be the geometric multiplicity of $\lambda$ for $A$. Form a matrix $\hat{
 > [!theorem|]
 > Let $A, X, \Lambda \in \mathbb{C}^{n, n}$. $\Lambda$ is a diagnol matrix. The matrix $A$ is nondefective iff it has an eigenvalue decomposition $A = X \Lambda X^{-1}$.
 
+`\begin{proof}`
+($\Longleftarrow$) Given $A = X\Lambda X^{-1}$, $\Lambda$ is diagonal and therefore nondefective. Since similarity transformations preserve eigenvalues and multiplicities, $A$ is nondefective.
+($\Longrightarrow$) A nondefective matrix has $n$ linearly independent eigenvectors, since each eigenvalue contributes as many independent eigenvectors as its algebraic multiplicity. Form $X$ from these $n$ eigenvectors. Then $X$ is nonsingular and $A = X\Lambda X^{-1}$.
+`\end{proof}`
+
 > [!theorem|]
 > Let $A \in \mathbb{C}^{n, n}$. Let $\lambda_1, \ldots, \lambda_n$ be the eigenvalues of $A$, counted with algebraic multiplicity. $\det(A) = \prod_{j=1}^{n} \lambda_j$ and $\operatorname{tr}(A) = \sum_{j=1}^{n} \lambda_j$.
+
+`\begin{proof}`
+From the characteristic polynomial $p_A(z) = \det(zI - A)$ and its factorization $p_A(z) = \prod_{j=1}^{n}(z - \lambda_j)$, setting $z = 0$ gives $\det(-A) = (-1)^n\det(A) = (-1)^n\prod_{j=1}^{n}\lambda_j$, so $\det(A) = \prod_{j=1}^{n}\lambda_j$. For the trace, the coefficient of $z^{n-1}$ in $p_A(z) = \det(zI - A)$ is $-\sum_{j=1}^{n}a_{jj} = -\operatorname{tr}(A)$. From the factored form, the coefficient of $z^{n-1}$ is $-\sum_{j=1}^{n}\lambda_j$. Thus $\operatorname{tr}(A) = \sum_{j=1}^{n}\lambda_j$.
+`\end{proof}`
 
 > [!Definition|] Normal Matrix
 > Let $A \in \mathbb{C}^{n, n}$. The matrix $A$ is a normal matrix if $A^*A = AA^*$.
@@ -135,8 +163,15 @@ Let $n$ be the geometric multiplicity of $\lambda$ for $A$. Form a matrix $\hat{
 > [!Theorem|]
 > Let $A \in \mathbb{C}^{n, n}$. The matrix $A$ is unitarily diagonalizable iff it is normal.
 
+> [!Theorem|]
+> Let $A \in \mathbb{C}^{n, n}$. If $A$ is Hermitian, $A$ is unitarily diagonalizable and its eigenvalues are real.
+
 > [!Theorem|] Schur Factorization
 > Let $A \in \mathbb{C}^{n, n}$. There exists a unitary matrix $Q$ and an upper-triangular matrix $T$ s.t. $A = Q T Q^*$. Moreover, the eigenvalues of $A$ appear on the diagonal of $T$.
+
+`\begin{proof}`
+By induction on $n$. The case $n = 1$ is trivial. Suppose $n \ge 2$. Let $x$ be an eigenvector of $A$ with eigenvalue $\lambda$. Normalize $x$ and let it be the first column of a unitary matrix $U$. Then $U^{*}AU = \begin{pmatrix} \lambda & B \\ 0 & C \end{pmatrix}$. By the inductive hypothesis, $C$ has a Schur factorization $C = VTV^{*}$. Set $Q = U\begin{pmatrix} 1 & 0 \\ 0 & V \end{pmatrix}$. Then $Q^{*}AQ = \begin{pmatrix} \lambda & BV \\ 0 & T \end{pmatrix}$, which is upper-triangular.
+`\end{proof}`
 
 ## Definiteness
 > [!definition|] Symmetric Positive Definite Matrix

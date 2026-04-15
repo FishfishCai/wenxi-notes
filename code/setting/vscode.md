@@ -27,6 +27,7 @@
     "workbench.navigationControl.enabled": false,
     "workbench.layoutControl.enabled": false,
     "workbench.activityBar.location": "hidden",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
     "window.commandCenter": false,
     "window.restoreWindows": "none",
     "extensions.ignoreRecommendations": true,
@@ -36,6 +37,7 @@
     "explorer.confirmDelete": false,
     "update.showReleaseNotes": false,
     "chat.tips.enabled": false,
+    "chat.viewSessions.orientation": "stacked",
     
     // git
     "git.autofetch": true,
@@ -174,7 +176,10 @@
     "jupyter.askForKernelRestart": false,
     
     // java
-    "redhat.telemetry.enabled": false
+    "redhat.telemetry.enabled": false,
+    
+    // claude code
+    "claudeCode.preferredLocation": "sidebar"
 }
 ```
 
@@ -184,10 +189,6 @@
     {
         "key": "cmd+m",
         "command": "opensshremotes.openEmptyWindow"
-    },
-    {
-        "key": "cmd+h",
-        "command": "workbench.action.toggleAuxiliaryBar"
     },
     {
         "key": "cmd+j",
@@ -209,6 +210,14 @@
         "key": "cmd+b",
         "command": "workbench.action.terminal.new",
         "when": "terminalProcessSupported || terminalWebExtensionContributedProfile"
+    },
+    {
+        "key": "cmd+h",
+        "command": "workbench.action.toggleAuxiliaryBar"
+    },
+    {
+        "key": "alt+cmd+b",
+        "command": "-workbench.action.toggleAuxiliaryBar"
     }
 ]
 ```

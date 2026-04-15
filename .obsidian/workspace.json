@@ -11,12 +11,15 @@
             "id": "0fef5ca1ac29e762",
             "type": "leaf",
             "state": {
-              "type": "vscode-editor",
+              "type": "markdown",
               "state": {
-                "file": "code/machineLearning/visualize/check_outputs.py"
+                "file": "math/Singular Vector Decomposition.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": false
               },
               "icon": "lucide-file",
-              "title": "check_outputs"
+              "title": "Singular Vector Decomposition"
             }
           }
         ]
@@ -59,7 +62,7 @@
                 "autoReveal": false
               },
               "icon": "lucide-folder-closed",
-              "title": "Files"
+              "title": "文件列表"
             }
           },
           {
@@ -81,7 +84,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 200
   },
   "right": {
     "id": "a341c1c2da9814f9",
@@ -97,11 +100,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "math/Vector Space.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "出链"
+              "title": "Outgoing links from Vector Space"
             }
           }
         ]
@@ -113,49 +117,50 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "graph:Open graph view": false,
-      "vscode-editor:Create Code File": false,
-      "obsidian42-brat:BRAT": false
+      "graph:查看关系图谱": false,
+      "obsidian42-brat:BRAT": false,
+      "vscode-editor:新建代码文件": false
     }
   },
-  "active": "ccea1679418a135c",
+  "active": "0fef5ca1ac29e762",
   "lastOpenFiles": [
+    "math/Matrix.md",
+    "math/Machine Learning.md",
+    "math/Iterative Methods.md",
+    "math/Least Square.md",
+    "math/Singular Vector Decomposition.md",
+    "math/Matrix Operator.md",
+    "math/Matrix Factorization.md",
+    "_tem/tem_prompt.md",
+    "math/Convex Set.md",
+    "math/Condition Number.md",
+    "_tem/stardew_valley.md",
+    "_tem/Fluid Dynamic.md",
+    "math/Eigenvalue Algorithm.md",
+    "math/Floating Point Arithmetic.md",
+    "code/promptMath.md",
+    "code/pythonPrompt.md",
+    "math/textbook/Numerical Linear Algebra.pdf",
+    "math/textbook/3M235.pdf",
+    "math/3M235.pdf",
+    "3M235.pdf",
+    "math/Stability.md",
+    "math/Structure.md",
+    "math/Vector Space.md",
+    "code/setting/vscode.md",
+    "code/setting/latexSuite.md",
+    "math/Computation.md",
+    "code/machineLearning/visualize/check_outputs.py",
     "code/machineLearning/visualize/check_dataset.py",
     "code/machineLearning/basic/base_model.py",
     "code/machineLearning/basic/load_args.py",
     "code/machineLearning/basic/seed.py",
     "code/machineLearning/basic/trainer.py",
-    "code/setting/latexSuite.md",
-    "code/setting/vscode.md",
     "code/latex.md",
     "code/tool/ssh.md",
     "code/tool/nvidia.md",
     "code/tool/git.md",
-    "code/tool/conda.md",
-    "code/promptMath.md",
-    "code/pythonPrompt.md",
-    "code/setting/kitty.md",
-    "code/machineLearning/visualize/check_outputs.py",
-    "code/machineLearning/tool/base_model.py",
-    "math/Matrix Factorization.md",
-    "math/Computation.md",
-    "math/Condition Number.md",
-    "math/Floating Point Arithmetic.md",
-    "math/Matrix.md",
-    "_tem/tem_prompt.md",
-    "main.js",
-    "styles.css",
     "_tem/Pasted image 20260331152949.png",
-    "math/Vector Space.md",
-    "math/Structure.md",
-    "math/Stability.md",
-    "math/Singular Vector Decomposition.md",
-    "math/Matrix Operator.md",
-    "math/Machine Learning.md",
-    "code/machineLearning/tool/trainer.py",
-    "code/tool/wandb.md",
-    "README.md",
-    "math/Least Square.md",
     "_tem/images/Pasted image 20260205004425.png",
     "_tem/images/Pasted image 20260205010053.png",
     "_tem/Pasted image 20260225041550.png",

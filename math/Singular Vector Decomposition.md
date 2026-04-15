@@ -62,3 +62,17 @@ By [[#^e30396]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-
 
 > [!Theorem|]
 > Let $A\in\mathbb{R}^{n,k}$ and $\tilde\sigma_1,\dots,\tilde\sigma_{k}$ be the computed singular values of $A$ in an idealized floating point system. There exists $\Delta A\in\mathbb{R}^{n,k}$ such that $\tilde\sigma_1,\dots,\tilde\sigma_{k}$ are the singular values of $A+\Delta A$ and $\|\Delta A\|_2\le cn^\alpha \epsilon \|A\|_2$.
+
+## Computing the SVD
+
+> [!definition|] Bidiagonal Matrix
+> Let $B \in \mathbb{R}^{n, k}$. The matrix $B$ is a bidiagonal matrix if $b_{ij} = 0$ for all $(i, j)$ with $j \neq i$ and $j \neq i + 1$.
+
+> [!theorem|] Golub-Kahan Bidiagonalization
+> Let $A \in \mathbb{R}^{n, k}$. There exist unitary matrices $U \in \mathbb{R}^{n, n}$ and $V \in \mathbb{R}^{k, k}$ s.t. $U^{\top}AV = B$, where $B$ is upper-bidiagonal.
+
+> [!theorem|]
+> The operation count of Golub-Kahan bidiagonalization is $\sim 4nk^{2} - \frac{4}{3}k^{3}$.
+
+> [!theorem|]
+> Let $A \in \mathbb{R}^{n, k}$. A backward stable algorithm for computing singular values produces computed values $\tilde{\sigma}_k$ satisfying $\tilde{\sigma}_k = \sigma_k(A + \delta A)$, $\frac{\|\delta A\|}{\|A\|} = O(\epsilon_{\text{machine}})$ for some $\delta A \in \mathbb{R}^{n, k}$. This implies $\frac{|\tilde{\sigma}_k - \sigma_k|}{\|A\|} = O(\epsilon_{\text{machine}})$.
