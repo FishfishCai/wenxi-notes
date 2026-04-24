@@ -7,11 +7,12 @@
   "lapel",
   "obsidian-latex-suite",
   "live-wallpaper",
-  "vscode-editor",
   "obsidian-style-settings",
   "settings-search",
   "mathlinks",
   "quick-preview",
   "obsidian-quiet-outline",
-  "math-booster"
+  "math-booster",
+  "folder-notes",
+  "dataview"
 ]

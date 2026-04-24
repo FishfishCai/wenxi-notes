@@ -1,84 +1,84 @@
 import json
 import sys
-import warnings
 from pathlib import Path
 from timeit import default_timer
 from typing import Any, Callable, Dict, Optional, Tuple, Type, Union
-
 import torch
 from torch import nn
 
 from .base_model import BaseModel
+from .loss import Metric
 
 
 class Trainer:
-    """Orchestrates training, evaluation, checkpointing, and optional log files."""
+    """Model trainer with AMP, checkpointing, scheduling, and pluggable metrics."""
 
     def __init__(
         self,
         *,
         model_class: Type[BaseModel],
+        optimizer: Optional[Callable[[nn.Module], torch.optim.Optimizer]] = None,
+        scheduler: Optional[Callable[[torch.optim.Optimizer], object]] = None,
         pre_processor: Optional[nn.Module] = None,
         post_processor: Optional[nn.Module] = None,
         config_path: Union[str, Path],
-        save_dir: Optional[Union[Path, str]],
+        save_dir: Union[Path, str],
         resume: bool = True,
-        n_epochs: int,
         device: str,
         mixed_precision: bool = False,
-        eval_interval: int = 1,
-        save_interval: int = 50,
+        compile_model: bool = True,
         verbose: bool = True,
         save_logs: bool = True,
         save_outs: bool = False,
         save_inps: bool = False,
         save_gts: bool = False,
-        n_outs: Optional[int] = None,
     ) -> None:
-        """
-        Build ``self.model`` from ``config_path``, move modules to ``device``, and optionally resume training state.
+        """Construct a Trainer from a model class and a config/checkpoint path.
+
+        The model is built from `config_path` (JSON config or `.pth` checkpoint).
+        If `resume` is True and a checkpoint was loaded, optimizer/scheduler/
+        scaler and epoch counter are restored.
 
         Parameters
         ----------
-        model_class : type of BaseModel
-            Class used to construct ``self.model`` from JSON or checkpoint ``_metadata``.
-        pre_processor : torch.nn.Module or None, optional
-            Applied as ``(inputs, gts) -> (inputs, gts)`` before the forward pass. Default is None.
-        post_processor : torch.nn.Module or None, optional
-            Applied as ``(outputs) -> outputs`` after the forward pass. Default is None.
-        config_path : str or pathlib.Path
-            ``.json`` file (constructor kwargs and optional ``args`` list) or ``.pth`` with ``model`` and ``_metadata``.
-        resume : bool, optional
-            If True, call :meth:`resume_state` after :meth:`load_config`. Default is True.
-        n_epochs : int
-            Exclusive upper epoch index passed to :meth:`train` (loops ``range(self.start_epoch, n_epochs)``).
+        model_class : Type[BaseModel]
+            Class used to build the model from loaded init args/kwargs.
+        optimizer : Optional[Callable[[nn.Module], torch.optim.Optimizer]]
+            Factory that builds an optimizer from the model. Default None;
+            training is disabled unless provided.
+        scheduler : Optional[Callable[[torch.optim.Optimizer], object]]
+            Factory that builds a scheduler from the optimizer. Default None.
+        pre_processor : Optional[nn.Module]
+            Module applied to (inputs, gts) before the model. Default None.
+        post_processor : Optional[nn.Module]
+            Module applied to model outputs before metric update. Default None.
+        config_path : Union[str, Path]
+            Path to a `.json` model config or a `.pth` checkpoint.
+        save_dir : Union[Path, str]
+            Directory for checkpoints, logs, and eval dumps.
+        resume : bool
+            Restore optimizer/scheduler/scaler/epoch from checkpoint if
+            available. Default True.
         device : str
-            Device string for the model and processors (for example ``"cuda:0"`` or ``"cpu"``).
-        mixed_precision : bool, optional
-            If True and ``device`` contains ``"cuda"``, enable autocast and ``GradScaler``. Default is False.
-        eval_interval : int, optional
-            Run :meth:`evaluate` every this many epochs inside :meth:`train`. Default is 1.
-        save_interval : int, optional
-            Save a periodic checkpoint every this many completed epochs in :meth:`train`. Default is 50.
-        verbose : bool, optional
-            If True, print training and checkpoint messages. Default is True.
-        save_logs : bool, optional
-            If True, append lines to ``save_dir / "logs.txt"`` via :meth:`log_train` and :meth:`log_eval`. Default is False.
-        save_outs : bool, optional
-            If True, :meth:`evaluate` saves outputs under ``self.save_dir``. Default is False.
-        save_inps : bool, optional
-            If True, :meth:`evaluate` saves inputs under ``self.save_dir``. Default is False.
-        save_gts : bool, optional
-            If True, :meth:`evaluate` saves ground truths under ``self.save_dir``. Default is False.
-        n_outs : int or None, optional
-            Maximum number of samples to keep when saving outputs/inputs/gts. None means no limit. Default is None.
-
-        Returns
-        -------
-        None
+            Torch device string (e.g. "cuda", "cuda:0", "cpu").
+        mixed_precision : bool
+            Enable AMP; only effective when device is CUDA. Default False.
+        compile_model : bool
+            Run `torch.compile` on the model after load. Default True.
+        verbose : bool
+            Print progress and log messages. Default True.
+        save_logs : bool
+            Append epoch logs to `<save_dir>/logs.txt`. Default True.
+        save_outs : bool
+            Collect model outputs during eval and dump to `eval.pt`.
+            Default False.
+        save_inps : bool
+            Collect inputs during eval and dump to `eval.pt`. Default False.
+        save_gts : bool
+            Collect ground truths during eval and dump to `eval.pt`.
+            Default False.
         """
         self.model_class = model_class
-        self.n_epochs = n_epochs
         self.device = device
 
         self.pre_processor = pre_processor
@@ -88,83 +88,474 @@ class Trainer:
         if self.post_processor is not None:
             self.post_processor.to(self.device)
 
-        ## AMP only when CUDA is selected
+        # AMP only on CUDA
         use_amp = mixed_precision and "cuda" in self.device
         self.mixed_precision = use_amp
-        self.autocast_device_type = "cuda" if use_amp else None
+        self.autocast_device_type = "cuda" if "cuda" in self.device else "cpu"
         self.scaler = torch.amp.GradScaler() if use_amp else None
 
-        self.eval_interval = eval_interval
-        self.save_interval = save_interval
-        self.start_epoch = 0
+        self.epoch = 0
 
         self.verbose = verbose
         self.save_dir = Path(save_dir).expanduser().resolve()
         self.save_dir.mkdir(parents=True, exist_ok=True)
         self.save_logs = save_logs
         if self.save_logs:
-            self.log_dir = self.save_dir / "logs.txt"
-            if not self.log_dir.is_file():
-                self.log_dir.touch()
+            self.log_path = self.save_dir / "logs.txt"
+            self.log_path.touch()
         self.save_outs = save_outs
         self.save_inps = save_inps
         self.save_gts = save_gts
-        self.n_outs = n_outs
 
-        self.load_config(config_path)
-        if resume and Path(config_path).suffix == ".pth":
-            self.resume_state(config_path)
+        # build model from config/checkpoint, then optionally resume state
+        ckpt = self._load_config(config_path)
+        self.optimizer = optimizer(self.model) if optimizer is not None else None
+        self.scheduler = (
+            scheduler(self.optimizer)
+            if (scheduler is not None and self.optimizer is not None)
+            else None
+        )
+        if resume and ckpt is not None:
+            self._resume_state(ckpt)
+        if compile_model:
+            self.model = torch.compile(self.model)
 
-    def load_config(
+    def train_with_eval(
         self,
-        config_path: Union[str, Path],
+        *,
+        n_epochs: int,
+        eval_interval: int = 1,
+        save_interval: int = 50,
+        train_loader: object,
+        eval_loaders: Optional[Dict[str, object]] = None,
+        train_metrics: Dict[str, Metric],
+        eval_metrics: Optional[Union[Dict[str, Metric], Dict[str, Dict[str, Metric]]]] = None,
+        train_iter: Optional[Callable[..., Any]] = None,
+        eval_iter: Optional[Union[Callable[..., Any], Dict[str, Callable[..., Any]]]] = None,
     ) -> None:
-        """
-        Instantiate ``self.model`` from a ``.json`` config or from ``_metadata`` inside a ``.pth`` checkpoint.
+        """Run the train/eval loop up to `n_epochs`, saving best and periodic checkpoints.
+
+        Evaluates every `eval_interval` epochs and saves `best_model.pth` when
+        the first metric of the first eval loader improves (lower is better).
+        Saves `epoch_<i>.pth` every `save_interval` epochs.
 
         Parameters
         ----------
-        config_path : str or pathlib.Path
-            Existing ``.json`` (root dict, optional ``args`` list) or ``.pth`` (dict with ``model`` state and ``_metadata``).
+        n_epochs : int
+            Target epoch count. Training resumes from `self.epoch`.
+        eval_interval : int
+            Run eval every N epochs. Default 1.
+        save_interval : int
+            Save a periodic checkpoint every N epochs. Default 50.
+        train_loader : object
+            Iterable yielding (inputs, gts) batches for training.
+        eval_loaders : Optional[Dict[str, object]]
+            Named eval iterables. Default None (no eval).
+        train_metrics : Dict[str, Metric]
+            Metrics computed per training epoch. The first one produces the
+            backward tensor.
+        eval_metrics : Optional[Union[Dict[str, Metric], Dict[str, Dict[str, Metric]]]]
+            Metrics computed per eval loader. A flat `{metric_name: Metric}`
+            dict is shared across all loaders; a nested
+            `{loader_name: {metric_name: Metric}}` dict assigns a distinct set
+            per loader. Required if `eval_loaders` is set.
+        train_iter : Optional[Callable[..., Any]]
+            Custom forward wrapper for training. Default None (uses
+            `model(**inputs)`).
+        eval_iter : Optional[Union[Callable[..., Any], Dict[str, Callable[..., Any]]]]
+            Custom forward wrapper for eval. A single callable is used for all
+            loaders; a dict maps `loader_name -> callable` for per-loader
+            dispatch. Default None.
+        """
+        eval_loaders = eval_loaders or {}
+        eval_metrics = eval_metrics or {}
+        if eval_loaders and not eval_metrics:
+            raise ValueError(
+                "eval_loaders is non-empty but eval_metrics is empty; "
+                "provide at least one evaluation metric, or use an empty eval_loaders."
+            )
+        if self.verbose:
+            parts = [f"Training on {len(train_loader.dataset)} samples"]
+            if eval_loaders:
+                eval_parts = ", ".join(
+                    f"{k}={len(v.dataset)} samples" for k, v in eval_loaders.items()
+                )
+                parts.append(f"evaluating on {len(eval_loaders)} loaders: {eval_parts}")
+            print(", ".join(parts))
+            sys.stdout.flush()
+
+        best_metric_value = float("inf")
+
+        # main training loop
+        while self.epoch < n_epochs:
+            self.train(train_loader, train_metrics, train_iter)
+            if (self.epoch + 1) % eval_interval == 0 and eval_loaders:
+                eval_results = self.evaluate(eval_loaders, eval_metrics, eval_iter)
+                # pick first metric of first loader as the "best" signal
+                first_loader_results = eval_results[next(iter(eval_loaders))]
+                if first_loader_results:
+                    val = next(iter(first_loader_results.values()))
+                    if isinstance(val, (int, float)) and val < best_metric_value:
+                        best_metric_value = val
+                        self._save_state("best_model")
+            if (self.epoch + 1) % save_interval == 0:
+                self._save_state(f"epoch_{self.epoch}")
+            self.epoch += 1
+
+    def train(
+        self,
+        train_loader: object,
+        train_metrics: Dict[str, Metric],
+        train_iter: Optional[Callable[..., Any]] = None,
+    ) -> None:
+        """Run one training epoch over `train_loader`.
+
+        The first metric in `train_metrics` produces the backward tensor. The
+        scheduler is stepped at the end of the epoch; `ReduceLROnPlateau` uses
+        the scalar value of that first metric.
+
+        Parameters
+        ----------
+        train_loader : object
+            Iterable yielding (inputs, gts) batches.
+        train_metrics : Dict[str, Metric]
+            Metrics updated per batch. Iteration order matters: the first
+            yields the backward tensor.
+        train_iter : Optional[Callable[..., Any]]
+            Custom forward wrapper receiving the model and unpacked inputs.
+            Default None (uses `model(**inputs)`).
+        """
+        if self.optimizer is None:
+            raise ValueError(
+                "Trainer.train() requires an optimizer; pass optimizer=... at construction."
+            )
+        self._set_mode(training=True)
+        backward_metric = next(iter(train_metrics))
+
+        for m in train_metrics.values():
+            m.reset()
+        t0 = default_timer()
+
+        # one step per batch
+        for sample in train_loader:
+            backward_tensor = self._train_one_batch(sample, train_metrics, train_iter)
+            if self.scaler is not None:
+                self.scaler.scale(backward_tensor).backward()
+                self.scaler.step(self.optimizer)
+                self.scaler.update()
+            else:
+                backward_tensor.backward()
+                self.optimizer.step()
+
+        metric_values = {name: m.compute() for name, m in train_metrics.items()}
+
+        # scheduler step (plateau uses backward metric value)
+        if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
+            backward_val = metric_values[backward_metric]
+            if not isinstance(backward_val, (int, float)):
+                raise TypeError(
+                    f"ReduceLROnPlateau requires a scalar from first train_metric.compute(), "
+                    f"got {type(backward_val).__name__}."
+                )
+            self.scheduler.step(backward_val)
+        elif self.scheduler is not None:
+            self.scheduler.step()
+
+        epoch_train_time = default_timer() - t0
+        lr = self.optimizer.param_groups[-1]["lr"]
+        self._log({"time": epoch_train_time, "train": metric_values, "lr": lr})
+
+    def evaluate(
+        self,
+        eval_loaders: Dict[str, object],
+        eval_metrics: Optional[Union[Dict[str, Metric], Dict[str, Dict[str, Metric]]]] = None,
+        eval_iter: Optional[Union[Callable[..., Any], Dict[str, Callable[..., Any]]]] = None,
+    ) -> Dict[str, Dict[str, Any]]:
+        """Run eval over every named loader and return the aggregated metric values.
+
+        When any of `save_inps`/`save_outs`/`save_gts` is set, stacks the
+        corresponding tensors across batches and dumps them to `eval.pt`.
+
+        Parameters
+        ----------
+        eval_loaders : Dict[str, object]
+            Named iterables yielding (inputs, gts) batches.
+        eval_metrics : Optional[Union[Dict[str, Metric], Dict[str, Dict[str, Metric]]]]
+            Metrics computed per loader. A flat `{metric_name: Metric}` dict
+            is shared across all loaders; a nested
+            `{loader_name: {metric_name: Metric}}` dict assigns a distinct set
+            per loader. Default None (no metric computation).
+        eval_iter : Optional[Union[Callable[..., Any], Dict[str, Callable[..., Any]]]]
+            Custom forward wrapper. A single callable is shared across all
+            loaders; a dict maps `loader_name -> callable` so each loader uses
+            its own iterator. Default None (uses `model(**inputs)`).
 
         Returns
         -------
-        None
+        eval_results : Dict[str, Dict[str, Any]]
+            Mapping `loader_name -> {metric_name -> metric_value}`.
+        """
+        self._set_mode(training=False)
+        eval_metrics = eval_metrics or {}
+        # detect nested per-loader layout by inspecting the first value
+        per_loader_metrics = bool(eval_metrics) and isinstance(
+            next(iter(eval_metrics.values())), dict
+        )
+
+        eval_results: Dict[str, Dict[str, Any]] = {}
+        save_spec = [
+            ("inputs", self.save_inps, {}),
+            ("outputs", self.save_outs, {}),
+            ("gts", self.save_gts, {}),
+        ]
+
+        with torch.no_grad():
+            for loader_name, eval_loader in eval_loaders.items():
+                # dispatch per-loader iter / metrics when a dict is passed
+                loader_iter = eval_iter.get(loader_name) if isinstance(eval_iter, dict) else eval_iter
+                loader_metrics = eval_metrics.get(loader_name, {}) if per_loader_metrics else eval_metrics
+                for m in loader_metrics.values():
+                    m.reset()
+                batches = {name: [] for name, _, _ in save_spec}
+                for sample in eval_loader:
+                    out, inp, gt = self._eval_one_batch(sample, loader_metrics, loader_iter)
+                    for name, val in (("inputs", inp), ("outputs", out), ("gts", gt)):
+                        if val is not None:
+                            batches[name].append(val)
+                eval_results[loader_name] = {
+                    name: m.compute() for name, m in loader_metrics.items()
+                }
+                for name, _, target in save_spec:
+                    if batches[name]:
+                        target[loader_name] = self._stack_batches(batches[name])
+
+        # dump requested payloads to a single eval.pt file
+        save_data = {name: target for name, flag, target in save_spec if flag}
+        if save_data:
+            torch.save(save_data, self.save_dir / "eval.pt")
+
+        if eval_metrics:
+            self._log(eval_results, prefix="Eval ")
+        return eval_results
+
+    def _to_device(
+        self,
+        d: Dict[str, Any],
+    ) -> None:
+        """Move every torch tensor value of `d` to `self.device` in-place.
+
+        Parameters
+        ----------
+        d : Dict[str, Any]
+            Dict whose tensor values are moved in-place; non-tensor values
+            are left untouched.
+        """
+        for k, v in d.items():
+            if torch.is_tensor(v):
+                d[k] = v.to(self.device, non_blocking=True)
+
+    @staticmethod
+    def _to_cpu(
+        d: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        """Return a copy of `d` with every tensor value detached on CPU."""
+        return {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in d.items()}
+
+    def _set_mode(
+        self,
+        training: bool,
+    ) -> None:
+        """Set model, pre-processor, and post-processor to `train()` or `eval()` mode.
+
+        Parameters
+        ----------
+        training : bool
+            True for `train()`, False for `eval()`.
+        """
+        mode = "train" if training else "eval"
+        for m in (self.model, self.pre_processor, self.post_processor):
+            if m is not None:
+                getattr(m, mode)()
+
+    @staticmethod
+    def _stack_batches(
+        batch_list: list,
+    ) -> Dict[str, Any]:
+        """Concatenate a list of batch dicts along dim 0 for tensors, else list them.
+
+        Parameters
+        ----------
+        batch_list : list
+            Non-empty list of dicts sharing identical keys. Each value is
+            either a torch tensor or an arbitrary Python object.
+
+        Returns
+        -------
+        combined : Dict[str, Any]
+            Dict with the same keys; tensor values concatenated along dim 0,
+            non-tensor values kept as lists in batch order.
+        """
+        combined = {}
+        for k in batch_list[0]:
+            vals = [b[k] for b in batch_list]
+            if torch.is_tensor(vals[0]):
+                combined[k] = torch.cat(vals, dim=0)
+            else:
+                combined[k] = vals
+        return combined
+
+    def _train_one_batch(
+        self,
+        sample: object,
+        train_metrics: Dict[str, Metric],
+        train_iter: Optional[Callable[..., Any]] = None,
+    ) -> torch.Tensor:
+        """Run one training batch: forward, metric update, and return the backward tensor.
+
+        The first metric in `train_metrics` must return a Tensor from its
+        `update()` call; that Tensor is returned as the backward target.
+
+        Parameters
+        ----------
+        sample : object
+            Pair `(inputs, gts)` where each half is a dict of tensors.
+        train_metrics : Dict[str, Metric]
+            Metrics updated with `(outputs, gts)`. Iteration order matters.
+        train_iter : Optional[Callable[..., Any]]
+            Custom forward wrapper. Default None (uses `model(**inputs)`).
+
+        Returns
+        -------
+        backward_tensor : torch.Tensor
+            Scalar tensor produced by the first metric's `update()`; used for
+            backward.
+        """
+        self.optimizer.zero_grad(set_to_none=True)
+
+        inputs, gts = sample
+        self._to_device(inputs)
+        self._to_device(gts)
+
+        if self.pre_processor is not None:
+            inputs, gts = self.pre_processor(inputs, gts)
+
+        # forward + metric update under autocast
+        with torch.autocast(
+            device_type=self.autocast_device_type,
+            enabled=self.mixed_precision,
+        ):
+            outputs = self.model(**inputs) if train_iter is None else train_iter(self.model, **inputs)
+            if self.post_processor is not None:
+                outputs = self.post_processor(outputs)
+            # first metric yields backward tensor; remaining metrics only update
+            metrics_iter = iter(train_metrics.values())
+            backward_tensor = next(metrics_iter).update(**outputs, **gts)
+            for m in metrics_iter:
+                m.update(**outputs, **gts)
+
+        if not isinstance(backward_tensor, torch.Tensor):
+            raise RuntimeError(
+                f"first train_metric.update() must return a Tensor for backward, "
+                f"got {type(backward_tensor).__name__}."
+            )
+        return backward_tensor
+
+    def _eval_one_batch(
+        self,
+        sample: object,
+        eval_metrics: Dict[str, Metric],
+        eval_iter: Optional[Callable[..., Any]] = None,
+    ) -> Tuple[Optional[Dict[str, Any]], Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+        """Run one eval batch: forward, metric update, and return CPU-detached payloads.
+
+        Returned payloads are gated by the `save_inps`/`save_outs`/`save_gts`
+        flags; unselected slots are returned as None.
+
+        Parameters
+        ----------
+        sample : object
+            Pair `(inputs, gts)` where each half is a dict of tensors.
+        eval_metrics : Dict[str, Metric]
+            Metrics updated with `(outputs, gts)`.
+        eval_iter : Optional[Callable[..., Any]]
+            Custom forward wrapper. Default None (uses `model(**inputs)`).
+
+        Returns
+        -------
+        outputs : Optional[Dict[str, Any]]
+            Model outputs detached on CPU if `save_outs` else None.
+        inputs : Optional[Dict[str, Any]]
+            Pre-processor inputs detached on CPU if `save_inps` else None.
+        gts : Optional[Dict[str, Any]]
+            Ground truths detached on CPU if `save_gts` else None.
+        """
+        inputs, gts = sample
+        self._to_device(inputs)
+        self._to_device(gts)
+
+        # snapshot raw inputs/gts before pre_processor mutates them
+        ret_inputs = self._to_cpu(inputs) if self.save_inps else None
+        ret_gts = self._to_cpu(gts) if self.save_gts else None
+
+        if self.pre_processor is not None:
+            inputs, gts = self.pre_processor(inputs, gts)
+
+        with torch.autocast(
+            device_type=self.autocast_device_type,
+            enabled=self.mixed_precision,
+        ):
+            outputs = self.model(**inputs) if eval_iter is None else eval_iter(self.model, **inputs)
+            if self.post_processor is not None:
+                outputs = self.post_processor(outputs)
+            for m in eval_metrics.values():
+                m.update(**outputs, **gts)
+
+        ret_outputs = self._to_cpu(outputs) if self.save_outs else None
+        return ret_outputs, ret_inputs, ret_gts
+
+    def _load_config(
+        self,
+        config_path: Union[str, Path],
+    ) -> Optional[dict]:
+        """Build `self.model` from a JSON config or a `.pth` checkpoint.
+
+        For `.json`, the root must be a dict; its optional `args` key provides
+        positional init args and the remaining keys provide kwargs. For `.pth`,
+        the checkpoint is `{"model": state_dict_with_metadata, ...}` and init
+        args/kwargs come from `state_dict["_metadata"]`.
+
+        Parameters
+        ----------
+        config_path : Union[str, Path]
+            Path to a `.json` config or a `.pth` checkpoint.
+
+        Returns
+        -------
+        ckpt : Optional[dict]
+            Loaded checkpoint dict for `.pth`; None for `.json`.
         """
         path = Path(config_path).expanduser().resolve()
         if not path.exists():
             raise FileNotFoundError(f"Not found: {path}")
 
         suffix = path.suffix.lower()
-
-        # JSON path: optional positional ``args`` plus kwargs
         if suffix == ".json":
-            cfg = json.loads(path.read_text(encoding="utf-8"))
-            if cfg is not None and not isinstance(cfg, dict):
+            cfg = json.loads(path.read_text(encoding="utf-8")) or {}
+            if not isinstance(cfg, dict):
                 raise TypeError(f"JSON root must be a dict, got {type(cfg)}")
-            cfg = cfg or {}
-
             init_args = cfg.pop("args", []) or []
-            if not isinstance(init_args, (list, tuple)):
-                raise TypeError(f"'args' must be a list/tuple, got {type(init_args)}")
-
-            cfg["mixed_precision"] = self.mixed_precision
-            ## Model from JSON
-            model = self.model_class(*init_args, **cfg)
-
+            init_kwargs = cfg
+            ckpt = None
         elif suffix == ".pth":
-            ckpt = torch.load(path.as_posix(), map_location=self.device, weights_only=False)
-            if not isinstance(ckpt, dict):
-                raise TypeError(f"Checkpoint must be a dict, got {type(ckpt)}")
-            if "model" not in ckpt or not isinstance(ckpt["model"], dict):
-                raise KeyError('Checkpoint must contain a dict field "model" (model.state_dict()).')
-
-            state = ckpt["model"]
-
-            init_meta = state.get("_metadata")
+            ckpt = torch.load(path, map_location=self.device, weights_only=False)
+            if not isinstance(ckpt, dict) or not isinstance(ckpt.get("model"), dict):
+                raise KeyError(
+                    'Checkpoint must be a dict with a dict field "model" (model.state_dict()).'
+                )
+            # recover init args/kwargs from state_dict metadata
+            init_meta = ckpt["model"].get("_metadata")
             if not isinstance(init_meta, dict):
                 raise ValueError('No "_metadata" found in ckpt["model"]; cannot reconstruct model.')
-
             model_name = init_meta.get("_name")
             if not model_name:
                 raise ValueError('Checkpoint "_metadata" must contain "_name".')
@@ -176,719 +567,114 @@ class Trainer:
             if self.verbose:
                 print(f'Loading config of model "{model_name}" from checkpoint.')
                 sys.stdout.flush()
-
             init_args = init_meta.get("args", []) or []
-            if not isinstance(init_args, (list, tuple)):
-                raise TypeError(f'metadata["args"] must be a list/tuple, got {type(init_args)}')
             init_kwargs = {k: v for k, v in init_meta.items() if k not in ("_name", "args")}
-            init_kwargs["mixed_precision"] = self.mixed_precision
-            ## Model from checkpoint metadata, then weights
-            model = self.model_class(*init_args, **init_kwargs)
-
         else:
             raise ValueError(f"Unsupported config file type: {suffix}")
 
-        model.to(self.device)
-        self.model = model
+        if not isinstance(init_args, (list, tuple)):
+            raise TypeError(f"'args' must be a list/tuple, got {type(init_args)}")
+        init_kwargs["mixed_precision"] = self.mixed_precision
+        self.model = self.model_class(*init_args, **init_kwargs).to(self.device)
+        return ckpt
 
-    def resume_state(
+    def _resume_state(
         self,
-        resume_path: Union[str, Path],
+        ckpt: dict,
     ) -> None:
-        """
-        Load a ``.pth`` checkpoint and restore ``start_epoch``, ``model``, and ``scaler`` state immediately.
-        ``optimizer`` and ``scheduler`` state dicts are cached in ``self.pending``
-        because these objects may not exist yet (they are created later in :meth:`train`).
+        """Restore model weights plus optional scaler/optimizer/scheduler state from `ckpt`.
+
+        Also advances `self.epoch` to `ckpt["epoch"] + 1` when present.
 
         Parameters
         ----------
-        resume_path : str or pathlib.Path
-            File passed to ``torch.load`` with ``map_location=self.device``.
-
-        Returns
-        -------
-        None
+        ckpt : dict
+            Checkpoint loaded by `_load_config` from a `.pth` file. Expected
+            keys: `"model"` (state dict), optional `"epoch"`, `"scaler"`,
+            `"optimizer"`, `"scheduler"`.
         """
-        ckpt = torch.load(Path(resume_path).as_posix(), map_location=self.device, weights_only=False)
-
-        epoch = ckpt.get("epoch")
-        if epoch is not None:
-            print(f"Loading checkpoint from epoch {epoch}.")
-            self.start_epoch = int(epoch) + 1
-
         self.model.load_state_dict(ckpt["model"])
-
-        if "scaler" in ckpt and self.scaler is not None:
-            self.scaler.load_state_dict(ckpt["scaler"])
-
-        self.pending = {}
-        if "optimizer" in ckpt:
-            self.pending["optimizer"] = ckpt["optimizer"]
-        if "scheduler" in ckpt:
-            self.pending["scheduler"] = ckpt["scheduler"]
-
-    def train(
-        self,
-        *,
-        train_loader: object,
-        eval_loaders: Dict[str, object] = {},
-        optimizer: torch.optim.Optimizer,
-        scheduler: Optional[object] = None,
-        train_losses: Union[nn.Module, Dict[str, nn.Module]],
-        backward_loss: Optional[str] = None,
-        eval_losses: Union[nn.Module, Dict[str, nn.Module]] = {},
-        save_loss: Optional[str] = None,
-    ) -> None:
-        """
-        Run training epochs with optional evaluation, best checkpointing by ``self.save_loss``, and periodic saves.
-
-        Parameters
-        ----------
-        train_loader : object
-            Iterable of ``(inputs, gts)`` batches; tensors are dict-valued with batch size on dimension 0.
-        eval_loaders : dict of str to object
-            Loader names to iterables of ``(inputs, gts)`` batches; empty dict skips evaluation.
-        optimizer : torch.optim.Optimizer
-            Optimizer stepped in :meth:`_train_one_batch` / :meth:`train_one_epoch`.
-        scheduler : object or None, optional
-            ``ReduceLROnPlateau`` is stepped with the mean batch loss; any other non-None scheduler is stepped once per epoch. Default is None.
-        train_losses : torch.nn.Module or dict of str to torch.nn.Module
-            A single loss module or named loss modules ``loss(**outputs, **gts)``; all are computed and logged each batch.
-            A single module is wrapped as ``{"loss": module}``.
-        backward_loss : str or None, optional
-            Key in ``train_losses`` whose output is back-propagated. If None, defaults to the first key. Default is None.
-        eval_losses : torch.nn.Module or dict of str to torch.nn.Module
-            A single metric module or named metric modules ``(**outputs, **gts)``.
-            A single module is wrapped as ``{"loss": module}``.
-        save_loss : str or None, optional
-            Key ``f"{loader}_{loss_name}"`` used for the best checkpoint; if None and ``eval_loaders`` is non-empty, defaults to the first loader and first metric. If ``eval_loaders`` is non-empty, ``eval_losses`` must be non-empty. If ``save_loss`` is set and both dicts are non-empty, it must match one of those keys. Default is None.
-
-        Returns
-        -------
-        None
-        """
-        self.optimizer = optimizer
-        self.scheduler = scheduler
-
-        if hasattr(self, "pending"):
-            if "optimizer" in self.pending:
-                self.optimizer.load_state_dict(self.pending["optimizer"])
-            if "scheduler" in self.pending:
-                self.scheduler.load_state_dict(self.pending["scheduler"])
-            del self.pending
-
-        if isinstance(train_losses, nn.Module):
-            train_losses = {"loss": train_losses}
-        if isinstance(eval_losses, nn.Module):
-            eval_losses = {"loss": eval_losses}
-
-        if backward_loss is None:
-            backward_loss = next(iter(train_losses))
-        if backward_loss not in train_losses:
-            raise KeyError(
-                f'backward_loss="{backward_loss}" is not a key in train_losses '
-                f"(available: {list(train_losses.keys())})"
-            )
-
-        if len(eval_loaders) > 0 and len(eval_losses) == 0:
-            raise ValueError(
-                "eval_loaders is non-empty but eval_losses is empty; "
-                "provide at least one evaluation metric, or use an empty eval_loaders."
-            )
-
-        if save_loss is None:
-            if len(eval_loaders) == 0:
-                self.save_loss = None
-            else:
-                save_loader_name = next(iter(eval_loaders))
-                save_loss_name = next(iter(eval_losses))
-                self.save_loss = f"{save_loader_name}_{save_loss_name}"
-        else:
-            self.save_loss = save_loss
-            if len(eval_loaders) > 0 and len(eval_losses) > 0:
-                valid_keys = {
-                    f"{loader_name}_{loss_name}"
-                    for loader_name in eval_loaders
-                    for loss_name in eval_losses
-                }
-                if self.save_loss not in valid_keys:
-                    raise ValueError(
-                        f'save_loss="{self.save_loss}" is not a valid metric key. '
-                        f"Expected one of: {sorted(valid_keys)}."
-                    )
-
-        # ``reduction="mean"`` conflicts with trainer batch-sum convention
-        for train_loss in train_losses.values():
-            if hasattr(train_loss, "reduction"):
-                if train_loss.reduction == "mean":
-                    warnings.warn(
-                        f"{train_loss.reduction=}. This means that the loss is "
-                        "initialized to average across the batch dim. The Trainer "
-                        "expects losses to sum across the batch dim."
-                    )
-        for eval_loss in eval_losses.values():
-            if hasattr(eval_loss, "reduction"):
-                if eval_loss.reduction == "mean":
-                    warnings.warn(
-                        f"{eval_loss.reduction=}. This means that the loss is "
-                        "initialized to average across the batch dim. The Trainer "
-                        "expects losses to sum across the batch dim."
-                    )
-
-        if self.verbose:
-            msg = f"Training on {len(train_loader.dataset)} samples, "
-            msg += f"evaluating on {len(eval_loaders)} loaders: "
-            msg_parts = []
-            for k, v in eval_loaders.items():
-                msg_parts.append(f"{k}={len(v.dataset)} samples")
-            msg += ", ".join(msg_parts)
-            print(msg)
-            sys.stdout.flush()
-
-        best_metric_value = float("inf")
-
-        # Epoch loop with eval and checkpoints
-        for epoch in range(self.start_epoch, self.n_epochs):
-            self.train_one_epoch(epoch, train_loader, train_losses, backward_loss)
-
-            if epoch % self.eval_interval == 0 and len(eval_loaders) > 0:
-                eval_metrics = self.evaluate(
-                    eval_loaders,
-                    eval_losses,
-                    epoch,
-                )
-
-                if eval_metrics[self.save_loss] < best_metric_value:
-                    best_metric_value = eval_metrics[self.save_loss]
-                    self.save_state(
-                        filename="best_model",
-                        model=self.model,
-                        optimizer=self.optimizer,
-                        scheduler=self.scheduler,
-                        scaler=self.scaler,
-                        epoch=epoch,
-                    )
-
-            if (epoch + 1) % self.save_interval == 0:
-                self.save_state(
-                    filename=f"epoch_{epoch}",
-                    model=self.model,
-                    optimizer=self.optimizer,
-                    scheduler=self.scheduler,
-                    scaler=self.scaler,
-                    epoch=epoch,
-                )
-
-    def train_one_epoch(
-        self,
-        epoch: int,
-        train_loader: object,
-        train_losses: Dict[str, nn.Module],
-        backward_loss: str,
-    ) -> None:
-        """
-        Run one epoch: accumulate per-loss metrics, step the scheduler with the backward loss, then log.
-
-        Parameters
-        ----------
-        epoch : int
-            Epoch index passed to :meth:`print_train` and :meth:`log_train`.
-        train_loader : object
-            Iterable of ``(inputs, gts)`` batches; ``len(train_loader)`` normalizes the mean batch loss.
-        train_losses : dict of str to torch.nn.Module
-            Named loss modules used in :meth:`_train_one_batch`.
-        backward_loss : str
-            Key in ``train_losses`` whose output is back-propagated.
-
-        Returns
-        -------
-        None
-        """
-        avg_losses = {name: 0.0 for name in train_losses}
-        train_err = 0.0
-        t0 = default_timer()
-        self.n_samples = 0
-
-        self.model.train()
-        if self.pre_processor is not None:
-            self.pre_processor.train()
-        if self.post_processor is not None:
-            self.post_processor.train()
-
-        for sample in train_loader:
-            loss, step_losses = self._train_one_batch(sample, train_losses, backward_loss)
-            if self.scaler is not None:
-                self.scaler.scale(loss).backward()
-                self.scaler.step(self.optimizer)
-                self.scaler.update()
-            else:
-                loss.backward()
-                self.optimizer.step()
-
-            train_err += step_losses[backward_loss]
-            for name, val in step_losses.items():
-                avg_losses[name] += val
-
-        train_err /= len(train_loader)
-        for name in avg_losses:
-            avg_losses[name] /= self.n_samples
-
-        if isinstance(self.scheduler, torch.optim.lr_scheduler.ReduceLROnPlateau):
-            self.scheduler.step(train_err)
-        elif self.scheduler is not None:
-            self.scheduler.step()
-
-        epoch_train_time = default_timer() - t0
-
-        lr = None
-        for pg in self.optimizer.param_groups:
-            lr = pg["lr"]
-        if self.verbose:
-            self.print_train(epoch, epoch_train_time, avg_losses, train_err, lr)
-        if self.save_logs:
-            self.log_train(epoch, epoch_train_time, avg_losses, train_err, lr)
-
-    def evaluate(
-        self,
-        eval_loaders: Dict[str, object],
-        eval_losses: Optional[Union[nn.Module, Dict[str, nn.Module]]] = None,
-        epoch: Optional[int] = None,
-        eval_iter: Optional[Callable[..., Any]] = None,
-    ) -> Dict[str, float]:
-        """
-        Compute mean per-sample losses per loader and metric, optionally save stacked last-batch outputs, and log.
-
-        Parameters
-        ----------
-        eval_loaders : dict of str to object
-            Loader names to iterables of ``(inputs, gts)`` batches.
-        eval_losses : torch.nn.Module, dict of str to torch.nn.Module, or None, optional
-            A single metric module, named metric modules, or None to skip metrics.
-            A single module is wrapped as ``{"loss": module}``. Default is None.
-        epoch : int or None, optional
-            Epoch index for logging and for ``outputs_epoch_{epoch}.pt`` when ``save_outs``. Default is None.
-        eval_iter : callable or None, optional
-            If None, call ``self.model(**inputs)``; otherwise ``eval_iter(self.model, **inputs)``. Default is None.
-
-        Returns
-        -------
-        eval_metrics : dict of str to float
-            Keys ``f"{loader_name}_{loss_name}"`` mapping to mean loss per sample for that loader.
-        """
-        if isinstance(eval_losses, nn.Module):
-            eval_losses = {"loss": eval_losses}
-
-        self.model.eval()
-        if self.pre_processor is not None:
-            self.pre_processor.eval()
-        if self.post_processor is not None:
-            self.post_processor.eval()
-
-        eval_metrics = {}
-        if eval_losses is not None:
-            for loader_name in eval_loaders.keys():
-                for loss_name in eval_losses.keys():
-                    eval_metrics[f"{loader_name}_{loss_name}"] = 0.0
-        all_inputs = {}
-        all_outs = {}
-        all_gts = {}
-
-        def _stack_batches(batch_list, n=None):
-            combined = {}
-            for k in batch_list[0]:
-                vals = [b[k] for b in batch_list]
-                if torch.is_tensor(vals[0]):
-                    combined[k] = torch.cat(vals, dim=0) if n is None else torch.cat(vals, dim=0)[:n]
-                else:
-                    combined[k] = vals if n is None else vals[:n]
-            return combined
-
-        with torch.no_grad():
-            for loader_name, eval_loader in eval_loaders.items():
-                self.n_samples = 0
-                batch_outs = []
-                batch_inputs = []
-                batch_gts = []
-                for sample in eval_loader:
-                    eval_step_losses, out, inp, gt = self._eval_one_batch(
-                        sample,
-                        eval_losses,
-                        return_output=self.save_outs,
-                        return_inputs=self.save_inps,
-                        return_gts=self.save_gts,
-                        eval_iter=eval_iter,
-                    )
-                    if out is not None:
-                        batch_outs.append(out)
-                    if inp is not None:
-                        batch_inputs.append(inp)
-                    if gt is not None:
-                        batch_gts.append(gt)
-                    for loss_name, val_loss in eval_step_losses.items():
-                        eval_metrics[f"{loader_name}_{loss_name}"] += val_loss
-                for loss_name in eval_losses.keys():
-                    eval_metrics[f"{loader_name}_{loss_name}"] /= self.n_samples
-                if batch_outs:
-                    all_outs[loader_name] = _stack_batches(batch_outs, self.n_outs)
-                if batch_inputs:
-                    all_inputs[loader_name] = _stack_batches(batch_inputs, self.n_outs)
-                if batch_gts:
-                    all_gts[loader_name] = _stack_batches(batch_gts, self.n_outs)
-
-        if self.save_outs or self.save_inps or self.save_gts:
-            save_data = {}
-            if self.save_inps:
-                save_data["inputs"] = all_inputs
-            if self.save_outs:
-                save_data["outputs"] = all_outs
-            if self.save_gts:
-                save_data["gts"] = all_gts
-            torch.save(save_data, self.save_dir / f"eval.pt")
-
-        if eval_losses is not None:
+        if "epoch" in ckpt:
+            self.epoch = int(ckpt["epoch"]) + 1
             if self.verbose:
-                self.print_eval(epoch, eval_metrics)
-            if self.save_logs:
-                self.log_eval(epoch, eval_metrics)
-        return eval_metrics
+                print(f"Loading checkpoint from epoch {self.epoch - 1}.")
+                sys.stdout.flush()
+        for k, v in (
+            ("scaler", self.scaler),
+            ("optimizer", self.optimizer),
+            ("scheduler", self.scheduler),
+        ):
+            if k in ckpt and v is not None:
+                v.load_state_dict(ckpt[k])
 
-    def _train_one_batch(
-        self,
-        sample: object,
-        train_losses: Dict[str, nn.Module],
-        backward_loss: str,
-    ) -> Tuple[torch.Tensor, Dict[str, float]]:
-        """
-        Transfer a batch to ``device``, optionally run processors, forward the model, compute all losses,
-        and return the backward-loss tensor together with all per-loss scalar values.
-
-        Parameters
-        ----------
-        sample : object
-            Pair ``(inputs, gts)`` of dicts; batch size is taken from dimension 0 of the first tensor in ``inputs``.
-        train_losses : dict of str to torch.nn.Module
-            Named loss modules ``loss(**outputs, **gts)``.
-        backward_loss : str
-            Key in ``train_losses`` whose tensor is returned for back-propagation.
-
-        Returns
-        -------
-        loss : torch.Tensor
-            Scalar tensor (shape ``()``) for ``backward`` in the training loop.
-        step_losses : dict of str to float
-            All loss values as Python floats for logging.
-        """
-        self.optimizer.zero_grad(set_to_none=True)
-
-        inputs, gts = sample[0], sample[1]
-        for k, v in inputs.items():
-            if torch.is_tensor(v):
-                inputs[k] = v.to(self.device, non_blocking=True)
-        for k, v in gts.items():
-            if torch.is_tensor(v):
-                gts[k] = v.to(self.device, non_blocking=True)
-
-        first_tensor = next((v for v in inputs.values() if torch.is_tensor(v)), None)
-        if first_tensor is None:
-            raise ValueError("The first input values must be torch Tensors.")
-        batch_dim = int(first_tensor.shape[0])
-        self.n_samples += batch_dim
-
-        if self.pre_processor is not None:
-            inputs, gts = self.pre_processor(inputs, gts)
-
-        if self.mixed_precision:
-            with torch.autocast(device_type=self.autocast_device_type):
-                outputs = self.model(**inputs)
-                if self.post_processor is not None:
-                    outputs = self.post_processor(outputs)
-                loss_tensors = {
-                    name: fn(**outputs, **gts) for name, fn in train_losses.items()
-                }
-        else:
-            outputs = self.model(**inputs)
-            if self.post_processor is not None:
-                outputs = self.post_processor(outputs)
-            loss_tensors = {
-                name: fn(**outputs, **gts) for name, fn in train_losses.items()
-            }
-
-        loss = loss_tensors[backward_loss]
-        step_losses = {name: t.item() for name, t in loss_tensors.items()}
-        return loss, step_losses
-
-    def _eval_one_batch(
-        self,
-        sample: object,
-        eval_losses: Dict[str, nn.Module],
-        return_output: bool = False,
-        return_inputs: bool = False,
-        return_gts: bool = False,
-        eval_iter: Optional[Callable[..., Any]] = None,
-    ) -> Tuple[Dict[str, float], Optional[Dict[str, Any]], Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
-        """
-        Evaluate one batch without gradients, record metric values, and optionally return CPU inputs/outputs/gts.
-
-        Parameters
-        ----------
-        sample : object
-            ``(inputs, gts)`` dicts with the same layout as training; batch size from dimension 0 of the first input tensor.
-        eval_losses : dict of str to torch.nn.Module
-            Metric names to scalar loss modules; must match keys used in :meth:`evaluate`.
-        return_output : bool, optional
-            If True, detach outputs to CPU in the second return value. Default is False.
-        return_inputs : bool, optional
-            If True, detach inputs to CPU in the third return value. Default is False.
-        return_gts : bool, optional
-            If True, detach gts to CPU in the fourth return value. Default is False.
-        eval_iter : callable or None, optional
-            If None, call ``self.model(**inputs)``; otherwise ``eval_iter(self.model, **inputs)``. Default is None.
-
-        Returns
-        -------
-        eval_step_losses : dict of str to float
-            Per-metric batch total as a Python float from ``.item()``.
-        outputs : dict or None
-            CPU-side postprocessed outputs if ``return_output`` is True; otherwise None.
-        inputs : dict or None
-            CPU-side inputs if ``return_inputs`` is True; otherwise None.
-        gts : dict or None
-            CPU-side ground truths if ``return_gts`` is True; otherwise None.
-        """
-        inputs, gts = sample[0], sample[1]
-        for k, v in inputs.items():
-            if torch.is_tensor(v):
-                inputs[k] = v.to(self.device, non_blocking=True)
-        for k, v in gts.items():
-            if torch.is_tensor(v):
-                gts[k] = v.to(self.device, non_blocking=True)
-
-        first_tensor = next((v for v in inputs.values() if torch.is_tensor(v)), None)
-        if first_tensor is None:
-            raise ValueError("The first input values must be torch Tensors.")
-        batch_dim = int(first_tensor.shape[0])
-        self.n_samples += batch_dim
-
-        ret_inputs = None
-        if return_inputs:
-            ret_inputs = {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in inputs.items()}
-        ret_gts = None
-        if return_gts:
-            ret_gts = {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in gts.items()}
-
-        if self.pre_processor is not None:
-            inputs, gts = self.pre_processor(inputs, gts)
-
-        # Forward and metrics; post-processor under autocast when enabled
-        if self.mixed_precision:
-            with torch.autocast(device_type=self.autocast_device_type):
-                if eval_iter is None:
-                    outputs = self.model(**inputs)
-                else:
-                    outputs = eval_iter(self.model, **inputs)
-                if self.post_processor is not None:
-                    outputs = self.post_processor(outputs)
-                eval_step_losses = {}
-                for loss_name, loss in eval_losses.items():
-                    eval_step_losses[loss_name] = loss(**outputs, **gts).item()
-        else:
-            if eval_iter is None:
-                outputs = self.model(**inputs)
-            else:
-                outputs = eval_iter(self.model, **inputs)
-            if self.post_processor is not None:
-                outputs = self.post_processor(outputs)
-            eval_step_losses = {
-                loss_name: loss(**outputs, **gts).item()
-                for loss_name, loss in eval_losses.items()
-            }
-
-        ret_outputs = None
-        if return_output:
-            ret_outputs = {k: (v.detach().cpu() if torch.is_tensor(v) else v) for k, v in outputs.items()}
-        return eval_step_losses, ret_outputs, ret_inputs, ret_gts
-
-    def print_train(
-        self,
-        epoch: int,
-        epoch_time: float,
-        avg_losses: Dict[str, float],
-        train_err: float,
-        lr: Optional[float] = None,
-    ) -> None:
-        """
-        Print one training summary line and flush stdout.
-
-        Parameters
-        ----------
-        epoch : int
-            Epoch index in the leading bracket.
-        epoch_time : float
-            Wall-clock seconds spent in the epoch.
-        avg_losses : dict of str to float
-            Mean per-sample loss for each named training loss.
-        train_err : float
-            Mean of per-batch backward-loss values over batches (used by scheduler).
-        lr : float or None, optional
-            Last optimizer param-group learning rate, or None to print ``lr=N/A``. Default is None.
-
-        Returns
-        -------
-        None
-        """
-        msg = f"[{epoch}] time={epoch_time:.2f}, "
-        for name, val in avg_losses.items():
-            msg += f"{name}={val:.4f}, "
-        msg += f"train_err={train_err:.4f}, "
-        msg += f"lr={lr:.3e}" if lr is not None else "lr=N/A"
-        print(msg)
-        sys.stdout.flush()
-
-    def print_eval(
-        self,
-        epoch: Optional[int],
-        eval_metrics: Dict[str, Any],
-    ) -> None:
-        """
-        Print one evaluation line with metrics formatted to four decimals.
-
-        Parameters
-        ----------
-        epoch : int or None
-            Epoch index in the prefix; None is treated as 0 for display.
-        eval_metrics : dict of str to float or torch.Tensor
-            Metric name to float or scalar tensor; non-tensor non-float entries are skipped.
-
-        Returns
-        -------
-        None
-        """
-        epoch = 0 if epoch is None else epoch
-        msg = f"[Eval {epoch}] "
-        parts = []
-        for metric, value in eval_metrics.items():
-            if isinstance(value, float) or isinstance(value, torch.Tensor):
-                v = float(value.item()) if isinstance(value, torch.Tensor) else float(value)
-                parts.append(f"{metric}={v:.4f}")
-        msg += ", ".join(parts)
-        print(msg)
-        sys.stdout.flush()
-
-    def log_train(
-        self,
-        epoch: int,
-        epoch_time: float,
-        avg_losses: Dict[str, float],
-        train_err: float,
-        lr: Optional[float] = None,
-    ) -> None:
-        """
-        Append the same line as :meth:`print_train` to ``self.log_dir`` using UTF-8 and a trailing newline.
-
-        Parameters
-        ----------
-        epoch : int
-            Epoch index in the log line.
-        epoch_time : float
-            Wall-clock seconds for the epoch.
-        avg_losses : dict of str to float
-            Mean per-sample loss for each named training loss.
-        train_err : float
-            Mean per-batch backward-loss value for the epoch.
-        lr : float or None, optional
-            Learning rate formatted like :meth:`print_train`. Default is None.
-
-        Returns
-        -------
-        None
-        """
-        msg = f"[{epoch}] time={epoch_time:.2f}, "
-        for name, val in avg_losses.items():
-            msg += f"{name}={val:.4f}, "
-        msg += f"train_err={train_err:.4f}, "
-        msg += f"lr={lr:.3e}" if lr is not None else "lr=N/A"
-        with self.log_dir.open("a", encoding="utf-8") as f:
-            f.write(msg + "\n")
-
-    def log_eval(
-        self,
-        epoch: Optional[int],
-        eval_metrics: Dict[str, Any],
-    ) -> None:
-        """
-        Append the same line as :meth:`print_eval` to ``self.log_dir`` using UTF-8 and a trailing newline.
-
-        Parameters
-        ----------
-        epoch : int or None
-            Epoch index in the prefix; None is treated as 0 for display.
-        eval_metrics : dict of str to float or torch.Tensor
-            Same structure as :meth:`print_eval`.
-
-        Returns
-        -------
-        None
-        """
-        epoch = 0 if epoch is None else epoch
-        msg = f"[Eval {epoch}] "
-        parts = []
-        for metric, value in eval_metrics.items():
-            if isinstance(value, float) or isinstance(value, torch.Tensor):
-                v = float(value.item()) if isinstance(value, torch.Tensor) else float(value)
-                parts.append(f"{metric}={v:.4f}")
-        msg += ", ".join(parts)
-        with self.log_dir.open("a", encoding="utf-8") as f:
-            f.write(msg + "\n")
-
-    def save_state(
+    def _save_state(
         self,
         filename: str,
-        model: nn.Module,
-        optimizer: Optional[torch.optim.Optimizer] = None,
-        scheduler: Optional[object] = None,
-        scaler: Optional[torch.amp.GradScaler] = None,
-        epoch: Optional[int] = None,
     ) -> None:
-        """
-        Save a checkpoint dict under ``self.save_dir`` for resuming training.
+        """Save model state plus optional scaler/optimizer/scheduler to `<save_dir>/<filename>.pth`.
+
+        Handles `torch.compile` models by saving the underlying `_orig_mod`.
 
         Parameters
         ----------
         filename : str
-            Base name without ``.pth``; the file is ``self.save_dir / f"{filename}.pth"``.
-        model : torch.nn.Module
-            Module whose ``state_dict`` is stored under ``"model"``.
-        optimizer : torch.optim.Optimizer or None, optional
-            If not None, store ``state_dict`` under ``"optimizer"``. Default is None.
-        scheduler : object or None, optional
-            If not None, store ``state_dict`` under ``"scheduler"``. Default is None.
-        scaler : torch.amp.GradScaler or None, optional
-            If not None, store AMP scaler state under ``"scaler"``. Default is None.
-        epoch : int or None, optional
-            If not None, store this integer under ``"epoch"``. Default is None.
-
-        Returns
-        -------
-        None
+            File stem (no extension); `.pth` is appended.
         """
         save_path = self.save_dir / f"{filename}.pth"
-
-        ckpt = {"model": model.state_dict()}
-
-        if optimizer is not None:
-            ckpt["optimizer"] = optimizer.state_dict()
-
-        if scheduler is not None:
-            ckpt["scheduler"] = scheduler.state_dict()
-
-        if scaler is not None:
-            ckpt["scaler"] = scaler.state_dict()
-
-        if epoch is not None:
-            ckpt["epoch"] = int(epoch)
-
-        torch.save(ckpt, save_path.as_posix())
-
+        # unwrap torch.compile wrapper if present
+        mod = self.model._orig_mod if hasattr(self.model, "_orig_mod") else self.model
+        ckpt = {"model": mod.state_dict(), "epoch": int(self.epoch)}
+        for k, v in (
+            ("scaler", self.scaler),
+            ("optimizer", self.optimizer),
+            ("scheduler", self.scheduler),
+        ):
+            if v is not None:
+                ckpt[k] = v.state_dict()
+        torch.save(ckpt, save_path)
         if self.verbose:
             print(f"Saved training state to {save_path}")
             sys.stdout.flush()
+
+    def _log(
+        self,
+        metrics: Dict[str, Any],
+        prefix: str = "",
+    ) -> None:
+        """Format `metrics` as `key=value` pairs and print and/or append to the log file.
+
+        Nested dicts are flattened with `/` separators. Tensors are converted
+        via `.item()`; None values become `N/A`; non-numeric leaves are skipped.
+
+        Parameters
+        ----------
+        metrics : Dict[str, Any]
+            Possibly nested dict of scalar / tensor / None values.
+        prefix : str
+            Prefix written inside the `[...]` tag before the epoch number.
+            Default "".
+        """
+        def walk(
+            d: Dict[str, Any],
+            parent: str = "",
+        ):
+            """Yield `key=value` strings, flattening nested dicts with `/` separators."""
+            for name, val in d.items():
+                full = f"{parent}/{name}" if parent else name
+                if isinstance(val, dict):
+                    yield from walk(val, full)
+                    continue
+                if isinstance(val, torch.Tensor):
+                    val = float(val.item())
+                if val is None:
+                    yield f"{full}=N/A"
+                elif isinstance(val, (int, float)):
+                    yield f"{full}={val:.4f}"
+
+        msg = f"[{prefix}{self.epoch}] " + ", ".join(walk(metrics))
+        if self.verbose:
+            print(msg)
+            sys.stdout.flush()
+        if self.save_logs:
+            with self.log_path.open("a", encoding="utf-8") as f:
+                f.write(msg + "\n")
