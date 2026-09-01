@@ -1,10 +1,3 @@
----
-id: qf1sjrdfps5zx9ds
-title: Singular Vector Decomposition
-tags: []
-refs: []
-backrefs: []
----
 ## Singular Vector Decomposition
 ::: theorem:Singular Vector Decomposition
 Let $A\in\mathbb{R}^{n,k}$. There exist orthogonal matrices $U\in\mathbb{R}^{n,n}$, orthogonal matrix $V\in\mathbb{R}^{k,k}$ and diagonal matrix $\Sigma=\begin{pmatrix}\sigma_1&0&\cdots&0\\0&\sigma_2&\cdots&0\\\vdots&\vdots&\ddots&\vdots\\0&0&\cdots&\sigma_p\\0&0&\cdots&0\\\vdots&\vdots&\ddots&\vdots\\0&0&\cdots&0\end{pmatrix}\in\mathbb{R}^{n,k}$ s.t. $A=U\Sigma V^T$, where $\sigma_1\ge\sigma_2\ge\cdots\ge\sigma_p\ge 0$ and $p=\min(n,k)$. The singular values $\sigma_j$ are uniquely determined.
@@ -40,7 +33,7 @@ Let $A\in\mathbb{R}^{n,n}$. $|\det(A)|=\prod_{i=1}^{n}\sigma_i$.
 
 ::: proposition
 Let $A\in\mathbb{R}^{n,k}$ and $j\in\{1,2,\dots,k\}$. The $j$-th singular value satisfies $\sigma_j(A)=\underset{V_j}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}$, where $V_j$ varies over all subspaces of $\mathbb{R}^k$ with dimension $j$.
-:::
+::: ^singular-value-max-min
 
 ::: proof
 Let $A\in\mathbb{R}^{n,k}$, and let $v_1,\dots,v_k$ be right singular vectors of $A$ corresponding to singular values $\sigma_1(A)\ge \cdots \ge \sigma_k(A)\ge 0$. We prove $\sigma_j(A)=\underset{V_j}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}$.
@@ -51,14 +44,14 @@ Combining the two inequalities gives $\sigma_j(A)=\underset{V_j}{\max}\ \underse
 
 ::: proposition
 Let $A\in\mathbb{R}^{n,k}$ and $j\in\{1,2,\dots,k\}$. The $j$-th singular value satisfies $\sigma_j(A)=\underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}$, where $V_{k-j+1}$ varies over all subspaces of $\mathbb{R}^k$ with dimension $k-j+1$.
-:::
+::: ^singular-value-min-max
 
 ::: proposition
 Let $A\in\mathbb{R}^{n,k}$ and $\hat A \in \mathbb{R}^{n,k'}$ be obtained by removing $k-k'$ columns of $A$. The singular values of $A$ and $\hat A$ satisfy the inequalities $\sigma_{j}\ge \hat\sigma_{j}\ge \sigma_{j+k-k'}$ for $j=1,\cdots ,k'$.
 :::
 
 ::: proof
-Let $H\subset \mathbb{R}^k$ be the coordinate subspace corresponding to the remaining $k'$ columns, so that $\dim H=k'$, and $\hat A$ is exactly the restriction of $A$ to $H$. Hence, for every subspace $V\subset \mathbb{R}^{k'}$, identifying $V$ with a subspace of $H$, the quotient $\frac{\|\hat A x\|}{\|x\|}$ agrees with $\frac{\|A x\|}{\|x\|}$. By [[:8]], $\hat\sigma_j=\underset{V_j\subset H}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|} \geq \underset{V_j\subset \mathbb{R}^k}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}=\sigma_j$. By [[:9]], $\hat\sigma_j=\underset{W_{k'-j+1}\subset H}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|} \geq \underset{W_{k'-j+1}\subset \mathbb{R}^k}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}=\sigma_{j+k-k'}$.
+Let $H\subset \mathbb{R}^k$ be the coordinate subspace corresponding to the remaining $k'$ columns, so that $\dim H=k'$, and $\hat A$ is exactly the restriction of $A$ to $H$. Hence, for every subspace $V\subset \mathbb{R}^{k'}$, identifying $V$ with a subspace of $H$, the quotient $\frac{\|\hat A x\|}{\|x\|}$ agrees with $\frac{\|A x\|}{\|x\|}$. By [[#^singular-value-max-min|the max–min characterization]], $\hat\sigma_j=\underset{V_j\subset H}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|} \geq \underset{V_j\subset \mathbb{R}^k}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}=\sigma_j$. By [[#^singular-value-min-max|the min–max characterization]], $\hat\sigma_j=\underset{W_{k'-j+1}\subset H}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|} \geq \underset{W_{k'-j+1}\subset \mathbb{R}^k}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}=\sigma_{j+k-k'}$.
 :::
 
 ::: proposition
@@ -66,7 +59,7 @@ Let $A,E\in\mathbb{R}^{n,k}$ and $j\in\{1,2,\dots,k\}$. The singular values sati
 :::
 
 ::: proof
-By [[:8]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|(A+E)x\|}{\|x\|} \le \underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}+\|E\|=\sigma_j(A)+\|E\|$. And by [[:9]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|(A+E)x\|}{\|x\|} \ge \underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}-\|E\|=\sigma_j(A)-\|E\|$.
+By [[#^singular-value-min-max|the min–max characterization]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|(A+E)x\|}{\|x\|} \le \underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}+\|E\|=\sigma_j(A)+\|E\|$. And by [[#^singular-value-max-min|the max–min characterization]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|(A+E)x\|}{\|x\|} \ge \underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}-\|E\|=\sigma_j(A)-\|E\|$.
 :::
 
 ::: theorem:Eckart–Young Theorem

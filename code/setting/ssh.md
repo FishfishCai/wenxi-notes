@@ -1,10 +1,3 @@
----
-id: dx7g88m48zxzar7q
-title: ssh setting
-tags: []
-refs: []
-backrefs: []
----
 # Setting
 ```CLI
 Host *

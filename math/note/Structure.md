@@ -1,10 +1,3 @@
----
-id: dzcgksdch6fnjpkc
-title: Structure
-tags: []
-refs: []
-backrefs: []
----
 ## Topological Structure
 ::: definition:Topology
 Let $X$ be a set and $\mathcal{T}$ be a set of subsets of $X$. $\mathcal{T}$ is a topology on $X$ if:

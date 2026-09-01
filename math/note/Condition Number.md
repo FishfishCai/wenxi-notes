@@ -1,25 +1,18 @@
----
-id: abr19znvvmbhgbw1
-title: Condition Number
-tags: []
-refs: []
-backrefs: []
----
 ## Condition Number
 ::: definition:Condition Number
 Let $X$ and $Y$ be normed vector spaces, $f : X \to Y$ and $x \in X$. Assume $f$ is continuous. The condition number of $f$ at $x$ is $\hat{\kappa}(x) := \underset{\delta \to 0}{\lim} \underset{\|\delta x\| \leq \delta}{\sup} \frac{\|\delta f\|}{\|\delta x\|}$.
-:::
+::: ^condition-number
 
 ::: note
-For [[:1]], if $f$ is differentiable, then $\hat{\kappa} = \|J(x)\|$.
+For [[#^condition-number|the condition number]], if $f$ is differentiable, then $\hat{\kappa} = \|J(x)\|$.
 :::
 
 ::: definition:Relative Condition Number
 Let $X$ and $Y$ be normed vector spaces, $f : X \to Y$ and $x \in X$. Assume $f$ is continuous. The relative condition number of $f$ at $x$ is $\kappa(x) := \underset{\delta \to 0}{\lim} \underset{\|\delta x\| \leq \delta}{\sup} \frac{\frac{\|\delta f\|}{\|f(x)\|}}{\frac{\|\delta x\|}{\|x\|}}$.
-:::
+::: ^relative-condition-number
 
 ::: note
-For [[:2]], if $f$ is differentiable, then $\kappa = \frac{\|J(x)\|\|x\|}{\|f(x)\|}$.
+For [[#^relative-condition-number|the relative condition number]], if $f$ is differentiable, then $\kappa = \frac{\|J(x)\|\|x\|}{\|f(x)\|}$.
 :::
 
 ## Condition Number of Matrix

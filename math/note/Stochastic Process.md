@@ -1,10 +1,3 @@
----
-id: 435wvm1ftc1df33t
-title: Stochastic Process
-tags: []
-refs: []
-backrefs: []
----
 ### Probability
 
 #### 1. Definition

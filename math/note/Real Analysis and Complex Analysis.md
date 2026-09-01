@@ -1,11 +1,3 @@
----
-id: f632a8494p4ry2qf
-title: Real Analysis and Complex Analysis
-tags: []
-refs: []
-backrefs: []
----
-
 ## Chapter 1
 
 #### 2. Set

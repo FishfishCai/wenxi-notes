@@ -1,10 +1,3 @@
----
-id: k6hy6ca2jqhnww7v
-title: Convex Set
-tags: []
-refs: []
-backrefs: []
----
 ## Affine Subspace
 ::: definition:Affine Subspace
 Let $M \subset \mathbb{R}^{n}$ and $x \in \mathbb{R}^{n}$.
@@ -17,10 +10,10 @@ Let $M \subset \mathbb{R}^{n}$. $M$ is convex if $[x, y] \subset M$ for any $x, 
 
 ::: proposition
 Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^{n}$, where $n$ can be infinite. The set of solutions $x$ of $Ax \leqslant b$ is convex.
-:::
+::: ^linear-inequality-solution-set-convexity
 
 ::: note
-If some of the $\leqslant$ in [[:3]] are replaced with $<$, then the statement still holds.
+If some of the $\leqslant$ in [[#^linear-inequality-solution-set-convexity|the linear-inequality convexity result]] are replaced with $<$, then the statement still holds.
 :::
 
 ::: definition:Convex Combination

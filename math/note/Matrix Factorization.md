@@ -1,10 +1,3 @@
----
-id: rh5yambq5md8d642
-title: Matrix Factorization
-backrefs: [pvhgzw2k1haf3n2h, pzepj2xq1zqekg8k]
-tags: []
-refs: []
----
 ## Gram–Schmidt QR Factorization
 ::: theorem:Classical Gram–Schmidt Process
 Let $a_1, a_2, \ldots, a_k \in \mathbb{R}^n$. If $a_1, a_2, \ldots, a_k$ are linearly independent, then there exists an orthonormal set $v_1, v_2, \ldots, v_k$ given by
@@ -38,10 +31,10 @@ A = QR
 0 & 0 & \cdots & \left\|\bigl(I - v_1 v_1^T - \cdots - v_{k-1} v_{k-1}^T\bigr)a_k\right\| \\ \\
 \end{pmatrix}.
 $$
-:::
+::: ^gram-schmidt-qr
 
 ::: note
-For [[:2]], it can also be formed as $AR_{1}R_{2}\cdots R_{k} = Q$, where
+For [[#^gram-schmidt-qr|Gram–Schmidt QR Factorization]], it can also be formed as $AR_{1}R_{2}\cdots R_{k} = Q$, where
 $$
 R_i=\begin{pmatrix} 
 1 & 0 & \cdots & 0 & 0 & \cdots & 0\\
@@ -77,10 +70,10 @@ v_i &=
 \qquad i=2,\dots,k.
 \end{align*}
 $$
-:::
+::: ^modified-gram-schmidt
 
 ::: proposition
-The operation count of [[:3]] is $\sum_{j=1}^{k}(4n-1)(j-1)\sim 2nk^{2}$.
+The operation count of [[#^modified-gram-schmidt|the Modified Gram–Schmidt Process]] is $\sum_{j=1}^{k}(4n-1)(j-1)\sim 2nk^{2}$.
 :::
 
 ## Householder QR Factorization
@@ -98,15 +91,15 @@ A_{i}&=H_iA_{i-1}
 \end{align*}
 $$
 Then $R:=A_{k}$ is upper triangular, $Q:=H_1H_2\cdots H_k$ is orthogonal, and $A=QR$.
+::: ^householder-qr
+
+::: proposition
+The operation count of [[#^householder-qr|Householder QR Factorization]] is $\sum_{j=1}^{k}4(n-j-1)(k-j+1)\sim 2nk^{2}-\frac{2}{3}k^{3}$.
 :::
 
 ::: proposition
-The operation count of [[:5]] is $\sum_{j=1}^{k}4(n-j-1)(k-j+1)\sim 2nk^{2}-\frac{2}{3}k^{3}$.
-:::
-
-::: proposition
-[[:5]] is backward stable.
-:::
+[[#^householder-qr|Householder QR Factorization]] is backward stable.
+::: ^householder-qr-backward-stability
 
 ## Gaussian Elimination
 ::: theorem:Gaussian Elimination
@@ -119,14 +112,14 @@ A_{i}&=L_{i}A_{i-1}
 \end{align*}
 $$
 Then $L:=L_kL_{k-1}\cdots L_2L_1$ is a lower triangular matrix, $U$ is an upper triangular matrix, and $A=LU$.
-:::
+::: ^gaussian-elimination
 
 ::: note
-For [[:8]], $L_{i}^{-1}=\left(\begin{matrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots & \vdots & & \vdots \\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0 \\ 0 & 0 & \cdots & \ell_{i+1,i} & 1 & \cdots & 0 \\ \vdots & \vdots & & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \ell_{ni} & 0 & \cdots & 1 \end{matrix}\right)$ and $L=\left(\begin{matrix} 1 & 0 & 0 & \cdots & 0 \\ \ell_{21} & 1 & 0 & \cdots & 0 \\ \ell_{31} & \ell_{32} & 1 & \cdots & 0 \\ \vdots & \vdots & \ddots & \ddots & \vdots \\ \ell_{k1} & \ell_{k2} & \cdots & \ell_{k,k-1} & 1 \end{matrix}\right)$.
+For [[#^gaussian-elimination|Gaussian Elimination]], $L_{i}^{-1}=\left(\begin{matrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots & \vdots & & \vdots \\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0 \\ 0 & 0 & \cdots & \ell_{i+1,i} & 1 & \cdots & 0 \\ \vdots & \vdots & & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \ell_{ni} & 0 & \cdots & 1 \end{matrix}\right)$ and $L=\left(\begin{matrix} 1 & 0 & 0 & \cdots & 0 \\ \ell_{21} & 1 & 0 & \cdots & 0 \\ \ell_{31} & \ell_{32} & 1 & \cdots & 0 \\ \vdots & \vdots & \ddots & \ddots & \vdots \\ \ell_{k1} & \ell_{k2} & \cdots & \ell_{k,k-1} & 1 \end{matrix}\right)$.
 :::
 
 ::: proposition
-The operation count of [[:8]] is $\sim \frac{2}{3}n^{3}$.
+The operation count of [[#^gaussian-elimination|Gaussian Elimination]] is $\sim \frac{2}{3}n^{3}$.
 :::
 
 ## Pivoting
@@ -136,10 +129,10 @@ Let $P \in \mathbb{R}^{n, n}$. The matrix $P$ is a permutation matrix if it is o
 
 ::: theorem:LU Factorization with Partial Pivoting
 Let $A \in \mathbb{C}^{n, n}$. There exist a permutation matrix $P \in \mathbb{R}^{n, n}$, a unit lower-triangular matrix $L \in \mathbb{C}^{n, n}$ with $|\ell_{ij}| \le 1$, and an upper-triangular matrix $U \in \mathbb{C}^{n, n}$ s.t. $PA = LU$.
-:::
+::: ^lu-partial-pivoting
 
 ::: proposition
-The operation count of [[:11]] is $\sim \frac{2}{3}n^{3}$.
+The operation count of [[#^lu-partial-pivoting|LU Factorization with Partial Pivoting]] is $\sim \frac{2}{3}n^{3}$.
 :::
 
 ## Stability of Gaussian Elimination
@@ -178,7 +171,7 @@ Let $A \in \mathbb{C}^{n, n}$. If $A$ is Hermitian positive definite, then any p
 
 ::: theorem:Cholesky Factorization
 Let $A \in \mathbb{C}^{n, n}$. If $A$ is Hermitian positive definite, then $A$ has a unique Cholesky factorization $A = R^{*}R$, where $R \in \mathbb{C}^{n, n}$ is upper-triangular with positive diagonal entries $r_{jj} > 0$.
-:::
+::: ^cholesky-factorization
 
 ::: proof
 Existence: Write $A = \begin{pmatrix} a_{11} & w^{*} \\ w & K \end{pmatrix}$ with $a_{11} > 0$. Set $\alpha = \sqrt{a_{11}}$. Then $A = R_1^{*}A_1R_1$ where $R_1 = \begin{pmatrix} \alpha & \frac{w^{*}}{\alpha} \\ 0 & I \end{pmatrix}$ and $A_1 = \begin{pmatrix} 1 & 0 \\ 0 & K - \frac{ww^{*}}{a_{11}} \end{pmatrix}$. The submatrix $K - \frac{ww^{*}}{a_{11}}$ is positive definite since it is an $(n-1) \times (n-1)$ principal submatrix of $R_1^{-*}AR_1^{-1}$. By induction, all submatrices $A_j$ that appear are positive definite, so the process cannot break down, giving $A = R^{*}R$.
@@ -186,9 +179,9 @@ Uniqueness: At each step, $\alpha = \sqrt{a_{11}}$ is uniquely determined, which
 :::
 
 ::: proposition
-The operation count of [[:20]] is $\sim \frac{1}{3}n^{3}$.
+The operation count of [[#^cholesky-factorization|Cholesky Factorization]] is $\sim \frac{1}{3}n^{3}$.
 :::
 
 ::: proposition
-[[:20]] is backward stable.
+[[#^cholesky-factorization|Cholesky Factorization]] is backward stable.
 :::

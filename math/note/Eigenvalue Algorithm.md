@@ -1,10 +1,3 @@
----
-id: y2kmwhs2j1s20rq2
-title: Eigenvalue Algorithm
-tags: []
-refs: []
-backrefs: []
----
 ## Fundamental Difficulty
 ::: definition:Companion Matrix
 Let $p(z) = z^n + a_{n-1}z^{n-1} + \cdots + a_1 z + a_0$ be a monic polynomial of degree $n$. The companion matrix of $p$ is $A \in \mathbb{R}^{n, n}$ given by $A = \begin{pmatrix} 0 & & & -a_0 \\ 1 & 0 & & -a_1 \\ & 1 & \ddots & \vdots \\ & & 1 & -a_{n-1} \end{pmatrix}$.

@@ -1,10 +1,3 @@
----
-id: 6sbt2k06hqdp5ear
-title: Differential Topology
-tags: []
-refs: []
-backrefs: []
----
 # Differential Topology
 ::: definition:Smooth
 Let $U \subset \mathbb{R}^k$ and $V \subset \mathbb{R}^l$ be open sets. A map $f : U \to V$ is smooth if all partial derivatives of $f$ exist and are continuous. More generally, let $M \subset \mathbb{R}^k$ and $N \subset \mathbb{R}^l$ be arbitrary subsets. A map $f : M \to N$ is smooth if for each $x \in M$ there exist an open set $U \subset \mathbb{R}^k$ containing $x$ and a smooth map $F : U \to \mathbb{R}^l$ that coincides with $f$ on $U \cap M$; such a map $F$ is an extension of $f$.

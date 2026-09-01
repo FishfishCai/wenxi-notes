@@ -1,10 +1,3 @@
----
-id: c6g1304hfxjh8xrm
-title: Vector Space
-tags: []
-refs: []
-backrefs: []
----
 ## Real Vector Space
 ::: definition:$l_{p}$-norm in $\mathbb{R}^{n}$
 Let $a\in \mathbb{R}^n$. The $l_{p}$-norm in $\mathbb{R}^{n}$ is $\|a\|_{p}:=\left(\sum_{i=1}^{n}|a_{i}|^{p}\right)^{\frac{1}{p}}$ for $1\leqslant p<\infty$, and $\|a\|_{\infty}:=\underset{1\leqslant i\leqslant n}{\max}|a_i|$.
@@ -24,7 +17,7 @@ Let $a,b\in\mathbb{R}^n$. $\|a+b\|^2=\|a\|^2+\|b\|^2$ iff $\langle a, b \rangle 
 
 ::: proposition
 Let $a,b\in\mathbb{R}^n$. If $\|a\|=\|b\|$, then $\langle a+b, a-b\rangle = 0$.
-:::
+::: ^equal-norm-orthogonality
 
 ::: proposition
 Let $a,b\in\mathbb{R}^n$. If $a\neq 0$, then there exist $\beta\in\mathbb{R}$ and $\delta\in\mathbb{R}^n$ s.t. $b=\beta a+\delta$ and $a^T\delta=0$, where $\beta=\frac{a^T b}{a^T a}$ and $\delta=b-\beta a$.
@@ -61,12 +54,12 @@ Let $a,b \in \mathbb{C}^n$. The outer product in $\mathbb{C}^{n}$ is $ab^*$.
 
 ::: proposition
 Let $a,b \in \mathbb{C}^n$. If $\langle a, b \rangle = 0$, then $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$.
+::: ^complex-orthogonal-pythagorean
+
+::: note
+The reverse of [[#^complex-orthogonal-pythagorean|the complex orthogonal Pythagorean result]] is incorrect. If $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$, then $\Re(a^{*}b)=\Re(b^{*}a)=0$.
 :::
 
 ::: note
-The reverse of [[:12]] is incorrect. If $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$, then $\Re(a^{*}b)=\Re(b^{*}a)=0$.
-:::
-
-::: note
-[[:5]] is incorrect in $\mathbb{C}^{n}$. If $\|a\|=\|b\|$, then $\langle a+b, a-b\rangle = 0$ does not always hold.
+[[#^equal-norm-orthogonality|The equal-norm orthogonality result]] is incorrect in $\mathbb{C}^{n}$. If $\|a\|=\|b\|$, then $\langle a+b, a-b\rangle = 0$ does not always hold.
 :::

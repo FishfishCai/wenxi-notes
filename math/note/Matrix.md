@@ -1,10 +1,3 @@
----
-id: pzepj2xq1zqekg8k
-title: Matrix
-refs: [rh5yambq5md8d642]
-tags: []
-backrefs: []
----
 ## Orthogonal Matrix
 ::: definition:Orthogonal Matrix
 Let $Q \in \mathbb{R}^{n, n}$. $Q$ is an orthogonal matrix if the columns of $Q$ are orthonormal.
@@ -12,15 +5,15 @@ Let $Q \in \mathbb{R}^{n, n}$. $Q$ is an orthogonal matrix if the columns of $Q$
 
 ::: proposition
 Let $Q \in \mathbb{R}^{n, n}$. $Q$ is an orthogonal matrix iff $Q^T Q = I$.
-:::
+::: ^orthogonal-qtq-characterization
 
 ::: proposition
 Let $Q \in \mathbb{R}^{n, n}$. $Q$ is an orthogonal matrix iff $\|Qx\| = \|x\|$ for any $x \in \mathbb{R}^n$.
-:::
+::: ^orthogonal-norm-preservation
 
 ::: proposition
 Let $Q \in \mathbb{R}^{n, n}$. If $Q$ is an orthogonal matrix, then $\|Qx - Qy\| = \|x - y\|$ for any $x, y \in \mathbb{R}^n$.
-:::
+::: ^orthogonal-distance-preservation
 
 ::: proposition
 Let $f : \mathbb{R}^n \to \mathbb{R}^n$. Assume $f(0) = 0$ and $\|f(x) - f(y)\| = \|x - y\|$ for any $x, y \in \mathbb{R}^n$. There exists an orthogonal matrix $Q$ s.t. $f(x) = Qx$ for any $x \in \mathbb{R}^n$.
@@ -40,15 +33,15 @@ This implies that $f(e_{1}), f(e_{2}), \cdots , f(e_{n})$ form an orthonormal ba
 
 ::: proposition
 Let $Q \in \mathbb{R}^{n, n}$ and $\lambda \in \mathbb{C}$. If $Q$ is an orthogonal matrix and $\lambda$ is an eigenvalue of $Q$, then $|\lambda| = 1$.
-:::
+::: ^orthogonal-eigenvalue-modulus
 
 ::: proposition
 Let $Q \in \mathbb{R}^{n, n}$ and $\lambda \in \mathbb{C}$. If $Q$ is an orthogonal matrix and $\lambda$ is an eigenvalue of $Q$, then $\frac{1}{\lambda}$ is an eigenvalue of $Q^T$.
-:::
+::: ^orthogonal-transpose-reciprocal-eigenvalue
 
 ::: proposition
 Let $Q \in \mathbb{R}^{n, n}$, $\lambda_{i}, \lambda_{j} \in \mathbb{C}$, and $v, w \in \mathbb{C}^{n}$. If $Q$ is an orthogonal matrix, $\lambda_{i}$ and $\lambda_{j}$ are distinct eigenvalues of $Q$, and $v, w$ are eigenvectors corresponding to $\lambda_{i}$ and $\lambda_{j}$, then $v^{*} w = w^{*} v = 0$.
-:::
+::: ^orthogonal-distinct-eigenvectors
 
 ::: proof
 $\lambda_{i}w^{*}v=w^{*}\lambda_{i}v=w^{*}Qv=(Q^Tw)^{*}v=(\lambda_{j}^{-1}w)^{*}v=\lambda_{j}w^{*}v$, implying that $v^{*}w=w^{*}v=0$.
@@ -56,10 +49,10 @@ $\lambda_{i}w^{*}v=w^{*}\lambda_{i}v=w^{*}Qv=(Q^Tw)^{*}v=(\lambda_{j}^{-1}w)^{*}
 
 ::: proposition
 Let $Q \in \mathbb{R}^{n, n}$. If $Q$ is an orthogonal matrix, then $\det(Q) = \pm 1$.
-:::
+::: ^orthogonal-determinant
 
 ::: note
-For [[:9]], if $\det(Q) = 1$, the columns of $Q$ have positive orientation; if $\det(Q) = -1$, the columns of $Q$ have negative orientation.
+For [[#^orthogonal-determinant|the determinant of an orthogonal matrix]], if $\det(Q) = 1$, the columns of $Q$ have positive orientation; if $\det(Q) = -1$, the columns of $Q$ have negative orientation.
 :::
 
 ::: note
@@ -67,13 +60,13 @@ Let $A \in \mathbb{R}^{n, n}$. $\det(A)$ can be interpreted as the signed volume
 :::
 
 ::: proof
-Following [[Matrix Factorization:2]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of $Q$.
+Following [[Matrix Factorization#^gram-schmidt-qr|Gram–Schmidt QR Factorization]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of $Q$.
 :::
 
 ## Spectral Theorem
 ::: lemma
 Let $A \in \mathbb{R}^{n, n}$. If $A = A^T$, then $A$ has $n$ real eigenvalues.
-:::
+::: ^symmetric-real-eigenvalues
 
 ::: proof
 Let $S^{n-1}=\{x\in \mathbb{R}^{n}:\|x\|=1\}$. Since $S^{n-1}$ is a compact set, there exists $x^{*}$ s.t. $x^{*T}Ax^{*}=\underset{\|x\|=1}{\max}x^TAx$. Let $L(x,\lambda)=x^TAx-\lambda(x^Tx-1)$. By the method of Lagrange multipliers, $\nabla_{x}L(x^{*},\lambda)=0$, implying that $Ax^{*}=\lambda x^{*}$. Then we consider the subspace orthogonal to $x^*$ and iterate the argument.
@@ -81,7 +74,7 @@ Let $S^{n-1}=\{x\in \mathbb{R}^{n}:\|x\|=1\}$. Since $S^{n-1}$ is a compact set,
 
 ::: lemma
 Let $A \in \mathbb{R}^{n, n}$, $\lambda_{i}, \lambda_{j} \in \mathbb{R}$, and $v, w \in \mathbb{R}^{n}$. If $A = A^T$, $\lambda_{i}$ and $\lambda_{j}$ are distinct eigenvalues of $A$, and $v, w$ are eigenvectors corresponding to $\lambda_{i}$ and $\lambda_{j}$, then $v^T w = w^T v = 0$.
-:::
+::: ^symmetric-distinct-eigenvectors
 
 ::: proof
 $\lambda_{i}w^Tv=w^T\lambda_{i}v=w^TAv=(A^Tw)^Tv=(\lambda_{j}w)^Tv=\lambda_{j}w^Tv$, implying that $v^Tw=w^Tv=0$.
@@ -92,7 +85,7 @@ Let $A \in \mathbb{R}^{n, n}$. If $A = A^T$, then $A$ admits an orthonormal basi
 :::
 
 ::: proof
-This follows from [[:10]] and [[:11]].
+This follows from [[#^symmetric-real-eigenvalues|the real-eigenvalue lemma]] and [[#^symmetric-distinct-eigenvectors|the orthogonality lemma]].
 :::
 
 ## Unitary Matrix
@@ -105,7 +98,7 @@ The eigenvectors of an orthogonal matrix form a unitary matrix.
 :::
 
 ::: note
-[[:2]], [[:3]], [[:4]], [[:6]], [[:7]] and [[:8]] follow if $^T$ is changed to $^{*}$.
+[[#^orthogonal-qtq-characterization|The $Q^TQ$ characterization]], [[#^orthogonal-norm-preservation|norm preservation]], [[#^orthogonal-distance-preservation|distance preservation]], [[#^orthogonal-eigenvalue-modulus|the eigenvalue-modulus result]], [[#^orthogonal-transpose-reciprocal-eigenvalue|the reciprocal-eigenvalue result]], and [[#^orthogonal-distinct-eigenvectors|the distinct-eigenvector orthogonality result]] follow if $^T$ is changed to $^{*}$.
 :::
 
 ## Eigenvalue

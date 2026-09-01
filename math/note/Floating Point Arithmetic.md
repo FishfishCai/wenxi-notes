@@ -1,10 +1,3 @@
----
-id: 8hfnb00aenkec69z
-title: Floating Point Arithmetic
-tags: []
-refs: []
-backrefs: []
----
 ## Floating Point Number System
 ::: definition:Idealized Floating Point Number System
 Let base (or radix) $\beta \geq 2$ and precision $t \geq 1$. The idealized floating point system is $F = \{0\} \cup \left\{ x \in \mathbb{R} : x = \pm \frac{m}{\beta^t} \beta^e, \ \beta^{t-1} \leq m \leq \beta^t - 1, \ e, m \in \mathbb{Z} \right\}$. The fraction (or mantissa) of $x$ is $\pm \frac{m}{\beta^t}$, and $e$ is the exponent.

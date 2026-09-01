@@ -1,10 +1,3 @@
----
-id: n3i54fal0shgfprp
-title: Optimization
-tags: []
-refs: []
-backrefs: []
----
 ## Minimizer
 ::: definition:Local minimizer
 Let $D \subset \mathbb{R}^n$, $f : D \to \mathbb{R}$ and $x^* \in D$. $x^*$ is a local minimizer of $f$ if there is a neighborhood $N$ of $x^*$ s.t. $f(x) \geq f(x^*)$ for any $x \in N \cap D$.
@@ -63,10 +56,10 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^1$. $f$ is L-sm
 
 ::: proposition
 Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x, y \in \mathbb{R}^n$. If $f$ is L-smooth, then $| f(y) - f(x) - \nabla f(x)^T (y - x) | \leq \frac{L}{2} \| y - x \|^2$.
-:::
+::: ^l-smooth-first-order-bound
 
 ::: note
-The converse of the [[:12]] may hold, but it is hard to prove.
+The converse of [[#^l-smooth-first-order-bound|the first-order bound for L-smooth functions]] may hold, but it is hard to prove.
 :::
 
 ::: proposition
@@ -221,10 +214,10 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$, $x \in \mathbb{R}^n$, and $\epsilon_g, \e
 
 ::: proposition
 Let $f : \mathbb{R}^n \to \mathbb{R}$, $x_k \in \mathbb{R}^n$, and $p_k \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^2$, the Hessian of $f$ is Lipschitz continuous with constant $M$, $\lambda_{\min}(\nabla^2 f(x_k)) < 0$, $p_k$ is the eigenvector s.t. $p_k^T \nabla^2 f(x_k)p_k = \lambda_{\min}(\nabla^2 f(x_k))$, and $p_k^T \nabla f(x_k) \leq 0$. Set $\lambda_k = \lambda_{\min}(\nabla^2 f(x_k))$ and $x_{k + 1} = x_k + \frac{2|\lambda_k|}{M}p_k$. $f(x_{k + 1}) \leq f(x_k) - \frac{2}{3}\frac{|\lambda_k|^3}{M^2}$.
-:::
+::: ^negative-curvature-decrease
 
 ::: note
-If the algorithm uses a steepest-descent step when $|\nabla f(x_k)| > \epsilon_g$ and a negative-curvature step in [[:47]] when $\lambda_{\min}(\nabla^2 f(x_k)) < -\epsilon_H$, then each nonterminal iteration decreases $f$ by at least $\min \left(\frac{\epsilon_g^2}{2L}, \frac{2\epsilon_H^3}{3M^2}\right)$. Hence, if $f$ is bounded below by $\bar{f}$, an approximate second-order necessary point is reached in at most $\max \left(2L\epsilon_g^{-2}, \frac{3}{2}M^2\epsilon_H^{-3}\right)(f(x_0) - \bar{f})$ iterations.
+If the algorithm uses a steepest-descent step when $|\nabla f(x_k)| > \epsilon_g$ and [[#^negative-curvature-decrease|the negative-curvature step]] when $\lambda_{\min}(\nabla^2 f(x_k)) < -\epsilon_H$, then each nonterminal iteration decreases $f$ by at least $\min \left(\frac{\epsilon_g^2}{2L}, \frac{2\epsilon_H^3}{3M^2}\right)$. Hence, if $f$ is bounded below by $\bar{f}$, an approximate second-order necessary point is reached in at most $\max \left(2L\epsilon_g^{-2}, \frac{3}{2}M^2\epsilon_H^{-3}\right)(f(x_0) - \bar{f})$ iterations.
 :::
 
 ## Mirror Descent
