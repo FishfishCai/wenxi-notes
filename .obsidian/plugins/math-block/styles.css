@@ -1,0 +1,226 @@
+.math-block {
+  margin: 0.4em 0;
+  color: var(--text-normal);
+  font-size: 1em;
+  line-height: 1.55;
+}
+
+.math-block-title {
+  margin-bottom: 0.18em;
+  font-family: var(--math-block-title-family);
+  font-style: var(--math-block-title-style);
+  font-weight: var(--math-block-title-weight);
+}
+
+.math-block-body,
+.math-block-tombstone {
+  font-family: var(--math-block-body-family);
+  font-style: var(--math-block-body-style);
+  font-weight: var(--math-block-body-weight);
+}
+
+.math-block-label,
+.math-block-label > p {
+  display: inline;
+  margin: 0;
+}
+
+.math-block-body > p:first-child {
+  margin-top: 0;
+}
+
+.math-block-body > p:last-of-type {
+  margin-bottom: 0;
+}
+
+.math-block-proof > .math-block-body {
+  margin-inline: 2em;
+}
+
+.math-block-tombstone {
+  display: block;
+  text-align: right;
+}
+
+.math-block-editor-widget {
+  display: flow-root;
+  cursor: text;
+}
+
+.math-block-editor-widget > .math-block {
+  margin: 0;
+}
+
+.math-block-hover-popover .markdown-preview-section:not(.math-block-hover-target) {
+  display: none;
+}
+
+.math-block-settings-table {
+  width: 100%;
+  max-width: 100%;
+  margin: 0.9em 0 0;
+  overflow: hidden;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: var(--background-primary);
+  table-layout: fixed;
+}
+
+.math-block-settings-name-column {
+  width: 24%;
+}
+
+.math-block-settings-title-column,
+.math-block-settings-body-column {
+  width: 31%;
+}
+
+.math-block-settings-numbering-column {
+  width: 14%;
+}
+
+.math-block-settings-container {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding-bottom: 0.2em;
+}
+
+.math-block-settings-table th,
+.math-block-settings-table td {
+  padding: 0.65em 0.75em;
+  border: 0;
+  border-bottom: 1px solid var(--background-modifier-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.math-block-settings-table th {
+  padding-top: 0.7em;
+  padding-bottom: 0.7em;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.02em;
+}
+
+.math-block-settings-table tbody tr {
+  transition: background-color 100ms ease;
+}
+
+.math-block-settings-table tbody tr:hover {
+  background: var(--background-secondary-alt);
+}
+
+.math-block-settings-table tbody:last-of-type tr:last-child td {
+  border-bottom: 0;
+}
+
+.math-block-settings-table input[type="text"] {
+  width: 100%;
+  min-width: 0;
+  height: 32px;
+  margin: 0;
+  font-size: var(--font-ui-small);
+}
+
+.math-block-settings-name {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px;
+  align-items: center;
+  gap: 0.45em;
+}
+
+.math-block-settings-typography {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.math-block-settings-style-controls {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 7px;
+  background: var(--background-secondary);
+}
+
+.math-block-settings-style-button {
+  width: 28px;
+  height: 26px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.math-block-settings-style-button:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.math-block-settings-style-button.is-active {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.math-block-settings-bold {
+  font-weight: 700;
+}
+
+.math-block-settings-italic {
+  font-family: serif;
+  font-style: italic;
+}
+
+.math-block-settings-delete {
+  width: 28px;
+  height: 28px;
+  padding: 5px;
+  color: var(--text-muted);
+  opacity: 0.45;
+  transition: color 100ms ease, opacity 100ms ease,
+    background-color 100ms ease;
+}
+
+.math-block-settings-table tr:hover .math-block-settings-delete,
+.math-block-settings-delete:focus-visible,
+.math-block-settings-delete:hover {
+  color: var(--text-normal);
+  opacity: 1;
+}
+
+.math-block-settings-add {
+  margin-top: 0.8em;
+}
+
+.math-block-settings-table td.math-block-settings-numbered {
+  text-align: center;
+}
+
+.math-block-settings-numbered input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.math-block-settings-not-applicable {
+  color: var(--text-muted);
+}
+
+.math-block-settings-proof-group tr:last-child td {
+  border-bottom: 5px solid var(--background-secondary);
+}
+
+.math-block-settings-table input:invalid {
+  border-color: var(--text-error);
+}

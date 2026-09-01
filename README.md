@@ -5,10 +5,7 @@
 - File Explorer Note Count: show note counts in the file explorer.
 - Lapel: show extra info at the line number area.
 - Latex Suite: support LaTeX input and shortcuts.
-- LaTeX-like Theorem & Equation Referencer: provide theorem-style callouts.
 - Live Background: dynamic wallpaper.
-- MathLinks: dependency of LaTeX-like Theorem & Equation Referencer.
-- Quick Preview: dependency of LaTeX-like Theorem & Equation Referencer.
+- Math Block: display mathematical content in structured callout blocks.
 - Quiet Outline: show a clean, low-noise outline panel.
 - Style Settings: expose theme and CSS options in a settings panel for controlled UI customization.
-- VScode Editor: view codes in Obsidian.

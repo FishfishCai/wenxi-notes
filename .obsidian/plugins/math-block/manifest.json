@@ -1,0 +1,9 @@
+{
+  "id": "math-block",
+  "name": "Math Block",
+  "version": "0.1.0",
+  "minAppVersion": "1.13.0",
+  "description": "Frameless mathematical blocks with native Obsidian block links.",
+  "author": "Wenxi Cai",
+  "isDesktopOnly": false
+}

@@ -1,4 +1,11 @@
-#### Setting
+---
+id: d9v4q08wj8qy2zjf
+title: vscode setting
+tags: []
+refs: []
+backrefs: []
+---
+# Setting
 ```json
 {
     // terminal
@@ -49,100 +56,62 @@
     },
     
     // latex
-    "latex-workshop.latex.autoBuild.run": "onFileChange",
+    "latex-workshop.latex.autoBuild.run": "onSave",
     "latex-workshop.showContextMenu": true,
     "latex-workshop.intellisense.package.enabled": true,
-    "latex-workshop.message.error.show": false,
-    "latex-workshop.message.warning.show": false,
     "latex-workshop.latex.tools": [
         {
-            "name": "xelatex",
-            "command": "xelatex",
-            "args": [
-                "-interaction=nonstopmode",
-                "-file-line-error",
-                "%DOCFILE%"
-            ]
-        },
-        {
-            "name": "pdflatex",
-            "command": "pdflatex",
-            "args": [
-                "-interaction=nonstopmode",
-                "-file-line-error",
-                "%DOCFILE%"
-            ]
-        },
-        {
-            "name": "bibtex",
-            "command": "bibtex",
-            "args": [
-                "%DOCFILE%"
-            ]
-        },
-        {
-            "name": "latexmk",
+            "name": "latexmk-xe",
             "command": "latexmk",
             "args": [
+                "-synctex=1",
                 "-interaction=nonstopmode",
                 "-file-line-error",
+                "-xelatex",
                 "-outdir=%OUTDIR%",
-                "-pdf",
-                "%DOCFILE%"
+                "%DOC%"
             ]
         },
         {
-            "name": "biber",
-            "command": "biber",
+            "name": "latexmk-pdf",
+            "command": "latexmk",
             "args": [
-                "%DOCFILE%"
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-pdf",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ]
+        },
+        {
+            "name": "latexmk-lua",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-lualatex",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
             ]
         }
     ],
     "latex-workshop.latex.recipes": [
         {
-            "name": "XeLaTeX",
-            "tools": [
-                "xelatex"
-            ]
+            "name": "latexmk (XeLaTeX)",
+            "tools": ["latexmk-xe"]
         },
         {
-            "name": "PDFLaTeX",
-            "tools": [
-                "pdflatex"
-            ]
+            "name": "latexmk (pdfLaTeX)",
+            "tools": ["latexmk-pdf"]
         },
         {
-            "name": "BibTeX",
-            "tools": [
-                "bibtex"
-            ]
-        },
-        {
-            "name": "LaTeXmk",
-            "tools": [
-                "latexmk"
-            ]
-        },
-        {
-            "name": "xelatex -> bibtex -> xelatex*2",
-            "tools": [
-                "xelatex",
-                "bibtex",
-                "xelatex",
-                "xelatex"
-            ]
-        },
-        {
-            "name": "pdflatex -> biber -> pdflatex*2",
-            "tools": [
-                "pdflatex",
-                "biber",
-                "pdflatex",
-                "pdflatex"
-            ]
+            "name": "latexmk (LuaLaTeX)",
+            "tools": ["latexmk-lua"]
         }
     ],
+    "latex-workshop.latex.recipe.default": "latexmk (XeLaTeX)",
     "latex-workshop.latex.clean.fileTypes": [
         "*.fdb_latexmk",
         "*.aux",
@@ -162,10 +131,16 @@
         "*.gls",
         "*.ist",
         "*.fls",
-        "*.log"
+        "*.log",
+        "*.synctex(busy)",
+        "*.nav",
+        "*.snm",
+        "*.vrb",
+        "*.bcf",
+        "*.run.xml",
+        "*.xdv"
     ],
     "latex-workshop.latex.autoClean.run": "onBuilt",
-    "latex-workshop.latex.recipe.default": "LaTeXmk",
     "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
     "latex-workshop.intellisense.argumentHint.enabled": false,
     "workbench.editorAssociations": {
@@ -183,7 +158,7 @@
 }
 ```
 
-#### key-binding
+# key-binding
 ```json
 [
     {
@@ -220,4 +195,162 @@
         "command": "-workbench.action.toggleAuxiliaryBar"
     }
 ]
+```---
+id: d9v4q08wj8qy2zjf
+nota: true
+title: vscode setting
+tag: [setting]
+coconote: true
+---
+# Setting
+```json
+{
+    // terminal
+    "terminal.integrated.defaultProfile.osx": "fish",
+    "terminal.integrated.inheritEnv": false,
+    "terminal.integrated.scrollback": 1000000,
+    "terminal.integrated.profiles.osx": {
+        "zsh": {
+            "path": "/bin/zsh",
+            "args": ["-l"]
+        },
+        "fish": {
+            "path": "/opt/homebrew/bin/fish",
+            "args": ["-l"]
+        }
+    },
+
+    // vscode
+    "files.autoSaveDelay": 10000,
+    "editor.fontSize": 15,
+    "editor.minimap.enabled": false,
+    "workbench.sideBar.location": "right",
+    "workbench.statusBar.visible": false,
+    "workbench.startupEditor": "none",
+    "workbench.browser.showInTitleBar": false,
+    "workbench.navigationControl.enabled": false,
+    "workbench.layoutControl.enabled": false,
+    "workbench.activityBar.location": "hidden",
+    "workbench.secondarySideBar.defaultVisibility": "hidden",
+    "window.commandCenter": false,
+    "window.restoreWindows": "none",
+    "extensions.ignoreRecommendations": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    "explorer.confirmPasteNative": false,
+    "explorer.confirmDragAndDrop": false,
+    "explorer.confirmDelete": false,
+    "update.showReleaseNotes": false,
+    "chat.tips.enabled": false,
+    "chat.viewSessions.orientation": "stacked",
+    
+    // git
+    "git.autofetch": true,
+
+    // ssh
+    "remote.SSH.lockfilesInTmp": true,
+    "remote.SSH.remotePlatform": {
+        "server1": "linux"
+    },
+    
+    // latex
+    "latex-workshop.latex.autoBuild.run": "onSave",
+    "latex-workshop.showContextMenu": true,
+    "latex-workshop.intellisense.package.enabled": true,
+    "latex-workshop.latex.tools": [
+        {
+            "name": "latexmk-xe",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-xelatex",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ]
+        },
+        {
+            "name": "latexmk-pdf",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-pdf",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ]
+        },
+        {
+            "name": "latexmk-lua",
+            "command": "latexmk",
+            "args": [
+                "-synctex=1",
+                "-interaction=nonstopmode",
+                "-file-line-error",
+                "-lualatex",
+                "-outdir=%OUTDIR%",
+                "%DOC%"
+            ]
+        }
+    ],
+    "latex-workshop.latex.recipes": [
+        {
+            "name": "latexmk (XeLaTeX)",
+            "tools": ["latexmk-xe"]
+        },
+        {
+            "name": "latexmk (pdfLaTeX)",
+            "tools": ["latexmk-pdf"]
+        },
+        {
+            "name": "latexmk (LuaLaTeX)",
+            "tools": ["latexmk-lua"]
+        }
+    ],
+    "latex-workshop.latex.recipe.default": "latexmk (XeLaTeX)",
+    "latex-workshop.latex.clean.fileTypes": [
+        "*.fdb_latexmk",
+        "*.aux",
+        "*.bbl",
+        "*.blg",
+        "*.idx",
+        "*.ind",
+        "*.lof",
+        "*.lot",
+        "*.out",
+        "*.toc",
+        "*.acn",
+        "*.acr",
+        "*.alg",
+        "*.glg",
+        "*.glo",
+        "*.gls",
+        "*.ist",
+        "*.fls",
+        "*.log",
+        "*.synctex(busy)",
+        "*.nav",
+        "*.snm",
+        "*.vrb",
+        "*.bcf",
+        "*.run.xml",
+        "*.xdv"
+    ],
+    "latex-workshop.latex.autoClean.run": "onBuilt",
+    "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
+    "latex-workshop.intellisense.argumentHint.enabled": false,
+    "workbench.editorAssociations": {
+        "*.pdf": "latex-workshop-pdf-hook"
+    },
+
+    // jupyter
+    "jupyter.askForKernelRestart": false,
+    
+    // java
+    "redhat.telemetry.enabled": false,
+    
+    // claude code
+    "claudeCode.preferredLocation": "sidebar"
+}
 ```
