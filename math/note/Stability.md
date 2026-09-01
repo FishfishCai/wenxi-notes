@@ -25,11 +25,11 @@ Let $F_X$ and $F_Y$ be idealized floating point systems of $X$ and $Y$, $f : X \
 :::
 
 ::: note
-For [[#^accuracy|accuracy]] and [[#^stability|stability]], if $\|x\| = 0$, then $\tilde{x} = x$, and if $f(x) = 0$, then $\tilde{f}(x) = f(x)$.
+For [[#^accuracy|Definition 4 (Accuracy)]] and [[#^stability|Definition 5 (Stability)]], if $\|x\| = 0$, then $\tilde{x} = x$, and if $f(x) = 0$, then $\tilde{f}(x) = f(x)$.
 :::
 
 ::: note
-For [[#^accuracy|accuracy]] and [[#^stability|stability]], in a finite-dimensional space, since all norms are equivalent, they hold regardless of the norm.
+For [[#^accuracy|Definition 4 (Accuracy)]] and [[#^stability|Definition 5 (Stability)]], in a finite-dimensional space, since all norms are equivalent, they hold regardless of the norm.
 :::
 
 ::: proposition

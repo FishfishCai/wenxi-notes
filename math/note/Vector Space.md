@@ -57,9 +57,9 @@ Let $a,b \in \mathbb{C}^n$. If $\langle a, b \rangle = 0$, then $\|a+b\|^{2}=\|a
 ::: ^complex-orthogonal-pythagorean
 
 ::: note
-The reverse of [[#^complex-orthogonal-pythagorean|the complex orthogonal Pythagorean result]] is incorrect. If $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$, then $\Re(a^{*}b)=\Re(b^{*}a)=0$.
+The reverse of [[#^complex-orthogonal-pythagorean|Proposition 12]] is incorrect. If $\|a+b\|^{2}=\|a\|^{2}+\|b\|^{2}$, then $\Re(a^{*}b)=\Re(b^{*}a)=0$.
 :::
 
 ::: note
-[[#^equal-norm-orthogonality|The equal-norm orthogonality result]] is incorrect in $\mathbb{C}^{n}$. If $\|a\|=\|b\|$, then $\langle a+b, a-b\rangle = 0$ does not always hold.
+[[#^equal-norm-orthogonality|Proposition 5]] is incorrect in $\mathbb{C}^{n}$. If $\|a\|=\|b\|$, then $\langle a+b, a-b\rangle = 0$ does not always hold.
 :::

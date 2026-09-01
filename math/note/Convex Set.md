@@ -13,7 +13,7 @@ Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^{n}$, where $n$ can be infin
 ::: ^linear-inequality-solution-set-convexity
 
 ::: note
-If some of the $\leqslant$ in [[#^linear-inequality-solution-set-convexity|the linear-inequality convexity result]] are replaced with $<$, then the statement still holds.
+If some of the $\leqslant$ in [[#^linear-inequality-solution-set-convexity|Proposition 3]] are replaced with $<$, then the statement still holds.
 :::
 
 ::: definition:Convex Combination

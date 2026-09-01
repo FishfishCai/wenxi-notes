@@ -4,7 +4,7 @@ Let $X$ and $Y$ be normed vector spaces, $f : X \to Y$ and $x \in X$. Assume $f$
 ::: ^condition-number
 
 ::: note
-For [[#^condition-number|the condition number]], if $f$ is differentiable, then $\hat{\kappa} = \|J(x)\|$.
+For [[#^condition-number|Definition 1 (Condition Number)]], if $f$ is differentiable, then $\hat{\kappa} = \|J(x)\|$.
 :::
 
 ::: definition:Relative Condition Number
@@ -12,7 +12,7 @@ Let $X$ and $Y$ be normed vector spaces, $f : X \to Y$ and $x \in X$. Assume $f$
 ::: ^relative-condition-number
 
 ::: note
-For [[#^relative-condition-number|the relative condition number]], if $f$ is differentiable, then $\kappa = \frac{\|J(x)\|\|x\|}{\|f(x)\|}$.
+For [[#^relative-condition-number|Definition 2 (Relative Condition Number)]], if $f$ is differentiable, then $\kappa = \frac{\|J(x)\|\|x\|}{\|f(x)\|}$.
 :::
 
 ## Condition Number of Matrix

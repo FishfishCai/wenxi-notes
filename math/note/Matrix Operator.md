@@ -12,7 +12,7 @@ Let $v_1, v_2, \dots, v_k \in \mathbb{R}^n$. If $\{v_1, v_2, \dots, v_k\}$ is an
 ::: ^orthonormal-subspace-projection
 
 ::: note
-Let $V = [v_1\ v_2\ \cdots\ v_k] \in \mathbb{R}^{n, k}$. The projection matrix $P$ in [[#^orthonormal-subspace-projection|the orthonormal-subspace projection result]] admits the factorization $P = VV^T$, whose rank is $k$. For any $x \in \mathbb{R}^n$, the vector $V^T x$ gives the coefficients of the projection of $x$ onto the subspace $\text{span}(v_1, v_2, \dots, v_k)$. The complementary projection matrix is $I - VV^T$, whose rank is $n - k$.
+Let $V = [v_1\ v_2\ \cdots\ v_k] \in \mathbb{R}^{n, k}$. The projection matrix $P$ in [[#^orthonormal-subspace-projection|Proposition 3]] admits the factorization $P = VV^T$, whose rank is $k$. For any $x \in \mathbb{R}^n$, the vector $V^T x$ gives the coefficients of the projection of $x$ onto the subspace $\text{span}(v_1, v_2, \dots, v_k)$. The complementary projection matrix is $I - VV^T$, whose rank is $n - k$.
 :::
 
 ::: definition:Projection Matrix of Matrix
@@ -29,7 +29,7 @@ Let $a, b \in \mathbb{R}^n$. If $v = \frac{a - b}{\|a - b\|}$ and $\|a\| = \|b\|
 :::
 
 ::: note
-For [[#^householder-reflection|the Householder reflection]], the Householder reflection matrix is an orthogonal matrix.
+For [[#^householder-reflection|Definition 5 (Householder Reflection Matrix)]], the Householder reflection matrix is an orthogonal matrix.
 :::
 
 ## Pseudoinverse

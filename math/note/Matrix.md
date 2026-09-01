@@ -52,7 +52,7 @@ Let $Q \in \mathbb{R}^{n, n}$. If $Q$ is an orthogonal matrix, then $\det(Q) = \
 ::: ^orthogonal-determinant
 
 ::: note
-For [[#^orthogonal-determinant|the determinant of an orthogonal matrix]], if $\det(Q) = 1$, the columns of $Q$ have positive orientation; if $\det(Q) = -1$, the columns of $Q$ have negative orientation.
+For [[#^orthogonal-determinant|Proposition 9]], if $\det(Q) = 1$, the columns of $Q$ have positive orientation; if $\det(Q) = -1$, the columns of $Q$ have negative orientation.
 :::
 
 ::: note
@@ -60,7 +60,7 @@ Let $A \in \mathbb{R}^{n, n}$. $\det(A)$ can be interpreted as the signed volume
 :::
 
 ::: proof
-Following [[Matrix Factorization#^gram-schmidt-qr|Gram–Schmidt QR Factorization]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of $Q$.
+Following [[Matrix Factorization#^gram-schmidt-qr|Theorem 2 (Gram–Schmidt QR Factorization)]], $\det(A)=\det(Q)\det(R)=\pm \prod r_{ii}$. The sign depends on the orientation of $Q$.
 :::
 
 ## Spectral Theorem
@@ -85,7 +85,7 @@ Let $A \in \mathbb{R}^{n, n}$. If $A = A^T$, then $A$ admits an orthonormal basi
 :::
 
 ::: proof
-This follows from [[#^symmetric-real-eigenvalues|the real-eigenvalue lemma]] and [[#^symmetric-distinct-eigenvectors|the orthogonality lemma]].
+This follows from [[#^symmetric-real-eigenvalues|Lemma 10]] and [[#^symmetric-distinct-eigenvectors|Lemma 11]].
 :::
 
 ## Unitary Matrix
@@ -98,7 +98,7 @@ The eigenvectors of an orthogonal matrix form a unitary matrix.
 :::
 
 ::: note
-[[#^orthogonal-qtq-characterization|The $Q^TQ$ characterization]], [[#^orthogonal-norm-preservation|norm preservation]], [[#^orthogonal-distance-preservation|distance preservation]], [[#^orthogonal-eigenvalue-modulus|the eigenvalue-modulus result]], [[#^orthogonal-transpose-reciprocal-eigenvalue|the reciprocal-eigenvalue result]], and [[#^orthogonal-distinct-eigenvectors|the distinct-eigenvector orthogonality result]] follow if $^T$ is changed to $^{*}$.
+[[#^orthogonal-qtq-characterization|Proposition 2]], [[#^orthogonal-norm-preservation|Proposition 3]], [[#^orthogonal-distance-preservation|Proposition 4]], [[#^orthogonal-eigenvalue-modulus|Proposition 6]], [[#^orthogonal-transpose-reciprocal-eigenvalue|Proposition 7]], and [[#^orthogonal-distinct-eigenvectors|Proposition 8]] follow if $^T$ is changed to $^{*}$.
 :::
 
 ## Eigenvalue

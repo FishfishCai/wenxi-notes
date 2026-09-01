@@ -51,7 +51,7 @@ Let $A\in\mathbb{R}^{n,k}$ and $\hat A \in \mathbb{R}^{n,k'}$ be obtained by rem
 :::
 
 ::: proof
-Let $H\subset \mathbb{R}^k$ be the coordinate subspace corresponding to the remaining $k'$ columns, so that $\dim H=k'$, and $\hat A$ is exactly the restriction of $A$ to $H$. Hence, for every subspace $V\subset \mathbb{R}^{k'}$, identifying $V$ with a subspace of $H$, the quotient $\frac{\|\hat A x\|}{\|x\|}$ agrees with $\frac{\|A x\|}{\|x\|}$. By [[#^singular-value-max-min|the max–min characterization]], $\hat\sigma_j=\underset{V_j\subset H}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|} \geq \underset{V_j\subset \mathbb{R}^k}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}=\sigma_j$. By [[#^singular-value-min-max|the min–max characterization]], $\hat\sigma_j=\underset{W_{k'-j+1}\subset H}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|} \geq \underset{W_{k'-j+1}\subset \mathbb{R}^k}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}=\sigma_{j+k-k'}$.
+Let $H\subset \mathbb{R}^k$ be the coordinate subspace corresponding to the remaining $k'$ columns, so that $\dim H=k'$, and $\hat A$ is exactly the restriction of $A$ to $H$. Hence, for every subspace $V\subset \mathbb{R}^{k'}$, identifying $V$ with a subspace of $H$, the quotient $\frac{\|\hat A x\|}{\|x\|}$ agrees with $\frac{\|A x\|}{\|x\|}$. By [[#^singular-value-max-min|Proposition 8]], $\hat\sigma_j=\underset{V_j\subset H}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|} \geq \underset{V_j\subset \mathbb{R}^k}{\max}\ \underset{x\in V_j,\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}=\sigma_j$. By [[#^singular-value-min-max|Proposition 9]], $\hat\sigma_j=\underset{W_{k'-j+1}\subset H}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|} \geq \underset{W_{k'-j+1}\subset \mathbb{R}^k}{\min}\ \underset{x\in W_{k'-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}=\sigma_{j+k-k'}$.
 :::
 
 ::: proposition
@@ -59,7 +59,7 @@ Let $A,E\in\mathbb{R}^{n,k}$ and $j\in\{1,2,\dots,k\}$. The singular values sati
 :::
 
 ::: proof
-By [[#^singular-value-min-max|the min–max characterization]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|(A+E)x\|}{\|x\|} \le \underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}+\|E\|=\sigma_j(A)+\|E\|$. And by [[#^singular-value-max-min|the max–min characterization]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|(A+E)x\|}{\|x\|} \ge \underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}-\|E\|=\sigma_j(A)-\|E\|$.
+By [[#^singular-value-min-max|Proposition 9]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|(A+E)x\|}{\|x\|} \le \underset{V_{k-j+1}}{\min}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\max}\frac{\|Ax\|}{\|x\|}+\|E\|=\sigma_j(A)+\|E\|$. And by [[#^singular-value-max-min|Proposition 8]], $\sigma_j(A+E)=\underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|(A+E)x\|}{\|x\|} \ge \underset{V_{k-j+1}}{\max}\ \underset{x\in V_{k-j+1},\ x\ne 0}{\min}\frac{\|Ax\|}{\|x\|}-\|E\|=\sigma_j(A)-\|E\|$.
 :::
 
 ::: theorem:Eckart–Young Theorem

@@ -59,7 +59,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x, y \in \mathbb{R}^n$. If $f$ is L-s
 ::: ^l-smooth-first-order-bound
 
 ::: note
-The converse of [[#^l-smooth-first-order-bound|the first-order bound for L-smooth functions]] may hold, but it is hard to prove.
+The converse of [[#^l-smooth-first-order-bound|Proposition 12]] may hold, but it is hard to prove.
 :::
 
 ::: proposition
@@ -217,7 +217,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$, $x_k \in \mathbb{R}^n$, and $p_k \in \mat
 ::: ^negative-curvature-decrease
 
 ::: note
-If the algorithm uses a steepest-descent step when $|\nabla f(x_k)| > \epsilon_g$ and [[#^negative-curvature-decrease|the negative-curvature step]] when $\lambda_{\min}(\nabla^2 f(x_k)) < -\epsilon_H$, then each nonterminal iteration decreases $f$ by at least $\min \left(\frac{\epsilon_g^2}{2L}, \frac{2\epsilon_H^3}{3M^2}\right)$. Hence, if $f$ is bounded below by $\bar{f}$, an approximate second-order necessary point is reached in at most $\max \left(2L\epsilon_g^{-2}, \frac{3}{2}M^2\epsilon_H^{-3}\right)(f(x_0) - \bar{f})$ iterations.
+If the algorithm uses a steepest-descent step when $|\nabla f(x_k)| > \epsilon_g$ and [[#^negative-curvature-decrease|Proposition 47]] when $\lambda_{\min}(\nabla^2 f(x_k)) < -\epsilon_H$, then each nonterminal iteration decreases $f$ by at least $\min \left(\frac{\epsilon_g^2}{2L}, \frac{2\epsilon_H^3}{3M^2}\right)$. Hence, if $f$ is bounded below by $\bar{f}$, an approximate second-order necessary point is reached in at most $\max \left(2L\epsilon_g^{-2}, \frac{3}{2}M^2\epsilon_H^{-3}\right)(f(x_0) - \bar{f})$ iterations.
 :::
 
 ## Mirror Descent

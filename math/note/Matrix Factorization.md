@@ -34,7 +34,7 @@ $$
 ::: ^gram-schmidt-qr
 
 ::: note
-For [[#^gram-schmidt-qr|Gram–Schmidt QR Factorization]], it can also be formed as $AR_{1}R_{2}\cdots R_{k} = Q$, where
+For [[#^gram-schmidt-qr|Theorem 2 (Gram–Schmidt QR Factorization)]], it can also be formed as $AR_{1}R_{2}\cdots R_{k} = Q$, where
 $$
 R_i=\begin{pmatrix} 
 1 & 0 & \cdots & 0 & 0 & \cdots & 0\\
@@ -73,7 +73,7 @@ $$
 ::: ^modified-gram-schmidt
 
 ::: proposition
-The operation count of [[#^modified-gram-schmidt|the Modified Gram–Schmidt Process]] is $\sum_{j=1}^{k}(4n-1)(j-1)\sim 2nk^{2}$.
+The operation count of [[#^modified-gram-schmidt|Theorem 3 (Modified Gram–Schmidt Process)]] is $\sum_{j=1}^{k}(4n-1)(j-1)\sim 2nk^{2}$.
 :::
 
 ## Householder QR Factorization
@@ -94,11 +94,11 @@ Then $R:=A_{k}$ is upper triangular, $Q:=H_1H_2\cdots H_k$ is orthogonal, and $A
 ::: ^householder-qr
 
 ::: proposition
-The operation count of [[#^householder-qr|Householder QR Factorization]] is $\sum_{j=1}^{k}4(n-j-1)(k-j+1)\sim 2nk^{2}-\frac{2}{3}k^{3}$.
+The operation count of [[#^householder-qr|Theorem 5 (Householder QR Factorization)]] is $\sum_{j=1}^{k}4(n-j-1)(k-j+1)\sim 2nk^{2}-\frac{2}{3}k^{3}$.
 :::
 
 ::: proposition
-[[#^householder-qr|Householder QR Factorization]] is backward stable.
+[[#^householder-qr|Theorem 5 (Householder QR Factorization)]] is backward stable.
 ::: ^householder-qr-backward-stability
 
 ## Gaussian Elimination
@@ -115,11 +115,11 @@ Then $L:=L_kL_{k-1}\cdots L_2L_1$ is a lower triangular matrix, $U$ is an upper 
 ::: ^gaussian-elimination
 
 ::: note
-For [[#^gaussian-elimination|Gaussian Elimination]], $L_{i}^{-1}=\left(\begin{matrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots & \vdots & & \vdots \\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0 \\ 0 & 0 & \cdots & \ell_{i+1,i} & 1 & \cdots & 0 \\ \vdots & \vdots & & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \ell_{ni} & 0 & \cdots & 1 \end{matrix}\right)$ and $L=\left(\begin{matrix} 1 & 0 & 0 & \cdots & 0 \\ \ell_{21} & 1 & 0 & \cdots & 0 \\ \ell_{31} & \ell_{32} & 1 & \cdots & 0 \\ \vdots & \vdots & \ddots & \ddots & \vdots \\ \ell_{k1} & \ell_{k2} & \cdots & \ell_{k,k-1} & 1 \end{matrix}\right)$.
+For [[#^gaussian-elimination|Theorem 8 (Gaussian Elimination)]], $L_{i}^{-1}=\left(\begin{matrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots & \vdots & & \vdots \\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0 \\ 0 & 0 & \cdots & \ell_{i+1,i} & 1 & \cdots & 0 \\ \vdots & \vdots & & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \ell_{ni} & 0 & \cdots & 1 \end{matrix}\right)$ and $L=\left(\begin{matrix} 1 & 0 & 0 & \cdots & 0 \\ \ell_{21} & 1 & 0 & \cdots & 0 \\ \ell_{31} & \ell_{32} & 1 & \cdots & 0 \\ \vdots & \vdots & \ddots & \ddots & \vdots \\ \ell_{k1} & \ell_{k2} & \cdots & \ell_{k,k-1} & 1 \end{matrix}\right)$.
 :::
 
 ::: proposition
-The operation count of [[#^gaussian-elimination|Gaussian Elimination]] is $\sim \frac{2}{3}n^{3}$.
+The operation count of [[#^gaussian-elimination|Theorem 8 (Gaussian Elimination)]] is $\sim \frac{2}{3}n^{3}$.
 :::
 
 ## Pivoting
@@ -132,7 +132,7 @@ Let $A \in \mathbb{C}^{n, n}$. There exist a permutation matrix $P \in \mathbb{R
 ::: ^lu-partial-pivoting
 
 ::: proposition
-The operation count of [[#^lu-partial-pivoting|LU Factorization with Partial Pivoting]] is $\sim \frac{2}{3}n^{3}$.
+The operation count of [[#^lu-partial-pivoting|Theorem 11 (LU Factorization with Partial Pivoting)]] is $\sim \frac{2}{3}n^{3}$.
 :::
 
 ## Stability of Gaussian Elimination
@@ -179,9 +179,9 @@ Uniqueness: At each step, $\alpha = \sqrt{a_{11}}$ is uniquely determined, which
 :::
 
 ::: proposition
-The operation count of [[#^cholesky-factorization|Cholesky Factorization]] is $\sim \frac{1}{3}n^{3}$.
+The operation count of [[#^cholesky-factorization|Theorem 20 (Cholesky Factorization)]] is $\sim \frac{1}{3}n^{3}$.
 :::
 
 ::: proposition
-[[#^cholesky-factorization|Cholesky Factorization]] is backward stable.
+[[#^cholesky-factorization|Theorem 20 (Cholesky Factorization)]] is backward stable.
 :::
