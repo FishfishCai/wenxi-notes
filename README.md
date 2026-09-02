@@ -5,5 +5,4 @@
 - Latex Suite: support LaTeX input and shortcuts.
 - Live Background: dynamic wallpaper.
 - Math Block: display mathematical content in structured callout blocks.
-- Quiet Outline: show a clean, low-noise outline panel.
 - Style Settings: expose theme and CSS options in a settings panel for controlled UI customization.
