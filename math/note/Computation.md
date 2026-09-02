@@ -2,6 +2,7 @@
 ::: proposition
 Let $a, b \in \mathbb{R}^n$. The operation count for $a^T b$ is $2n - 1$.
 ::: ^dot-product-operation-count
+
 ::: proof
 $n$ multiplication and $n - 1$ addition.
 :::
