@@ -1,6 +1,4 @@
 # Plugins
-- Better Link Clicker: change click-to-open into Ctrl+click-to-open.
-- BRAT: support install plugins from GitHub and beta versions.
 - Editor Width Slider: adjust editor line width interactively with a slider.
 - File Explorer Note Count: show note counts in the file explorer.
 - Lapel: show extra info at the line number area.

@@ -17,5 +17,6 @@
   "showRibbon": false,
   "baseFontSize": 20,
   "nativeMenus": true,
-  "theme": "obsidian"
+  "theme": "obsidian",
+  "baseFontSizeAction": true
 }

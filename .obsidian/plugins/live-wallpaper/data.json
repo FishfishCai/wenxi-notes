@@ -1,7 +1,7 @@
 {
   "LatestVersion": "1.5.7",
   "currentWallpaper": {
-    "path": "plugins/live-wallpaper/wallpapers/active/normal/1.mp4",
+    "path": "plugins/live-wallpaper/wallpapers/active/normal/lost-cat.mp4",
     "type": "video",
     "zIndex": 100,
     "opacity": 15,
@@ -20,7 +20,7 @@
   },
   "globalConfig": {
     "config": {
-      "path": "plugins/live-wallpaper/wallpapers/active/normal/1.mp4",
+      "path": "plugins/live-wallpaper/wallpapers/active/normal/lost-cat.mp4",
       "type": "video",
       "zIndex": 100,
       "opacity": 15,
@@ -42,7 +42,7 @@
   "Preview": false,
   "WallpaperConfigs": [
     {
-      "path": "plugins/live-wallpaper/wallpapers/active/normal/1.mp4",
+      "path": "plugins/live-wallpaper/wallpapers/active/normal/lost-cat.mp4",
       "type": "video",
       "zIndex": 5,
       "opacity": 40,
