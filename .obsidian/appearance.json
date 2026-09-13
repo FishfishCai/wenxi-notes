@@ -1,9 +1,9 @@
 {
   "cssTheme": "Catppuccin",
   "accentColor": "",
-  "textFontFamily": "CodeNewRoman Nerd Font",
-  "monospaceFontFamily": "CodeNewRoman Nerd Font Mono",
-  "interfaceFontFamily": "CodeNewRoman Nerd Font Mono",
+  "textFontFamily": "",
+  "monospaceFontFamily": "",
+  "interfaceFontFamily": "",
   "enabledCssSnippets": [
     "better-bullet-points-in-edit-mode",
     "enlarge-image-on-horver",
@@ -18,5 +18,5 @@
   "baseFontSize": 20,
   "nativeMenus": true,
   "theme": "obsidian",
-  "baseFontSizeAction": true
+  "baseFontSizeAction": false
 }

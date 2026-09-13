@@ -1,9 +1,9 @@
 {
   "preview": false,
-  "search": false,
+  "search": true,
   "editor": false,
-  "tab-header": false,
-  "file-explorer": false,
-  "outline": false,
-  "graph": false
+  "tab-header": true,
+  "file-explorer": true,
+  "outline": true,
+  "graph": true
 }

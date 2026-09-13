@@ -21,7 +21,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var main_exports = {};
 __export(main_exports, {
   DEFAULT_SETTINGS: () => DEFAULT_SETTINGS,
-  default: () => LiveWallpaperPlugin4,
+  default: () => LiveWallpaperPlugin3,
   defaultWallpaper: () => defaultWallpaper
 });
 module.exports = __toCommonJS(main_exports);
@@ -119,7 +119,7 @@ var WallpaperConfigUtils = class _WallpaperConfigUtils {
       const index = this.getWallpaperIndex(Plugin2);
       if (index == void 0) {
         Plugin2.settings.WallpaperConfigs = _WallpaperConfigUtils.NewConfig(Plugin2.settings.WallpaperConfigs);
-        Plugin2.saveSettings();
+        await Plugin2.saveSettings();
         return Plugin2.settings.WallpaperConfigs[Plugin2.settings.WallpaperConfigs.length - 1];
       }
       if (Settings.globalConfig.enabled) {
@@ -201,23 +201,29 @@ var WallpaperConfigUtils = class _WallpaperConfigUtils {
   static RemoveConfig(configs, config) {
     return configs.filter((c) => c.Index !== config.Index).map((c, i) => ({ ...c, Index: i }));
   }
+  static ClearConfigsFromIndex(configs, startIndex) {
+    return configs.filter((c) => c.Index < startIndex);
+  }
 };
 
 // src/Wallpaper/mediaUtils.ts
-function UpdatePaths(Plugin2, Args) {
-  Plugin2.lastPath = Args.path;
-  Plugin2.lastType = Args.type;
+function UpdatePaths(plugin, Args) {
+  plugin.lastPath = Args.path;
+  plugin.lastType = Args.type;
 }
-async function GetConfig(Plugin2, skipConfigReload) {
+async function GetConfig(plugin, skipConfigReload) {
   try {
     if (skipConfigReload) {
-      return Plugin2.settings.currentWallpaper;
+      return plugin.settings.currentWallpaper;
     }
-    return await WallpaperConfigUtils.GetCurrentConfig(Plugin2);
+    return await WallpaperConfigUtils.GetCurrentConfig(plugin);
   } catch (err) {
     console.error("Error while accessing wallpaper config:", err);
     return void 0;
   }
+}
+function GetFileName(FilePath) {
+  return FilePath.substring(FilePath.lastIndexOf("/") + 1);
 }
 async function waitForMediaDimensions(element, timeout = 2e3) {
   if (element instanceof HTMLImageElement) {
@@ -236,7 +242,7 @@ async function waitForMediaDimensions(element, timeout = 2e3) {
       }
     }),
     new Promise(
-      (resolve) => setTimeout(() => resolve(), timeout)
+      (resolve) => window.setTimeout(() => resolve(), timeout)
     )
   ]);
 }
@@ -305,21 +311,21 @@ function applyContainerEffects(container, currentConfig, adnvOpened) {
 }
 
 // src/Wallpaper/wallpaperMedia.ts
-async function createMediaElement(doc, Plugin2) {
-  const { currentWallpaper } = Plugin2.settings;
+async function createMediaElement(doc, plugin) {
+  const { currentWallpaper } = plugin.settings;
   const isVideo = currentWallpaper.type === "video";
   const media = isVideo ? doc.createElement("video") : doc.createElement("img");
   media.id = "live-wallpaper-media";
   if (media instanceof HTMLImageElement) {
     media.loading = "lazy";
   }
-  const path = `${Plugin2.app.vault.configDir}/${currentWallpaper.path}`;
-  const exists = await Plugin2.app.vault.adapter.exists(path);
+  const path = `${plugin.app.vault.configDir}/${currentWallpaper.path}`;
+  const exists = await plugin.app.vault.adapter.exists(path);
   if (!exists) {
     currentWallpaper.path = "";
     return null;
   }
-  media.src = Plugin2.app.vault.adapter.getResourcePath(path);
+  media.src = plugin.app.vault.adapter.getResourcePath(path);
   applyMediaStyles(media, currentWallpaper);
   if (isVideo) {
     const video = media;
@@ -353,75 +359,77 @@ function applyMediaStyles(media, config) {
 
 // src/Wallpaper/WallpaperApplier.ts
 var import_obsidian = require("obsidian");
-var WallpaperApplier = class {
-  static async applyWallpaper(Plugin2, skipConfigReload = false, doc) {
-    const config = await GetConfig(Plugin2, skipConfigReload);
+var WallpaperApplier = class _WallpaperApplier {
+  static async applyWallpaper(plugin, skipConfigReload = false, doc) {
+    const config = await GetConfig(plugin, skipConfigReload);
     if (!config) {
       return false;
     }
-    Plugin2.settings.currentWallpaper = config;
-    if (Plugin2.settings.ScheduledOptions.dayNightMode || Plugin2.settings.ScheduledOptions.autoSwitch) {
-      Plugin2.startDayNightWatcher();
+    plugin.settings.currentWallpaper = config;
+    if (plugin.settings.ScheduledOptions.dayNightMode || plugin.settings.ScheduledOptions.autoSwitch) {
+      plugin.startDayNightWatcher();
     } else {
-      Plugin2.stopDayNightWatcher();
+      plugin.stopDayNightWatcher();
     }
-    if (!Plugin2.settings.currentWallpaper || !Plugin2.settings.currentWallpaper.path) {
+    if (!plugin.settings.currentWallpaper || !plugin.settings.currentWallpaper.path) {
       new import_obsidian.Notice("No wallpaper path defined, skipping applyWallpaper.");
       return false;
     }
-    const newPath = Plugin2.settings.currentWallpaper.path;
-    const newType = Plugin2.settings.currentWallpaper.type;
+    const newPath = plugin.settings.currentWallpaper.path;
+    const newType = plugin.settings.currentWallpaper.type;
     const container = doc.getElementById("live-wallpaper-container");
     let media = doc.getElementById("live-wallpaper-media");
     if (container && media) {
-      applyContainerEffects(container, Plugin2.settings.currentWallpaper, Plugin2.settings.AdnvOpend);
+      applyContainerEffects(container, plugin.settings.currentWallpaper, plugin.settings.AdnvOpend);
       if (media.tagName === "VIDEO") {
         const video = media;
-        video.playbackRate = Plugin2.settings.currentWallpaper.playbackSpeed;
+        video.playbackRate = plugin.settings.currentWallpaper.playbackSpeed;
       }
-      if (newPath !== Plugin2.lastPath || newType !== Plugin2.lastType) {
-        const newMedia = await createMediaElement(doc, Plugin2);
+      if (newPath !== plugin.lastPath || newType !== plugin.lastType) {
+        const newMedia = await createMediaElement(doc, plugin);
         if (newMedia) {
-          newMedia.style.opacity = "0";
-          newMedia.style.transition = "opacity 1s ease-in-out";
-          container.appendChild(newMedia);
-          await new Promise(
-            (resolve) => requestAnimationFrame(() => resolve())
-          );
-          await new Promise((resolve) => setTimeout(resolve, 20));
-          const medias = container.querySelectorAll(
-            '[id^="live-wallpaper-media"]'
-          );
-          await waitForMediaDimensions(newMedia);
-          medias.forEach((el, i) => {
-            if (i < medias.length - 1) {
-              const htmlEl = el;
-              htmlEl.style.transition = "opacity 1s ease-in-out";
-              htmlEl.style.opacity = "0";
-              newMedia.style.opacity = "1";
-              setTimeout(() => {
-                if (htmlEl.parentElement) {
-                  htmlEl.remove();
-                }
-              }, 3e3);
-            }
-          });
+          _WallpaperApplier.applyNewMedia(newMedia, container);
           media = newMedia;
         }
       }
-      if (Plugin2.settings.currentWallpaper.Reposition) {
-        await waitForMediaDimensions(media);
-        SettingsUtils.applyImagePosition(
+      if (plugin.settings.currentWallpaper.Reposition) {
+        await SettingsUtils.applyImagePosition(
           media,
-          Plugin2.settings.currentWallpaper.positionX,
-          Plugin2.settings.currentWallpaper.positionY,
-          Plugin2.settings.currentWallpaper.Scale
+          plugin.settings.currentWallpaper.positionX,
+          plugin.settings.currentWallpaper.positionY,
+          plugin.settings.currentWallpaper.Scale
         );
       }
       return true;
     }
-    await Plugin2.CreateMedia(doc);
+    await plugin.CreateMedia(doc);
     return true;
+  }
+  static async applyNewMedia(newMedia, container) {
+    await waitForMediaDimensions(newMedia);
+    newMedia.style.opacity = "0";
+    newMedia.style.transition = "opacity 1s ease-in-out";
+    container.appendChild(newMedia);
+    await new Promise(
+      (resolve) => window.requestAnimationFrame(() => resolve())
+    );
+    await new Promise((resolve) => window.setTimeout(resolve, 20));
+    const medias = container.querySelectorAll(
+      '[id^="live-wallpaper-media"]'
+    );
+    medias.forEach((el, i) => {
+      if (i < medias.length - 1) {
+        const htmlEl = el;
+        htmlEl.style.transition = "opacity 1s ease-in-out";
+        htmlEl.style.opacity = "0";
+        newMedia.style.opacity = "1";
+        window.setTimeout(() => {
+          if (htmlEl.parentElement) {
+            htmlEl.remove();
+          }
+        }, 3e3);
+      }
+    });
   }
 };
 
@@ -438,7 +446,7 @@ var SettingsUtils = class {
     const trimmed = target.trim();
     if (trimmed === "") return false;
     try {
-      document.createDocumentFragment().querySelector(trimmed);
+      createFragment().querySelector(trimmed);
       return true;
     } catch {
       return false;
@@ -613,23 +621,37 @@ async function clearBackgroundColor(doc) {
 }
 
 // src/FilePicker/fileUtils.ts
-async function removeFileIfUnused(Plugin2, newPath, oldPath, allPaths) {
-  if (!oldPath) return;
-  if (newPath === oldPath) return;
-  const occurrences = allPaths.filter((path) => path === oldPath).length;
-  if (occurrences <= 1) {
-    const fullPath = `${Plugin2.app.vault.configDir}/${oldPath}`;
-    await Plugin2.app.vault.adapter.remove(fullPath).catch(() => {
-    });
+async function removeFileIfUnused(plugin, index, filetoRemoveName) {
+  const matches = WallpaperConfigUtils.getPaths(index, plugin.settings.WallpaperConfigs).filter(
+    (file) => file.split("/").pop() === filetoRemoveName.split("/").pop()
+  );
+  if (matches.length !== 1) return;
+  await plugin.app.vault.adapter.remove(`.obsidian/${filetoRemoveName}`).catch(() => {
+  });
+}
+async function removeUnusedFilesInFolder(plugin, folderPath, index, currentPath) {
+  const filesInFolder = await plugin.app.vault.adapter.list(folderPath);
+  const validFileNames = new Set(
+    WallpaperConfigUtils.getPathAndType(index, plugin.settings.WallpaperConfigs).map((cfg) => cfg.path?.split("/").pop()).filter((p) => !!p)
+  );
+  const currentFileName = currentPath?.split("/").pop();
+  for (const file of filesInFolder.files) {
+    const fileName = file.split("/").pop();
+    if (!fileName) continue;
+    if (fileName === currentFileName) continue;
+    if (!validFileNames.has(fileName)) {
+      await plugin.app.vault.adapter.remove(file).catch(() => {
+      });
+    }
   }
 }
-async function removeAllExcept(Plugin2, dirPath, keepFilePath) {
-  const fullDirPath = `${Plugin2.app.vault.configDir}/${dirPath}`;
-  const files = await Plugin2.app.vault.adapter.list(fullDirPath).catch(() => null);
+async function removeAllExcept(plugin, dirPath, keepFilePath) {
+  const fullDirPath = `${plugin.app.vault.configDir}/${dirPath}`;
+  const files = await plugin.app.vault.adapter.list(fullDirPath).catch(() => null);
   if (!files || !files.files) return;
   for (const file of files.files) {
-    if (file !== `${Plugin2.app.vault.configDir}/${keepFilePath}`) {
-      await Plugin2.app.vault.adapter.remove(file).catch(() => {
+    if (file !== `${plugin.app.vault.configDir}/${keepFilePath}`) {
+      await plugin.app.vault.adapter.remove(file).catch(() => {
       });
     }
   }
@@ -642,14 +664,19 @@ function prependHistory(history, entry) {
     ...history.filter((e) => e.path !== entry.path)
   ];
 }
-async function trimHistory(plugin, max) {
-  const over = plugin.settings.HistoryPaths.length - max;
-  if (over <= 0) return;
-  const toRemove = plugin.settings.HistoryPaths.slice(max);
+async function trimHistory(plugin, max, folderPath) {
+  const filesInFolder = await plugin.app.vault.adapter.list(folderPath);
+  if (filesInFolder.files.length <= max) return;
+  const allowed = new Set(
+    plugin.settings.HistoryPaths.slice(0, max).map((e) => e.path.split("/").pop()).filter((p) => !!p)
+  );
+  const toRemove = filesInFolder.files.filter((file) => {
+    const fileName = file.split("/").pop();
+    return fileName && !allowed.has(fileName);
+  });
   plugin.settings.HistoryPaths = plugin.settings.HistoryPaths.slice(0, max);
-  for (const e of toRemove) {
-    const full = `${plugin.app.vault.configDir}/${e.path}`;
-    await plugin.app.vault.adapter.remove(full).catch(() => {
+  for (const file of toRemove) {
+    await plugin.app.vault.adapter.remove(file).catch(() => {
     });
   }
 }
@@ -696,12 +723,12 @@ async function resizeImageToBlob(file, options) {
 }
 
 // src/FilePicker/fileManager.ts
-async function saveUnder(Plugin2, baseDir, subfolder, fileName, arrayBuffer) {
+async function saveUnder(plugin, baseDir, subfolder, fileName, arrayBuffer) {
   const dir = `${baseDir}/${subfolder}`;
-  await Plugin2.app.vault.adapter.mkdir(dir);
+  await plugin.app.vault.adapter.mkdir(dir);
   const fullPath = `${dir}/${fileName}`;
-  await Plugin2.app.vault.adapter.writeBinary(fullPath, arrayBuffer);
-  return `plugins/${Plugin2.manifest.id}/wallpapers/${subfolder}/${fileName}`;
+  await plugin.app.vault.adapter.writeBinary(fullPath, arrayBuffer);
+  return `plugins/${plugin.manifest.id}/wallpapers/${subfolder}/${fileName}`;
 }
 async function getFileArrayBuffer(file, options) {
   if (file.type.startsWith("image/")) {
@@ -712,6 +739,33 @@ async function getFileArrayBuffer(file, options) {
 }
 
 // src/FilePicker/filePicker.ts
+async function openFilePicker(plugin, slotIndex, isScheduledPicker = false, doc) {
+  const file = await pickSingleFile(doc);
+  if (!file) return;
+  try {
+    await plugin.applyWallpaperFile(file, slotIndex, doc, isScheduledPicker);
+    plugin.debouncedSave();
+  } catch (error) {
+    alert("Could not save the file. Check disk permissions.");
+    console.error(error);
+  }
+}
+async function pickFolderFiles(doc, accept = ".jpg,.jpeg,.png,.gif,.mp4,.webm,.avif") {
+  return new Promise((resolve) => {
+    const input = doc.createElement("input");
+    input.type = "file";
+    input.accept = accept;
+    input.multiple = true;
+    input.webkitdirectory = true;
+    input.addEventListener("cancel", () => {
+      resolve(null);
+    });
+    input.onchange = () => {
+      resolve(Array.from(input.files ?? []));
+    };
+    input.click();
+  });
+}
 function pickSingleFile(doc, accept = ".jpg,.jpeg,.png,.gif,.mp4,.webm,.avif") {
   return new Promise((resolve) => {
     const input = doc.createElement("input");
@@ -808,27 +862,20 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
               if (ActiveSubFolder === "normal") {
                 await removeAllExcept(this.plugin, folder, relativeTargetFullPath);
               } else {
-                const Path = `plugins/${pluginId}/wallpapers/active/${ActiveSubFolder}/${entry.fileName}`;
-                await removeFileIfUnused(
-                  this.plugin,
-                  Path,
-                  this.plugin.settings.WallpaperConfigs[Index].path,
-                  WallpaperConfigUtils.getPaths(Index, this.plugin.settings.WallpaperConfigs)
-                );
+                const Path = `.obsidian/plugins/${pluginId}/wallpapers/active/${ActiveSubFolder}`;
+                await removeUnusedFilesInFolder(this.plugin, Path, this.plugin.settings.currentWallpaper.Index, this.plugin.settings.currentWallpaper.path);
               }
               this.plugin.settings.currentWallpaper.path = `plugins/${pluginId}/wallpapers/active/${ActiveSubFolder}/${entry.fileName}`;
               this.plugin.settings.currentWallpaper.type = entry.type;
               this.plugin.settings.WallpaperConfigs[Index].path = `plugins/${pluginId}/wallpapers/active/${ActiveSubFolder}/${entry.fileName}`;
               this.plugin.settings.WallpaperConfigs[Index].type = entry.type;
-              this.app.workspace.iterateAllLeaves(async (leaf) => {
-                if (leaf.getViewState().type === "markdown") {
-                  const view = leaf.view;
-                  const container = view.containerEl;
-                  const doc = container.ownerDocument;
-                  await toggleModalStyles(doc, this.plugin);
-                  WallpaperApplier.applyWallpaper(this.plugin, true, doc);
-                }
-              });
+              await Promise.all(
+                Array.from(this.plugin.windows).map(async (win) => {
+                  await toggleModalStyles(win.document, this.plugin);
+                  await WallpaperApplier.applyWallpaper(this.plugin, true, win.document);
+                })
+              );
+              UpdatePaths(this.plugin, { path: this.plugin.settings.currentWallpaper.path, type: this.plugin.settings.currentWallpaper.type });
               await this.plugin.saveSettings();
               this.display();
             });
@@ -855,7 +902,7 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
     setting.addButton(
       (btn) => btn.setButtonText("Browse").setIcon("folder-open").setClass("mod-cta").onClick(async (evt) => {
         const doc = evt.currentTarget.ownerDocument;
-        await this.plugin.openFilePicker(this.plugin.settings.currentWallpaper.Index, false, doc);
+        await openFilePicker(this.plugin, this.plugin.settings.currentWallpaper.Index, false, doc);
         for (const win of this.plugin.windows) {
           await toggleModalStyles(win.document, this.plugin);
         }
@@ -921,11 +968,14 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
           if (currentConfig) {
             this.plugin.settings.currentWallpaper = { ...currentConfig };
             this.plugin.settings.Preview = false;
-            for (const win of this.plugin.windows) {
-              await toggleModalStyles(win.document, this.plugin);
-              WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
-            }
+            await Promise.all(
+              Array.from(this.plugin.windows).map(async (win) => {
+                await toggleModalStyles(win.document, this.plugin);
+                await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+              })
+            );
             new import_obsidian4.Notice("Preview turned off restored scheduled wallpaper.");
+            UpdatePaths(this.plugin, { path: this.plugin.settings.currentWallpaper.path, type: this.plugin.settings.currentWallpaper.type });
             await this.plugin.saveSettings();
             this.display();
           }
@@ -962,8 +1012,17 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
       });
     });
     if (this.plugin.settings.currentWallpaper.Reposition) {
-      new import_obsidian4.Setting(containerEl).setName("Horizontal position").setDesc("Adjust the horizontal position of the wallpaper.").addSlider((slider) => {
-        slider.setLimits(0, 100, 1).setValue(this.plugin.settings.currentWallpaper.positionX).setDynamicTooltip().setInstant(true).onChange(async (value) => {
+      new import_obsidian4.Setting(containerEl).setName("Horizontal position").setDesc("Adjust the horizontal position of the wallpaper.").addExtraButton((button) => {
+        button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+          this.plugin.settings.currentWallpaper.positionX = DEFAULT_SETTINGS.currentWallpaper.positionX;
+          await this.plugin.saveSettings();
+          for (const win of this.plugin.windows) {
+            await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+          }
+          this.display();
+        });
+      }).addSlider((slider) => {
+        slider.setLimits(0, 100, 1).setValue(this.plugin.settings.currentWallpaper.positionX).setInstant(true).onChange(async (value) => {
           this.plugin.settings.currentWallpaper.positionX = value;
           this.plugin.debouncedSave();
           await Promise.all(
@@ -976,8 +1035,17 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
           );
         });
       });
-      new import_obsidian4.Setting(containerEl).setName("Vertical position").setDesc("Adjust the vertical position of the wallpaper.").addSlider((slider) => {
-        slider.setLimits(0, 100, 1).setValue(this.plugin.settings.currentWallpaper.positionY).setDynamicTooltip().setInstant(true).onChange(async (value) => {
+      new import_obsidian4.Setting(containerEl).setName("Vertical position").setDesc("Adjust the vertical position of the wallpaper.").addExtraButton((button) => {
+        button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+          this.plugin.settings.currentWallpaper.positionY = DEFAULT_SETTINGS.currentWallpaper.positionY;
+          await this.plugin.saveSettings();
+          for (const win of this.plugin.windows) {
+            await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+          }
+          this.display();
+        });
+      }).addSlider((slider) => {
+        slider.setLimits(0, 100, 1).setValue(this.plugin.settings.currentWallpaper.positionY).setInstant(true).onChange(async (value) => {
           this.plugin.settings.currentWallpaper.positionY = value;
           this.plugin.debouncedSave();
           await Promise.all(
@@ -990,8 +1058,17 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
           );
         });
       });
-      new import_obsidian4.Setting(containerEl).setName("Image scale").setDesc("Adjust the size of the wallpaper.").addSlider((slider) => {
-        slider.setLimits(0.5, 2, 0.1).setValue(this.plugin.settings.currentWallpaper.Scale ?? 1).setDynamicTooltip().setInstant(true).onChange(async (value) => {
+      new import_obsidian4.Setting(containerEl).setName("Image scale").setDesc("Adjust the size of the wallpaper.").addExtraButton((button) => {
+        button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+          this.plugin.settings.currentWallpaper.Scale = DEFAULT_SETTINGS.currentWallpaper.Scale;
+          await this.plugin.saveSettings();
+          for (const win of this.plugin.windows) {
+            await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+          }
+          this.display();
+        });
+      }).addSlider((slider) => {
+        slider.setLimits(0.5, 2, 0.1).setValue(this.plugin.settings.currentWallpaper.Scale ?? 1).setInstant(true).onChange(async (value) => {
           this.plugin.settings.currentWallpaper.Scale = value;
           this.plugin.debouncedSave();
           await Promise.all(
@@ -1046,8 +1123,18 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
     }
     new import_obsidian4.Setting(containerEl).setName("Wallpaper opacity").setDesc(
       "Controls the transparency level of the wallpaper (0% = fully transparent, 100% = fully visible)"
-    ).addSlider((slider) => {
-      const valueEl = containerEl.createEl("span", {
+    ).addExtraButton((button) => {
+      button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+        if (this.plugin.settings.AdnvOpend) return;
+        this.plugin.settings.currentWallpaper.opacity = DEFAULT_SETTINGS.currentWallpaper.opacity;
+        await this.plugin.saveSettings();
+        for (const win of this.plugin.windows) {
+          await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+        }
+        this.display();
+      });
+    }).addSlider((slider) => {
+      const valueEl = containerEl.createSpan({
         text: ` ${this.plugin.settings.currentWallpaper.opacity}%`,
         cls: "setting-item-description"
       });
@@ -1056,7 +1143,7 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
         slider.setDisabled(true);
         valueEl.textContent = ` 100%`;
       }
-      slider.setLimits(0, 80, 1).setValue(initialValue).setDisabled(this.plugin.settings.AdnvOpend).setDynamicTooltip().setInstant(true).onChange(async (v) => {
+      slider.setLimits(0, 80, 1).setValue(initialValue).setDisabled(this.plugin.settings.AdnvOpend).setInstant(true).onChange(async (v) => {
         if (!this.plugin.settings.AdnvOpend) {
           this.plugin.settings.currentWallpaper.opacity = v;
           valueEl.textContent = ` ${v}%`;
@@ -1065,8 +1152,17 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
         }
       });
     });
-    new import_obsidian4.Setting(containerEl).setName("Blur radius").setDesc("Applies a blur effect to the wallpaper in pixels").addSlider((slider) => {
-      const valueEl = containerEl.createEl("span", {
+    new import_obsidian4.Setting(containerEl).setName("Blur radius").setDesc("Applies a blur effect to the wallpaper in pixels").addExtraButton((button) => {
+      button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+        this.plugin.settings.currentWallpaper.blurRadius = DEFAULT_SETTINGS.currentWallpaper.blurRadius;
+        await this.plugin.saveSettings();
+        for (const win of this.plugin.windows) {
+          await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+        }
+        this.display();
+      });
+    }).addSlider((slider) => {
+      const valueEl = containerEl.createSpan({
         text: ` ${this.plugin.settings.currentWallpaper.blurRadius}px`,
         cls: "setting-item-description"
       });
@@ -1077,8 +1173,17 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
         this.plugin.debouncedSave();
       });
     });
-    new import_obsidian4.Setting(containerEl).setName("Brightness").setDesc("Adjusts the wallpaper brightness (100% = normal)").addSlider((slider) => {
-      const valueEl = containerEl.createEl("span", {
+    new import_obsidian4.Setting(containerEl).setName("Brightness").setDesc("Adjusts the wallpaper brightness (100% = normal)").addExtraButton((button) => {
+      button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+        this.plugin.settings.currentWallpaper.brightness = DEFAULT_SETTINGS.currentWallpaper.brightness;
+        await this.plugin.saveSettings();
+        for (const win of this.plugin.windows) {
+          await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+        }
+        this.display();
+      });
+    }).addSlider((slider) => {
+      const valueEl = containerEl.createSpan({
         text: ` ${this.plugin.settings.currentWallpaper.brightness}%`,
         cls: "setting-item-description"
       });
@@ -1089,8 +1194,17 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
         this.plugin.debouncedSave();
       });
     });
-    new import_obsidian4.Setting(containerEl).setName("Contrast").setDesc("Controls the wallpaper contrast intensity 100% represents the original image").addSlider((slider) => {
-      const valueEl = containerEl.createEl("span", {
+    new import_obsidian4.Setting(containerEl).setName("Contrast").setDesc("Controls the wallpaper contrast intensity 100% represents the original image").addExtraButton((button) => {
+      button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+        this.plugin.settings.currentWallpaper.contrast = DEFAULT_SETTINGS.currentWallpaper.contrast;
+        await this.plugin.saveSettings();
+        for (const win of this.plugin.windows) {
+          await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+        }
+        this.display();
+      });
+    }).addSlider((slider) => {
+      const valueEl = containerEl.createSpan({
         text: ` ${this.plugin.settings.currentWallpaper.contrast}%`,
         cls: "setting-item-description"
       });
@@ -1103,8 +1217,19 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
     });
     new import_obsidian4.Setting(containerEl).setName("Layer position (z\u2011index)").setDesc(
       "Determines the stacking order: higher values bring the wallpaper closer to the front"
-    ).addSlider((slider) => {
-      const valueEl = containerEl.createEl("span", {
+    ).addExtraButton((button) => {
+      button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+        if (!this.plugin.settings.AdnvOpend) {
+          this.plugin.settings.currentWallpaper.zIndex = DEFAULT_SETTINGS.currentWallpaper.zIndex;
+          await this.plugin.saveSettings();
+          for (const win of this.plugin.windows) {
+            await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+          }
+          this.display();
+        }
+      });
+    }).addSlider((slider) => {
+      const valueEl = containerEl.createSpan({
         text: ` ${this.plugin.settings.currentWallpaper.zIndex}`,
         cls: "setting-item-description"
       });
@@ -1119,7 +1244,16 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
     });
     new import_obsidian4.Setting(containerEl).setName("Change playback speed").setDesc(
       "Adjust the playback speed for videos (0.25x \u2013 2x). This does not affect GIFs."
-    ).addSlider((slider) => {
+    ).addExtraButton((button) => {
+      button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+        this.plugin.settings.currentWallpaper.playbackSpeed = DEFAULT_SETTINGS.currentWallpaper.playbackSpeed;
+        await this.plugin.saveSettings();
+        for (const win of this.plugin.windows) {
+          await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+        }
+        this.display();
+      });
+    }).addSlider((slider) => {
       const valueEl = containerEl.createSpan({
         text: `${this.plugin.settings.currentWallpaper.playbackSpeed.toFixed(2)}x`,
         cls: "setting-item-description"
@@ -1132,12 +1266,21 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
       });
     });
     if (import_obsidian4.Platform.isMobileApp) {
-      const desc = document.createElement("div");
+      const desc = createDiv();
       desc.textContent = "On mobile devices, zooming can affect background size. You can manually set the height and width to maintain consistency.";
       containerEl.appendChild(desc);
       new import_obsidian4.Setting(containerEl).setName("Background width").setDesc(
         "Set a custom width for the background on mobile (e.g., 100vw or 500px)."
-      ).addText(
+      ).addExtraButton((button) => {
+        button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+          this.plugin.settings.mobileBackgroundWidth = DEFAULT_SETTINGS.mobileBackgroundWidth;
+          await this.plugin.saveSettings();
+          for (const win of this.plugin.windows) {
+            ChangeWallpaperContainer(win.document, { width: this.plugin.settings.mobileBackgroundWidth, height: this.plugin.settings.mobileBackgroundHeight });
+          }
+          this.display();
+        });
+      }).addText(
         (text) => text.setPlaceholder("e.g., 100vw").setValue(this.plugin.settings.mobileBackgroundWidth || "").onChange(async (value) => {
           this.plugin.settings.mobileBackgroundWidth = value;
           await this.plugin.saveSettings();
@@ -1148,7 +1291,16 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
       );
       new import_obsidian4.Setting(containerEl).setName("Background height").setDesc(
         "Set a custom height for the background on mobile (e.g., 100vh or 800px)."
-      ).addText(
+      ).addExtraButton((button) => {
+        button.setIcon("rotate-ccw").setTooltip("Reset").onClick(async () => {
+          this.plugin.settings.mobileBackgroundHeight = DEFAULT_SETTINGS.mobileBackgroundHeight;
+          await this.plugin.saveSettings();
+          for (const win of this.plugin.windows) {
+            ChangeWallpaperContainer(win.document, { width: this.plugin.settings.mobileBackgroundWidth, height: this.plugin.settings.mobileBackgroundHeight });
+          }
+          this.display();
+        });
+      }).addText(
         (text) => text.setPlaceholder("e.g., 100vh").setValue(this.plugin.settings.mobileBackgroundHeight || "").onChange(async (value) => {
           this.plugin.settings.mobileBackgroundHeight = value;
           await this.plugin.saveSettings();
@@ -1171,32 +1323,19 @@ var SettingsApp = class extends import_obsidian4.PluginSettingTab {
         })
       );
     }
-    new import_obsidian4.Setting(containerEl).setName("Reset options").setDesc("Resets all settings").addButton(
-      (Button) => Button.setButtonText("Reset").onClick(async () => {
-        const defaults = DEFAULT_SETTINGS;
-        this.plugin.settings.currentWallpaper.path = defaults.currentWallpaper.path;
-        this.plugin.settings.currentWallpaper.type = defaults.currentWallpaper.type;
-        this.plugin.settings.HistoryPaths = defaults.HistoryPaths;
-        this.plugin.settings.currentWallpaper.playbackSpeed = defaults.currentWallpaper.playbackSpeed;
-        this.plugin.settings.currentWallpaper.opacity = defaults.currentWallpaper.opacity;
-        this.plugin.settings.currentWallpaper.zIndex = defaults.currentWallpaper.zIndex;
-        this.plugin.settings.currentWallpaper.blurRadius = defaults.currentWallpaper.blurRadius;
-        this.plugin.settings.currentWallpaper.brightness = defaults.currentWallpaper.brightness;
-        this.plugin.settings.currentWallpaper.contrast = defaults.currentWallpaper.contrast;
-        this.plugin.settings.mobileBackgroundHeight = defaults.mobileBackgroundHeight;
-        this.plugin.settings.mobileBackgroundWidth = defaults.mobileBackgroundWidth;
-        await this.plugin.saveSettings();
-        for (const win of this.plugin.windows) {
-          WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
-        }
-        this.display();
-      })
-    );
   }
 };
 
 // src/Settings/ScheduledWallpaperSettings.ts
 var import_obsidian5 = require("obsidian");
+var WALLPAPER_INTERVALS = {
+  "00:01": "Every 1 minute",
+  "00:05": "Every 5 minutes",
+  "00:10": "Every 10 minutes",
+  "00:30": "Every 30 minutes",
+  "01:00": "Every 1 hour",
+  "custom": "Custom interval"
+};
 var ScheduledApp = class extends import_obsidian5.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -1237,11 +1376,11 @@ var ScheduledApp = class extends import_obsidian5.PluginSettingTab {
       if (!paths[1]) paths[1] = "";
       new import_obsidian5.Setting(containerEl).setName("Day Wallpaper").setDesc("Wallpaper to use during the day").addButton((btn) => btn.setIcon("folder-open").setTooltip("Browse for file").onClick((evt) => {
         const doc = evt.currentTarget.ownerDocument;
-        this.plugin.openFilePicker(1, true, doc);
+        openFilePicker(this.plugin, 1, true, doc);
       }));
       new import_obsidian5.Setting(containerEl).setName("Night Wallpaper").setDesc("Wallpaper to use at night").addButton((btn) => btn.setIcon("folder-open").setTooltip("Browse for file").onClick((evt) => {
         const doc = evt.currentTarget.ownerDocument;
-        this.plugin.openFilePicker(2, true, doc);
+        openFilePicker(this.plugin, 2, true, doc).catch;
       }));
       let dayTimeValue = this.plugin.settings.ScheduledOptions.dayStartTime;
       let nightTimeValue = this.plugin.settings.ScheduledOptions.nightStartTime;
@@ -1264,7 +1403,7 @@ var ScheduledApp = class extends import_obsidian5.PluginSettingTab {
             await this.plugin.saveSettings();
             new import_obsidian5.Notice("Wallpaper schedule has been set.");
             for (const win of this.plugin.windows) {
-              WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+              await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
             }
             UpdatePaths(this.plugin, { path: this.plugin.settings.currentWallpaper.path, type: this.plugin.settings.currentWallpaper.type });
           } else {
@@ -1340,7 +1479,7 @@ var ScheduledApp = class extends import_obsidian5.PluginSettingTab {
           const doc = evt.currentTarget.ownerDocument;
           const index = daysOfWeek.indexOf(selectedDay);
           if (index !== -1) {
-            this.plugin.openFilePicker(index + 3, true, doc);
+            openFilePicker(this.plugin, index + 3, true, doc);
           } else {
             console.warn("Invalid day selected");
           }
@@ -1401,74 +1540,100 @@ var ScheduledApp = class extends import_obsidian5.PluginSettingTab {
       })
     );
     if (this.plugin.settings.ScheduledOptions.autoSwitch) {
+      const currentInterval = this.plugin.settings.ScheduledOptions.intervalCheckTime ?? "00:10";
+      new import_obsidian5.Setting(containerEl).setName("Wallpaper change interval").setDesc("How often the wallpaper should be checked and changed").addDropdown((dropdown) => {
+        dropdown.addOptions(WALLPAPER_INTERVALS);
+        dropdown.setValue(this.plugin.settings.ScheduledOptions.isCustomInterval ? "custom" : currentInterval);
+        dropdown.onChange(async (value) => {
+          if (value !== "custom") {
+            this.plugin.settings.ScheduledOptions.intervalCheckTime = value;
+            this.plugin.settings.ScheduledOptions.isCustomInterval = false;
+            await this.plugin.saveSettings();
+            this.plugin.startDayNightWatcher();
+            this.display();
+          } else {
+            this.plugin.settings.ScheduledOptions.intervalCheckTime = "00:42";
+            this.plugin.settings.ScheduledOptions.isCustomInterval = true;
+            await this.plugin.saveSettings();
+            this.display();
+          }
+        });
+      });
+      if (this.plugin.settings.ScheduledOptions.isCustomInterval) {
+        let customValue = currentInterval;
+        new import_obsidian5.Setting(containerEl).setName("Custom interval").setDesc("Enter time in HH:MM format (e.g., 00:42)").addText((text) => {
+          text.setPlaceholder("HH:MM").setValue(currentInterval).onChange((value) => {
+            customValue = value;
+          });
+        });
+        new import_obsidian5.Setting(containerEl).addButton(
+          (btn) => btn.setButtonText("Apply custom interval").setCta().onClick(async () => {
+            if (!Scheduler.ValidateText(customValue)) {
+              new import_obsidian5.Notice("Invalid format. Use HH:MM.");
+              return;
+            }
+            this.plugin.settings.ScheduledOptions.intervalCheckTime = customValue;
+            await this.plugin.saveSettings();
+            this.plugin.startDayNightWatcher();
+            new import_obsidian5.Notice("Custom interval applied.");
+          })
+        );
+      }
+      new import_obsidian5.Setting(containerEl).setName("Wallpaper folder").setDesc("Select a folder and load all wallpapers").addButton(
+        (btn) => btn.setIcon("folder").setButtonText("Select folder").onClick(async (evt) => {
+          const doc = evt.currentTarget.ownerDocument;
+          await this.plugin.openFolderPicker(doc);
+          await Promise.all(
+            Array.from(this.plugin.windows).map(
+              async (win) => {
+                await toggleModalStyles(win.document, this.plugin);
+              }
+            )
+          );
+          UpdatePaths(this.plugin, { path: this.plugin.settings.currentWallpaper.path, type: this.plugin.settings.currentWallpaper.type });
+          this.display();
+        })
+      );
+      new import_obsidian5.Setting(containerEl).addButton(
+        (btn) => btn.setButtonText("Add new element").setClass("text-arena-center-button").setTooltip("Add a new row to the table").onClick(async (evt) => {
+          const doc = evt.currentTarget.ownerDocument;
+          this.plugin.settings.WallpaperConfigs = WallpaperConfigUtils.NewConfig(this.plugin.settings.WallpaperConfigs);
+          await openFilePicker(this.plugin, this.plugin.settings.WallpaperConfigs.length - 1, true, doc);
+          await Promise.all(
+            Array.from(this.plugin.windows).map(
+              async (win) => {
+                await toggleModalStyles(win.document, this.plugin);
+              }
+            )
+          );
+          UpdatePaths(this.plugin, { path: this.plugin.settings.currentWallpaper.path, type: this.plugin.settings.currentWallpaper.type });
+          await this.plugin.saveSettings();
+          this.display();
+        })
+      );
       this.plugin.settings.WallpaperConfigs.slice(10, this.plugin.settings.WallpaperConfigs.length).forEach((Config) => {
-        new import_obsidian5.Setting(containerEl).setName(`Wallpaper ${Config.Index - 9}`).setDesc("Order in the automatic rotation").addButton(
-          (btn) => btn.setIcon("folder-open").setTooltip("Browse for file").onClick((evt) => {
+        new import_obsidian5.Setting(containerEl).setName(`Wallpaper ${GetFileName(Config.path)}`).setDesc("Order in the automatic rotation").addButton(
+          (btn) => btn.setIcon("folder-open").setTooltip("Browse for file").onClick(async (evt) => {
             const doc = evt.currentTarget.ownerDocument;
-            this.plugin.openFilePicker(Config.Index, true, doc);
+            await openFilePicker(this.plugin, Config.Index, true, doc);
+            await Promise.all(
+              Array.from(this.plugin.windows).map(
+                async (win) => {
+                  await toggleModalStyles(win.document, this.plugin);
+                }
+              )
+            );
+            this.display();
           })
         ).addExtraButton(
           (btn) => btn.setIcon("x").setTooltip("Remove").onClick(async () => {
+            await removeFileIfUnused(this.plugin, Config.Index, this.plugin.settings.WallpaperConfigs[Config.Index].path);
             this.plugin.settings.WallpaperConfigs = WallpaperConfigUtils.RemoveConfig(this.plugin.settings.WallpaperConfigs, Config);
             await this.plugin.saveSettings();
             this.display();
           })
         );
       });
-      new import_obsidian5.Setting(containerEl).addButton(
-        (btn) => btn.setButtonText("Add new element").setClass("text-arena-center-button").setTooltip("Add a new row to the table").onClick(async () => {
-          this.plugin.settings.WallpaperConfigs = WallpaperConfigUtils.NewConfig(this.plugin.settings.WallpaperConfigs);
-          await this.plugin.saveSettings();
-          this.display();
-        })
-      );
-    }
-    const WALLPAPER_INTERVALS = {
-      "00:01": "Every 1 minute",
-      "00:05": "Every 5 minutes",
-      "00:10": "Every 10 minutes",
-      "00:30": "Every 30 minutes",
-      "01:00": "Every 1 hour",
-      "custom": "Custom interval"
-    };
-    const currentInterval = this.plugin.settings.ScheduledOptions.intervalCheckTime ?? "00:10";
-    new import_obsidian5.Setting(containerEl).setName("Wallpaper change interval").setDesc("How often the wallpaper should be checked and changed").addDropdown((dropdown) => {
-      dropdown.addOptions(WALLPAPER_INTERVALS);
-      dropdown.setValue(this.plugin.settings.ScheduledOptions.isCustomInterval ? "custom" : currentInterval);
-      dropdown.onChange(async (value) => {
-        if (value !== "custom") {
-          this.plugin.settings.ScheduledOptions.intervalCheckTime = value;
-          this.plugin.settings.ScheduledOptions.isCustomInterval = false;
-          await this.plugin.saveSettings();
-          this.plugin.startDayNightWatcher();
-          this.display();
-        } else {
-          this.plugin.settings.ScheduledOptions.intervalCheckTime = "00:42";
-          this.plugin.settings.ScheduledOptions.isCustomInterval = true;
-          await this.plugin.saveSettings();
-          this.display();
-        }
-      });
-    });
-    if (this.plugin.settings.ScheduledOptions.isCustomInterval) {
-      let customValue = currentInterval;
-      new import_obsidian5.Setting(containerEl).setName("Custom interval").setDesc("Enter time in HH:MM format (e.g., 00:42)").addText((text) => {
-        text.setPlaceholder("HH:MM").setValue(currentInterval).onChange((value) => {
-          customValue = value;
-        });
-      });
-      new import_obsidian5.Setting(containerEl).addButton(
-        (btn) => btn.setButtonText("Apply custom interval").setCta().onClick(async () => {
-          if (!Scheduler.ValidateText(customValue)) {
-            new import_obsidian5.Notice("Invalid format. Use HH:MM.");
-            return;
-          }
-          this.plugin.settings.ScheduledOptions.intervalCheckTime = customValue;
-          await this.plugin.saveSettings();
-          this.plugin.startDayNightWatcher();
-          new import_obsidian5.Notice("Custom interval applied.");
-        })
-      );
     }
   }
 };
@@ -1499,16 +1664,16 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
       toggleTransparencyButton.setText(this.plugin.settings.AdnvOpend ? "Hide transparency options" : "Show transparency options");
       for (const win of this.plugin.windows) {
         await toggleModalStyles(win.document, this.plugin);
-        WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
+        await WallpaperApplier.applyWallpaper(this.plugin, false, win.document);
       }
-      this.plugin.saveSettings();
+      await this.plugin.saveSettings();
       this.display();
     };
     const tableDescription = transparencyOptionsContainer.createEl("p", {
       cls: "transparency-options-description"
     });
     tableDescription.innerHTML = "Define UI elements and CSS attributes that should be made transparent. This allows the wallpaper to appear behind the interface, improving readability and aesthetics. Example attributes you can modify:<br>\u2022 attribute: <code>--background-primary</code><br>\u2022 attribute: <code>--background-secondary</code><br>\u2022 attribute: <code>--background-secondary-alt</code><br>\u2022 attribute: <code>--col-pr-background</code><br>\u2022 attribute: <code>--col-bckg-mainpanels</code><br>\u2022 attribute: <code>--col-txt-titlebars</code><br><br>You can inspect elements and variables using browser dev tools (CTRL + SHIFT + I) to discover more attributes to adjust.";
-    const tableContainer = transparencyOptionsContainer.createEl("div", {
+    const tableContainer = transparencyOptionsContainer.createDiv({
       cls: "text-arena-table-container"
     });
     const table = tableContainer.createEl("table", { cls: "text-arena-table" });
@@ -1527,7 +1692,7 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
           }
           this.plugin.settings.TextArenas[index].attribute = value;
           for (const win of this.plugin.windows) {
-            await LoadOrUnloadChanges(win.document, this.plugin.settings.TextArenas, true);
+            LoadOrUnloadChanges(win.document, this.plugin.settings.TextArenas, true);
             ApplyChanges(win.document, this.plugin.settings.TextArenas, index);
           }
           await this.plugin.saveSettings();
@@ -1535,7 +1700,7 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
       });
       const actionCell = row.createEl("td");
       new import_obsidian6.Setting(actionCell).addExtraButton((btn) => {
-        btn.setIcon("cross").setTooltip("Remove this entry").onClick(() => {
+        btn.setIcon("cross").setTooltip("Remove this entry").onClick(async () => {
           for (const win of this.plugin.windows) {
             RemoveChanges(win.document, this.plugin.settings.TextArenas, index);
           }
@@ -1543,7 +1708,7 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
           for (const win of this.plugin.windows) {
             LoadOrUnloadChanges(win.document, this.plugin.settings.TextArenas, true);
           }
-          this.plugin.saveSettings();
+          await this.plugin.saveSettings();
           this.display();
         });
       });
@@ -1561,7 +1726,7 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
         this.plugin.settings.Color = value;
         await this.plugin.saveSettings();
         for (const win of this.plugin.windows) {
-          applyBackgroundColor(win.document, this.plugin.settings.AdnvOpend, this.plugin.settings.Color);
+          await applyBackgroundColor(win.document, this.plugin.settings.AdnvOpend, this.plugin.settings.Color);
         }
       });
     }).addExtraButton(
@@ -1569,7 +1734,7 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
         this.plugin.settings.Color = "";
         await this.plugin.saveSettings();
         for (const win of this.plugin.windows) {
-          applyBackgroundColor(win.document, this.plugin.settings.AdnvOpend, this.plugin.settings.Color);
+          await applyBackgroundColor(win.document, this.plugin.settings.AdnvOpend, this.plugin.settings.Color);
         }
         if (colorPickerRef) {
           colorPickerRef.setValue("#000000");
@@ -1593,7 +1758,7 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
         });
       });
       new import_obsidian6.Setting(transparencyOptionsContainer).setName("Modal blur radius").setDesc("Adjust the blur intensity applied to the modal background").addSlider((slider) => {
-        slider.setValue(this.plugin.settings.modalStyle.blurRadius).setLimits(0, 30, 1).setInstant(true).setDynamicTooltip().onChange(async (value) => {
+        slider.setValue(this.plugin.settings.modalStyle.blurRadius).setLimits(0, 30, 1).setInstant(true).onChange(async (value) => {
           this.plugin.settings.modalStyle.blurRadius = value;
           for (const win of this.plugin.windows) {
             await toggleModalStyles(win.document, this.plugin);
@@ -1602,7 +1767,7 @@ var TransparencySettingsTab = class extends import_obsidian6.PluginSettingTab {
         });
       });
       new import_obsidian6.Setting(transparencyOptionsContainer).setName("Modal dim opacity").setDesc("Adjust the darkness level applied to the modal background").addSlider((slider) => {
-        slider.setValue(this.plugin.settings.modalStyle.dimOpacity * 100).setLimits(0, 100, 5).setInstant(true).setDynamicTooltip().onChange(async (value) => {
+        slider.setValue(this.plugin.settings.modalStyle.dimOpacity * 100).setLimits(0, 100, 5).setInstant(true).onChange(async (value) => {
           this.plugin.settings.modalStyle.dimOpacity = value / 100;
           for (const win of this.plugin.windows) {
             await toggleModalStyles(win.document, this.plugin);
@@ -1878,7 +2043,7 @@ var defaultWallpaper = {
   Index: 0
 };
 var DEFAULT_SETTINGS = {
-  LatestVersion: "1.5.7",
+  LatestVersion: "1.6.7",
   currentWallpaper: defaultWallpaper,
   globalConfig: {
     config: defaultWallpaper,
@@ -1914,7 +2079,7 @@ var DEFAULT_SETTINGS = {
   },
   migrated: false
 };
-var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
+var LiveWallpaperPlugin3 = class extends import_obsidian8.Plugin {
   constructor() {
     super(...arguments);
     this.settings = DEFAULT_SETTINGS;
@@ -1930,7 +2095,7 @@ var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
     await this.ensureWallpaperFolderExists();
     if (this.isVersionLess(this.settings.LatestVersion, "1.5.1")) {
       await Migrate.migrateOldSettings(this);
-      this.settings.LatestVersion = "1.5.7";
+      this.settings.LatestVersion = "1.6.7";
       await this.saveSettings();
     }
     const anyOptionEnabled = Scheduler.Check(this.settings.ScheduledOptions);
@@ -1948,9 +2113,9 @@ var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
       }
     });
     this.registerEvent(
-      this.app.workspace.on("window-open", (win, winWindow) => {
+      this.app.workspace.on("window-open", async (win, winWindow) => {
         this.windows.add(winWindow);
-        this.initWallpaperForWindow(winWindow.document);
+        await this.initWallpaperForWindow(winWindow.document);
       })
     );
     this.registerEvent(
@@ -1959,8 +2124,8 @@ var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
       })
     );
     this.registerEvent(
-      this.app.workspace.on("css-change", () => {
-        WallpaperApplier.applyWallpaper(this, anyOptionEnabled, window.document);
+      this.app.workspace.on("css-change", async () => {
+        await WallpaperApplier.applyWallpaper(this, anyOptionEnabled, window.document);
       })
     );
     for (const win of this.windows) {
@@ -1977,21 +2142,21 @@ var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
     }
     ChangeWallpaperContainer(doc, { width: this.settings.mobileBackgroundWidth, height: this.settings.mobileBackgroundHeight });
     removeExistingWallpaperElements(doc);
-    toggleModalStyles(doc, this);
+    await toggleModalStyles(doc, this);
     const newContainer = createWallpaperContainer(doc, this.settings.currentWallpaper, this.settings.AdnvOpend);
     const appContainer = doc.querySelector(".app-container");
     if (appContainer) appContainer.insertAdjacentElement("beforebegin", newContainer);
     else doc.body.appendChild(newContainer);
     doc.body.classList.add("live-wallpaper-active");
-    WallpaperApplier.applyWallpaper(this, false, doc);
+    await WallpaperApplier.applyWallpaper(this, false, doc);
     UpdatePaths(this, { path: this.settings.currentWallpaper.path, type: this.settings.currentWallpaper.type });
     await applyBackgroundColor(doc, this.settings.AdnvOpend, this.settings.Color);
     if (this.settings.currentWallpaper.Reposition) {
       SettingsUtils.enableReposition(this, doc);
       const media = doc.getElementById("live-wallpaper-media");
       if (media && media.parentElement) {
-        const reposition = () => {
-          SettingsUtils.applyImagePosition(
+        const reposition = async () => {
+          await SettingsUtils.applyImagePosition(
             media,
             this.settings.currentWallpaper.positionX,
             this.settings.currentWallpaper.positionY,
@@ -2065,7 +2230,7 @@ var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
     doc.body.classList.add("live-wallpaper-active");
     if (this.settings.currentWallpaper.Reposition) {
       await waitForMediaDimensions(newMedia);
-      SettingsUtils.applyImagePosition(
+      await SettingsUtils.applyImagePosition(
         newMedia,
         this.settings.currentWallpaper.positionX,
         this.settings.currentWallpaper.positionY,
@@ -2073,54 +2238,87 @@ var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
       );
     }
   }
-  async openFilePicker(slotIndex, isScheduledPicker = false, doc) {
-    const file = await pickSingleFile(doc);
-    if (!file) return;
+  async applyWallpaperFile(file, slotIndex, doc, isScheduledPicker = false) {
     if (!validateWallpaperFile(file, this.settings.SizeLimited)) {
       return;
     }
+    const baseDir = `${this.app.vault.configDir}/plugins/${this.manifest.id}/wallpapers`;
+    const arrayBuffer = await getFileArrayBuffer(file, {
+      maxWidth: doc.win.innerWidth,
+      mobileBackgroundWidth: this.settings.mobileBackgroundWidth,
+      allowFullRes: this.settings.currentWallpaper.Quality
+    });
+    const targetSubfolder = WallpaperConfigUtils.computeActiveSubfolder(slotIndex);
+    let fileName = file.name;
+    if (file.type.startsWith("image/") && this.settings.currentWallpaper.Quality) {
+      const dotIndex = fileName.lastIndexOf(".");
+      fileName = dotIndex !== -1 ? fileName.slice(0, dotIndex) + "_quality" + fileName.slice(dotIndex) : fileName + "_quality";
+    }
+    const activeRelPath = await saveUnder(
+      this,
+      baseDir,
+      `active/${targetSubfolder}`,
+      fileName,
+      arrayBuffer
+    );
+    const historyRelPath = await saveUnder(
+      this,
+      baseDir,
+      `history`,
+      fileName,
+      arrayBuffer
+    );
+    this.settings.HistoryPaths = prependHistory(this.settings.HistoryPaths, { path: historyRelPath, type: getWallpaperType(fileName), fileName });
+    await trimHistory(this, 5, `${baseDir}/history`);
+    if (this.settings.Preview && !isScheduledPicker) {
+      this.settings.currentWallpaper.path = activeRelPath;
+      this.settings.currentWallpaper.type = getWallpaperType(fileName);
+    }
+    if (this.settings.globalConfig.enabled) {
+      this.settings.globalConfig.config.path = activeRelPath;
+      this.settings.globalConfig.config.type = getWallpaperType(fileName);
+    }
+    this.settings.WallpaperConfigs[slotIndex].path = activeRelPath;
+    this.settings.WallpaperConfigs[slotIndex].type = getWallpaperType(fileName);
+    for (const win of this.windows) {
+      await WallpaperApplier.applyWallpaper(this, false, win.document);
+    }
+    if (slotIndex === 0) {
+      const folder = activeRelPath.substring(0, activeRelPath.lastIndexOf("/"));
+      await removeAllExcept(this, folder, activeRelPath);
+    } else {
+      const folder = `${baseDir}/active/${targetSubfolder}`;
+      await removeUnusedFilesInFolder(this, folder, slotIndex, activeRelPath);
+    }
+    UpdatePaths(this, { path: activeRelPath, type: getWallpaperType(fileName) });
+  }
+  async openFolderPicker(doc) {
+    const files = await pickFolderFiles(doc);
+    if (files === null) return;
+    this.settings.WallpaperConfigs = WallpaperConfigUtils.ClearConfigsFromIndex(this.settings.WallpaperConfigs, 10);
+    const validFiles = files.filter(
+      (f) => validateWallpaperFile(f, this.settings.SizeLimited)
+    );
+    if (validFiles.length === 0) return;
     try {
-      const baseDir = `${this.app.vault.configDir}/plugins/${this.manifest.id}/wallpapers`;
-      const arrayBuffer = await getFileArrayBuffer(file, { maxWidth: doc.win.innerWidth, mobileBackgroundWidth: this.settings.mobileBackgroundWidth, allowFullRes: this.settings.currentWallpaper.Quality });
-      const targetSubfolder = WallpaperConfigUtils.computeActiveSubfolder(slotIndex);
-      let fileName = file.name;
-      if (file.type.startsWith("image/") && this.settings.currentWallpaper.Quality) {
-        const dotIndex = fileName.lastIndexOf(".");
-        fileName = dotIndex !== -1 ? fileName.slice(0, dotIndex) + "_quality" + fileName.slice(dotIndex) : fileName + "_quality";
+      const START_INDEX = 10;
+      for (let i = 0; i < validFiles.length; i++) {
+        const slotIndex = START_INDEX + i;
+        this.settings.WallpaperConfigs = WallpaperConfigUtils.NewConfig(this.settings.WallpaperConfigs);
+        await this.applyWallpaperFile(validFiles[i], slotIndex, doc, false);
       }
-      const activeRelPath = await saveUnder(this, baseDir, `active/${targetSubfolder}`, fileName, arrayBuffer);
-      const historyRelPath = await saveUnder(this, baseDir, `history`, fileName, arrayBuffer);
-      prependHistory(this.settings.HistoryPaths, { path: historyRelPath, type: getWallpaperType(fileName), fileName });
-      await trimHistory(this, 5);
-      if (slotIndex === 0) {
-        const folder = activeRelPath.substring(0, activeRelPath.lastIndexOf("/"));
-        await removeAllExcept(this, folder, activeRelPath);
-      } else {
-        await removeFileIfUnused(this, activeRelPath, this.settings.WallpaperConfigs[slotIndex].path, WallpaperConfigUtils.getPaths(slotIndex, this.settings.WallpaperConfigs));
-      }
-      if (this.settings.Preview && !isScheduledPicker) {
-        this.settings.currentWallpaper.path = activeRelPath;
-        this.settings.currentWallpaper.type = getWallpaperType(fileName);
-      }
-      if (this.settings.globalConfig.enabled) {
-        this.settings.globalConfig.config.path = activeRelPath;
-        this.settings.globalConfig.config.type = getWallpaperType(fileName);
-      }
-      this.settings.WallpaperConfigs[slotIndex].path = activeRelPath;
-      this.settings.WallpaperConfigs[slotIndex].type = getWallpaperType(fileName);
       for (const win of this.windows) {
         await WallpaperApplier.applyWallpaper(this, false, win.document);
       }
-      UpdatePaths(this, { path: activeRelPath, type: getWallpaperType(fileName) });
       this.debouncedSave();
     } catch (error) {
-      alert("Could not save the file. Check disk permissions.");
+      alert("Could not import wallpaper folder.");
       console.error(error);
     }
   }
   startDayNightWatcher() {
     this.stopDayNightWatcher();
-    this._dayNightInterval = window.setInterval(() => {
+    this._dayNightInterval = window.setInterval(async () => {
       if (this.settings.Preview) return;
       const index = WallpaperConfigUtils.getWallpaperIndex(this);
       if (index !== void 0) {
@@ -2130,7 +2328,7 @@ var LiveWallpaperPlugin4 = class extends import_obsidian8.Plugin {
           this.settings.currentWallpaper = this.settings.WallpaperConfigs[index];
         }
         for (const win of this.windows) {
-          WallpaperApplier.applyWallpaper(this, true, win.document);
+          await WallpaperApplier.applyWallpaper(this, true, win.document);
         }
         UpdatePaths(this, { path: this.settings.currentWallpaper.path, type: this.settings.currentWallpaper.type });
       }

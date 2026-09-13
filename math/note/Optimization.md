@@ -51,7 +51,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}^m$ and $L > 0$. $f$ is Lipschitz continuous
 :::
 
 ::: definition:L-smooth
-Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^1$. $f$ is L-smooth if $\| \nabla f(x) - \nabla f(y) \| \leq L \| x - y \|$ for any $x, y \in \mathbb{R}^n$.
+Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^1$. $f$ is L-smooth if $\| \nabla f(x) - \nabla f(y) \|_{*} \leq L \| x - y \|$ for any $x, y \in \mathbb{R}^n$.
 :::
 
 ::: proposition
@@ -64,6 +64,10 @@ The converse of [[#^l-smooth-first-order-bound|Proposition 12]] may hold, but it
 
 ::: proposition
 Let $f : \mathbb{R}^n \to \mathbb{R}$ and $L > 0$. Assume $f \in \mathcal{C}^2$. $f$ is L-smooth iff $- L I \preceq \nabla^2 f(x) \preceq L I$ for any $x \in \mathbb{R}^n$.
+:::
+
+::: proposition
+Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f$ is $L$-smooth and $x^*$ is its global minimizer. $\frac{\|\nabla f(x)\|_2^2}{2L} \le f(x) - f(x^*) \le \frac{L}{2}\|x - x^*\|_2^2$ for any $x \in \mathbb{R}^n$.
 :::
 
 ::: definition:Lipschitz continuous Hessian
@@ -113,7 +117,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in 
 :::
 
 ::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^1$ is strongly convex with modulus $m$ and $x^*$ is its global minimizer. $f(x) - f(x^*) \leq \frac{\|\nabla f(x)\|^2}{2m}$ and $\|x - x^*\| \leq \frac{2}{m} \|\nabla f(x)\|$ for any $x \in \mathbb{R}^n$.
+Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^1$ is strongly convex with modulus $m$ and $x^*$ is its global minimizer. $\frac{m}{2}\|x-x^{*}\|^{2}_{x} \leqslant f(x)-f(x^{*}) \leqslant \frac{\|\nabla f(x)\|^2}{2m}$.
 :::
 
 ::: definition:Polyak-Łojasiewicz condition
@@ -139,7 +143,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$, $x_0 \in \mathbb{R}^n$ and $\alpha_k > 0$
 
 ::: lemma
 Let $f : \mathbb{R}^n \to \mathbb{R}$, and $x \in \mathbb{R}^n$. Assume $f$ is $L$-smooth. Set $x_+ = x - \frac{1}{L} \nabla f(x)$. $f(x_+) \leq f(x) - \frac{1}{2L} \|\nabla f(x)\|^2$.
-:::
+::: ^lemma-0fb324
 
 ::: proposition
 Let $f : \mathbb{R}^n \to \mathbb{R}$, $\bar{f} \in \mathbb{R}$, and $x_0 \in \mathbb{R}^n$. Assume $f$ is $L$-smooth and $f(x) \geq \bar{f}$ for any $x \in \mathbb{R}^n$. Set $\{x_k\}$ by $x_{k + 1} = x_k - \frac{1}{L} \nabla f(x_k)$. $\underset{0 \leq k \leq T - 1}{\min} \|\nabla f(x_k)\| \leq \sqrt{\frac{2L(f(x_0) - \bar{f})}{T}}$ for any integer $T \geq 1$.

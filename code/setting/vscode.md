@@ -8,11 +8,15 @@
     "terminal.integrated.profiles.osx": {
         "zsh": {
             "path": "/bin/zsh",
-            "args": ["-l"]
+            "args": [
+                "-l"
+            ]
         },
         "fish": {
             "path": "/opt/homebrew/bin/fish",
-            "args": ["-l"]
+            "args": [
+                "-l"
+            ]
         }
     },
 
@@ -38,7 +42,7 @@
     "update.showReleaseNotes": false,
     "chat.tips.enabled": false,
     "chat.viewSessions.orientation": "stacked",
-    
+
     // git
     "git.autofetch": true,
 
@@ -47,15 +51,19 @@
     "remote.SSH.remotePlatform": {
         "server1": "linux"
     },
-    
+
     // latex
     "latex-workshop.latex.autoBuild.run": "onSave",
     "latex-workshop.showContextMenu": true,
     "latex-workshop.intellisense.package.enabled": true,
+
     "latex-workshop.latex.tools": [
         {
             "name": "latexmk-xe",
-            "command": "latexmk",
+            "command": "/usr/local/texlive/2026/bin/universal-darwin/latexmk",
+            "env": {
+                "PATH": "/usr/local/texlive/2026/bin/universal-darwin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+            },
             "args": [
                 "-synctex=1",
                 "-interaction=nonstopmode",
@@ -67,7 +75,10 @@
         },
         {
             "name": "latexmk-pdf",
-            "command": "latexmk",
+            "command": "/usr/local/texlive/2026/bin/universal-darwin/latexmk",
+            "env": {
+                "PATH": "/usr/local/texlive/2026/bin/universal-darwin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+            },
             "args": [
                 "-synctex=1",
                 "-interaction=nonstopmode",
@@ -79,7 +90,10 @@
         },
         {
             "name": "latexmk-lua",
-            "command": "latexmk",
+            "command": "/usr/local/texlive/2026/bin/universal-darwin/latexmk",
+            "env": {
+                "PATH": "/usr/local/texlive/2026/bin/universal-darwin:/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+            },
             "args": [
                 "-synctex=1",
                 "-interaction=nonstopmode",
@@ -90,21 +104,30 @@
             ]
         }
     ],
+
     "latex-workshop.latex.recipes": [
         {
-            "name": "latexmk (XeLaTeX)",
-            "tools": ["latexmk-xe"]
+            "name": "latexmk (pdfLaTeX)",
+            "tools": [
+                "latexmk-pdf"
+            ]
         },
         {
-            "name": "latexmk (pdfLaTeX)",
-            "tools": ["latexmk-pdf"]
+            "name": "latexmk (XeLaTeX)",
+            "tools": [
+                "latexmk-xe"
+            ]
         },
         {
             "name": "latexmk (LuaLaTeX)",
-            "tools": ["latexmk-lua"]
+            "tools": [
+                "latexmk-lua"
+            ]
         }
     ],
-    "latex-workshop.latex.recipe.default": "latexmk (XeLaTeX)",
+
+    "latex-workshop.latex.recipe.default": "latexmk (pdfLaTeX)",
+
     "latex-workshop.latex.clean.fileTypes": [
         "*.fdb_latexmk",
         "*.aux",
@@ -131,23 +154,29 @@
         "*.vrb",
         "*.bcf",
         "*.run.xml",
-        "*.xdv"
+        "*.xdv",
+        "*Notes.bib"
     ],
+
+    "latex-workshop.latex.clean.method": "glob",
     "latex-workshop.latex.autoClean.run": "onBuilt",
     "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
     "latex-workshop.intellisense.argumentHint.enabled": false,
+    "latex-workshop.message.badbox.show": "none",
+    "latex-workshop.message.latexlog.exclude": [
+        "[Ff]ont shape"
+    ],
+
     "workbench.editorAssociations": {
         "*.pdf": "latex-workshop-pdf-hook"
     },
 
     // jupyter
     "jupyter.askForKernelRestart": false,
-    
-    // java
-    "redhat.telemetry.enabled": false,
-    
+
     // claude code
-    "claudeCode.preferredLocation": "sidebar"
+    "claudeCode.preferredLocation": "sidebar",
+    "editor.unicodeHighlight.nonBasicASCII": false
 }
 ```
 

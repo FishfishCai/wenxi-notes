@@ -22,7 +22,7 @@
   "autoPairBrackets": false,
   "foldHeading": false,
   "foldIndent": false,
-  "propertiesInDocument": "hidden",
+  "propertiesInDocument": "visible",
   "autoConvertHtml": true,
   "useTab": true,
   "autoPairMarkdown": true

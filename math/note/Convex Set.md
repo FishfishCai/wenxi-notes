@@ -1,9 +1,3 @@
-## Affine Subspace
-::: definition:Affine Subspace
-Let $M \subset \mathbb{R}^{n}$ and $x \in \mathbb{R}^{n}$.
-:::
-
-## Convex Set
 ::: definition:Convex
 Let $M \subset \mathbb{R}^{n}$. $M$ is convex if $[x, y] \subset M$ for any $x, y \in M$.
 :::
@@ -52,7 +46,6 @@ Let $M \subset \mathbb{R}^{n}$. Assume $M \neq \emptyset$. $\text{Conv}(M)$ is t
 Let $M \subset \mathbb{R}^{n}$. Assume $M \neq \emptyset$. $\text{Conv}(M) = \{\text{all convex combinations of vectors from } M\}$.
 :::
 
-## Conic Set
 ::: definition:Conic
 Let $M \subset \mathbb{R}^{n}$. Assume $M \neq \emptyset$. $M$ is conic if the ray $Rx = \{tx : t \geq 0\} \subset M$ for any $x \in M$.
 :::

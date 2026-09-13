@@ -14,15 +14,16 @@
 	{trigger: "Vmat", replacement: "\\begin{Vmatrix}\n$0\n\\end{Vmatrix}", options: "MA"},
 	{trigger: "dm", replacement: "$$\n$0\n$$", options: "tA"},
 	{trigger: "mk", replacement: "$$0$$1", options: "tA"},
-	{trigger: "proof", replacement: "`\\begin{proof}`\n$0\n`\\end{proof}`\n$1", options: "t"},
+	{trigger: "proof", replacement: "::: proof\n$0\n:::\n$1", options: "t"},
 
-    // callout
-	{trigger: "def", replacement: "> [!definition|] $0\n$1", options: "t"},
-	{trigger: "thm", replacement: "> [!theorem|]$0\n$1", options: "t"},
-	{trigger: "lemma", replacement: "> [!lemma|] $0\n$1", options: "t"},
-	{trigger: "prop", replacement: "> [!proposition|]$0\n$1", options: "t"},
-	{trigger: "remark", replacement: "> [!remark|]$0\n$1", options: "t"},
-	{trigger: "example", replacement: "> [!example|]$0\n$1", options: "t"},
+    // Math Block
+	{trigger: "def", replacement: "::: definition:$0\n$1\n:::", options: "t"},
+	{trigger: "thm", replacement: "::: theorem:$0\n$1\n:::", options: "t"},
+	{trigger: "lemma", replacement: "::: lemma:$0\n$1\n:::", options: "t"},
+	{trigger: "prop", replacement: "::: proposition:$0\n$1\n:::", options: "t"},
+	{trigger: "corollary", replacement: "::: corollary:$0\n$1\n:::", options: "t"},
+	{trigger: "example", replacement: "::: example:$0\n$1\n:::", options: "t"},
+	{trigger: "note", replacement: "::: note:$0\n$1\n:::", options: "t"},
 
     // text
 	{trigger: "text", replacement: "\\text{$0}$1", options: "mA"},
@@ -127,7 +128,7 @@
     {trigger: "det", replacement: "\\det($0)", options: "m"},
     {trigger: "span", replacement: "\\text{span}($0)", options: "m"},
     {trigger: "range", replacement: "\\mathrm{range}($0)", options: "m"},
-    {trigger: "null", replacement: "\\mathrm{null}($0)", options: "m"},
+    {trigger: "nll", replacement: "\\mathrm{null}($0)", options: "m"},
     {trigger: "rank", replacement: "\\mathrm{rank}($0)", options: "m"},
 
     // complex

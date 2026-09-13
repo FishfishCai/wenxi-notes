@@ -3,6 +3,9 @@
 .obsidian/graph.json
 math/textbook/
 
+# AI
+.agents/
+.claude/
+
 # macOS System
 .DS_Store
-

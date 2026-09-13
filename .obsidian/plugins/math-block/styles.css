@@ -1,4 +1,4 @@
-.math-block {
+.math-block-container {
   margin: 0.4em 0;
   color: var(--text-normal);
   font-size: 1em;
@@ -19,17 +19,29 @@
   font-weight: var(--math-block-body-weight);
 }
 
+.math-block-body {
+  white-space: normal;
+}
+
 .math-block-label,
 .math-block-label > p {
   display: inline;
   margin: 0;
 }
 
-.math-block-body > p:first-child {
+.math-block-body > :is(p, ol, ul, .math) {
+  margin-block: 0.35em;
+}
+
+.math-block-container .math-block-body .math-block > mjx-container {
+  padding: 0.35em 0;
+}
+
+.math-block-body > :first-child {
   margin-top: 0;
 }
 
-.math-block-body > p:last-of-type {
+.math-block-body > :last-child {
   margin-bottom: 0;
 }
 
@@ -47,7 +59,7 @@
   cursor: text;
 }
 
-.math-block-editor-widget > .math-block {
+.math-block-editor-widget > .math-block-container {
   margin: 0;
 }
 
