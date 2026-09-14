@@ -1,4 +1,4 @@
-# Setting
+## Setting
 ```json
 {
     // terminal
@@ -180,7 +180,7 @@
 }
 ```
 
-# key-binding
+## Key Binding
 ```json
 [
     {

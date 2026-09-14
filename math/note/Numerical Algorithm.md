@@ -68,7 +68,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}^m$ and $x \in \mathbb{R}^n$. Assume $f$ is 
 ::: ^condition-number
 
 ::: note
-For [[#^condition-number|Definition 16 (Condition Number)]], if $f$ is differentiable at $x$, then $\hat{\kappa}(x) = \|J_f(x)\|$.
+For [[#^condition-number|Condition Number]], if $f$ is differentiable at $x$, then $\hat{\kappa}(x) = \|J_f(x)\|$.
 :::
 
 ::: definition:Relative Condition Number
@@ -76,7 +76,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}^m$ and $x \in \mathbb{R}^n$. Assume $f$ is 
 ::: ^relative-condition-number
 
 ::: note
-For [[#^relative-condition-number|Definition 17 (Relative Condition Number)]], if $f$ is differentiable at $x$, then $\kappa(x) = \frac{\|J_f(x)\|\|x\|}{\|f(x)\|}$.
+For [[#^relative-condition-number|Relative Condition Number]], if $f$ is differentiable at $x$, then $\kappa(x) = \frac{\|J_f(x)\|\|x\|}{\|f(x)\|}$.
 :::
 
 ::: definition:Condition Number of Matrix
@@ -103,8 +103,7 @@ Let $A \in \mathbb{R}^{n, n}$ and $x, b \in \mathbb{R}^n$. Assume $A$ is nonsing
 Let $A \in \mathbb{R}^{n, n}$ and $x, b \in \mathbb{R}^n$. Assume $A$ is nonsingular, $Ax = b$, and $b \neq 0$. Given $b$, the condition number of computing $x$ with $x = A^{-1}b$ is $\kappa(A) = \|A\|\|A^{-1}\|$.
 :::
 
-### Stability and Backward Stability
-
+### Stability
 ::: definition:Stability
 Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{R}^m$, $f : X \to Y$, and $\tilde f : F_X \to F_Y$. $\tilde f$ is stable for $f$ if there exist $C_1, C_2 > 0$ and $\varepsilon_0 > 0$ s.t. for any $F$ with $\varepsilon_{\text{machine}} < \varepsilon_0$ and any $x \in F_X$, there exists $\tilde x \in X$ satisfying $\|\tilde x - x\| \leq C_1\varepsilon_{\text{machine}}\|x\|$ and $\|\tilde f(x) - f(\tilde x)\| \leq C_2\varepsilon_{\text{machine}}\|f(\tilde x)\|$.
 ::: ^stability
@@ -118,11 +117,11 @@ Let $* \in \{+, -, \times, \div\}$. For each idealized floating point system $F$
 :::
 
 ::: note
-For all sufficiently small $\varepsilon_{\text{machine}}$, [[#^accuracy|Definition 15 (Accuracy)]] implies that $f(x) = 0$ gives $\tilde f(x) = f(x)$. [[#^stability|Definition 25 (Stability)]] implies that $x = 0$ gives $\tilde x = x$ and that $f(\tilde x) = 0$ gives $\tilde f(x) = f(\tilde x)$. [[#^backward-stability|Definition 26 (Backward Stability)]] implies that $x = 0$ gives $\tilde x = x$.
+For all sufficiently small $\varepsilon_{\text{machine}}$, [[#^accuracy|Accuracy]] implies that $f(x) = 0$ gives $\tilde f(x) = f(x)$. [[#^stability|Stability]] implies that $x = 0$ gives $\tilde x = x$ and that $f(\tilde x) = 0$ gives $\tilde f(x) = f(\tilde x)$. [[#^backward-stability|Backward Stability]] implies that $x = 0$ gives $\tilde x = x$.
 :::
 
 ::: note
-For fixed $n$ and $m$, [[#^accuracy|Definition 15 (Accuracy)]], [[#^stability|Definition 25 (Stability)]] and [[#^backward-stability|Definition 26 (Backward Stability)]] are unchanged if the Euclidean norms are replaced by any other norms, since all norms on finite-dimensional real spaces are equivalent.
+For fixed $n$ and $m$, [[#^accuracy|Accuracy]], [[#^stability|Stability]] and [[#^backward-stability|Backward Stability]] are unchanged if the Euclidean norms are replaced by any other norms, since all norms on finite-dimensional real spaces are equivalent.
 :::
 
 ::: proposition
@@ -133,7 +132,8 @@ Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{
 By the definition of backward stability, $\tilde f(x) = f(\tilde x)$ for some $\tilde x \in X$ satisfying $\frac{\|\tilde x - x\|}{\|x\|} = O(\varepsilon_{\text{machine}})$. By the definition of $\kappa(x)$, this implies $\frac{\|\tilde f(x) - f(x)\|}{\|f(x)\|} \le (\kappa(x) + o(1)) \frac{\|\tilde x - x\|}{\|x\|}$, where $o(1)$ denotes a quantity that converges to zero as $\varepsilon_{\text{machine}} \to 0$. For fixed $x$, combining these gives the proof.
 :::
 
-## LU Factorization
+## Matrix Factorizations
+### LU Factorization
 ::: theorem:Gaussian Elimination
 Let $A = \left(\begin{matrix} a_{11} & a_{12} & \cdots & a_{1k} \\ a_{21} & a_{22} & \cdots & a_{2k} \\ \vdots & \vdots & \ddots & \vdots \\ a_{n1} & a_{n2} & \cdots & a_{nk} \end{matrix}\right) \in \mathbb{R}^{n, k}$. Assume $n \ge k$ and every pivot encountered during elimination is nonzero. Set $A = A_{0}$ and, at the $i$-th iteration, compute in order
 $$
@@ -147,11 +147,11 @@ Set $L = L_1^{-1}L_2^{-1}\cdots L_k^{-1}$ and $U = A_k$. $L$ is unit lower trian
 ::: ^gaussian-elimination
 
 ::: note
-For [[#^gaussian-elimination|Theorem 29 (Gaussian Elimination)]], $L_{i}^{-1} = \left(\begin{matrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots & \vdots & & \vdots \\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0 \\ 0 & 0 & \cdots & \ell_{i + 1, i} & 1 & \cdots & 0 \\ \vdots & \vdots & & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \ell_{ni} & 0 & \cdots & 1 \end{matrix}\right)$ and $L \in \mathbb{R}^{n, n}$ has entries $L_{ij} = 1$ if $i = j$, $L_{ij} = \ell_{ij}$ if $1 \leq j \leq k$ and $i > j$, and $L_{ij} = 0$ otherwise.
+For [[#^gaussian-elimination|Gaussian Elimination]], $L_{i}^{-1} = \left(\begin{matrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0 \\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots & \vdots & & \vdots \\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0 \\ 0 & 0 & \cdots & \ell_{i + 1, i} & 1 & \cdots & 0 \\ \vdots & \vdots & & \vdots & \vdots & \ddots & \vdots \\ 0 & 0 & \cdots & \ell_{ni} & 0 & \cdots & 1 \end{matrix}\right)$ and $L \in \mathbb{R}^{n, n}$ has entries $L_{ij} = 1$ if $i = j$, $L_{ij} = \ell_{ij}$ if $1 \leq j \leq k$ and $i > j$, and $L_{ij} = 0$ otherwise.
 :::
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume the indicated elimination completes without breakdown. The operation count of [[#^gaussian-elimination|Theorem 29 (Gaussian Elimination)]] is $\sim \frac{2}{3}n^{3}$.
+Let $A \in \mathbb{R}^{n, n}$. Assume the indicated elimination completes without breakdown. The operation count of [[#^gaussian-elimination|Gaussian Elimination]] is $\sim \frac{2}{3}n^{3}$.
 :::
 
 ::: definition:Permutation Matrix
@@ -163,7 +163,7 @@ Let $A \in \mathbb{C}^{n, n}$. There exist a permutation matrix $P \in \mathbb{R
 ::: ^lu-partial-pivoting
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume the indicated elimination completes without breakdown. The operation count of [[#^lu-partial-pivoting|Theorem 32 (LU Factorization with Partial Pivoting)]] is $\sim \frac{2}{3}n^{3}$.
+Let $A \in \mathbb{R}^{n, n}$. Assume the indicated elimination completes without breakdown. The operation count of [[#^lu-partial-pivoting|LU Factorization with Partial Pivoting]] is $\sim \frac{2}{3}n^{3}$.
 :::
 
 ::: definition:Growth Factor
@@ -190,16 +190,16 @@ Gaussian elimination with partial pivoting is backward stable.
 For the above, backward stability holds in the sense that for each fixed dimension $n$, the bound $\frac{\|\delta A\|}{\|A\|} = O(\varepsilon_{\text{machine}})$ applies uniformly to all matrices of that dimension, but the constant involves $2^{n - 1}$. In practice, large growth factors are exponentially rare among random matrices, and Gaussian elimination with partial pivoting is utterly stable in practice.
 :::
 
-## Cholesky Factorization
+### Cholesky Factorizations
 ::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $A$ is symmetric positive definite. The operation count of [[Matrix#^cholesky-factorization|Theorem 39 (Cholesky Factorization)]] is $\sim \frac{1}{3}n^{3}$.
+Let $A \in \mathbb{R}^{n, n}$. Assume $A$ is symmetric positive definite. The operation count of [[Matrix#^cholesky-factorization|Cholesky Factorization]] is $\sim \frac{1}{3}n^{3}$.
 :::
 
 ::: proposition
 Let $A \in \mathbb{R}^{n, n}$. Assume $A$ is symmetric positive definite and [[Matrix#^cholesky-factorization|Cholesky factorization]] is computed on a computer satisfying the axioms of floating point arithmetic. For all sufficiently small $\varepsilon_{\text{machine}}$, the algorithm completes and its computed factor $\tilde R$ satisfies $\tilde R^T \tilde R = A + \delta A$ with $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$ for some $\delta A \in \mathbb{R}^{n, n}$.
 :::
 
-## QR Algorithms and Least Squares
+### QR Factorization
 ::: theorem:Classical Gram–Schmidt Process
 Let $a_1, a_2, \ldots, a_k \in \mathbb{R}^n$. If $a_1, a_2, \ldots, a_k$ are linearly independent, then there exists an orthonormal set $v_1, v_2, \ldots, v_k$ given by
 $$
@@ -216,22 +216,22 @@ Let $A = [a_1\; a_2\; \cdots\; a_k] \in \mathbb{R}^{n, k}$. Assume $A$ has full 
 ::: ^gram-schmidt-qr
 
 ::: note
-For [[#^gram-schmidt-qr|Theorem 42 (Gram–Schmidt QR Factorization)]], it can also be formed as $AR_{1}R_{2}\cdots R_{k} = Q$, where $R_i = \begin{pmatrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0\\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0\\ \vdots & \vdots & \ddots & \vdots & \vdots &  & \vdots\\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0\\ 0 & 0 & \cdots & 0 & \frac{1}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|} & -\frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{i + 1}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|^{2}} & \cdots & -\frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{k}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|^{2}} \\ 0 & 0 & \cdots & 0 & 0 & 1 & \cdots\\ \vdots & \vdots &  & \vdots & \vdots &  & \ddots \end{pmatrix}$. The vector $v_{j}$ is the $j$-th column of $AR_{1}R_{2}\cdots R_{i - 1}$ for $j < i$. Its inverse is $R_{i}^{-1} = \begin{pmatrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0\\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0\\ \vdots & \vdots & \ddots & \vdots & \vdots &  & \vdots\\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0\\ 0 & 0 & \cdots & 0 & \left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\| & \frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{i + 1}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|} & \cdots & \frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{k}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|} \\ 0 & 0 & \cdots & 0 & 0 & 1 & \cdots\\ \vdots & \vdots &  & \vdots & \vdots &  & \ddots \end{pmatrix}$. Thus $R = R_{k}^{-1}R_{k - 1}^{-1}\cdots R_{1}^{-1}$ is an upper triangular matrix.
+For [[#^gram-schmidt-qr|Gram–Schmidt QR Factorization]], it can also be formed as $AR_{1}R_{2}\cdots R_{k} = Q$, where $R_i = \begin{pmatrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0\\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0\\ \vdots & \vdots & \ddots & \vdots & \vdots &  & \vdots\\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0\\ 0 & 0 & \cdots & 0 & \frac{1}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|} & -\frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{i + 1}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|^{2}} & \cdots & -\frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{k}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|^{2}} \\ 0 & 0 & \cdots & 0 & 0 & 1 & \cdots\\ \vdots & \vdots &  & \vdots & \vdots &  & \ddots \end{pmatrix}$. The vector $v_{j}$ is the $j$-th column of $AR_{1}R_{2}\cdots R_{i - 1}$ for $j < i$. Its inverse is $R_{i}^{-1} = \begin{pmatrix} 1 & 0 & \cdots & 0 & 0 & \cdots & 0\\ 0 & 1 & \cdots & 0 & 0 & \cdots & 0\\ \vdots & \vdots & \ddots & \vdots & \vdots &  & \vdots\\ 0 & 0 & \cdots & 1 & 0 & \cdots & 0\\ 0 & 0 & \cdots & 0 & \left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\| & \frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{i + 1}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|} & \cdots & \frac{\left\langle \left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i, a_{k}\right\rangle}{\left\|\left(I - v_1v_1^T - \cdots - v_{i - 1}v_{i - 1}^T\right)a_i\right\|} \\ 0 & 0 & \cdots & 0 & 0 & 1 & \cdots\\ \vdots & \vdots &  & \vdots & \vdots &  & \ddots \end{pmatrix}$. Thus $R = R_{k}^{-1}R_{k - 1}^{-1}\cdots R_{1}^{-1}$ is an upper triangular matrix.
 :::
 
 ::: theorem:Modified Gram–Schmidt Process
-Let $a_1, a_2, \ldots, a_k \in \mathbb{R}^n$. If $a_1, a_2, \ldots, a_k$ are linearly independent, then there exists an orthonormal set $v_1, v_2, \ldots, v_k$ given by
+Let $A \in \mathbb{R}^{n, k}$. Assume $A$ has full column rank. Set $z_j = A_{:,j}$ for $1 \le j \le k$ and $R = 0 \in \mathbb{R}^{k, k}$. For $i = 1,\ldots,k$, compute
 $$
-\begin{align*}
-v_1 & = \frac{a_1}{\|a_1\|}, \\
-v_i & = \frac{\bigl(I - v_{i - 1}v_{i - 1}^T\bigr)\cdots \bigl(I - v_2v_2^T\bigr)\bigl(I - v_1v_1^T\bigr)a_i}
-{\|\bigl(I - v_{i - 1}v_{i - 1}^T\bigr)\cdots \bigl(I - v_2v_2^T\bigr)\bigl(I - v_1v_1^T\bigr)a_i\|}, \qquad i = 2, \dots, k.
-\end{align*}
+\begin{aligned}
+r_{ii} &\leftarrow \|z_i\|_2,\qquad q_i \leftarrow \frac{z_i}{r_{ii}},\\
+r_{ij} &\leftarrow q_i^Tz_j,\qquad z_j \leftarrow z_j - r_{ij}q_i\quad(j = i + 1,\ldots,k).
+\end{aligned}
 $$
+The output $Q = (q_1\ \cdots\ q_k)$ satisfies $A = QR$ and $Q^TQ = I$ in exact arithmetic.
 ::: ^modified-gram-schmidt
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, k}$. Assume $A$ has full column rank. The operation count of [[#^modified-gram-schmidt|Theorem 43 (Modified Gram–Schmidt Process)]] is $\sum_{j = 1}^{k}(4n - 1)(j - 1) \sim 2nk^{2}$.
+Let $A \in \mathbb{R}^{n, k}$. Assume $A$ has full column rank. The operation count of [[#^modified-gram-schmidt|Modified Gram–Schmidt Process]] is $\sim 2nk^{2}$.
 :::
 
 ::: definition:Householder Reflection Matrix
@@ -243,7 +243,7 @@ Let $a, b \in \mathbb{R}^n$. Assume $a \neq b$ and $\|a\|_2 = \|b\|_2$. Set $v =
 :::
 
 ::: note
-For [[#^householder-reflection|Definition 45 (Householder Reflection Matrix)]], the Householder reflection matrix is an orthogonal matrix.
+For [[#^householder-reflection|Householder Reflection Matrix]], the Householder reflection matrix is an orthogonal matrix.
 :::
 
 ::: theorem:Householder QR Factorization
@@ -263,20 +263,20 @@ Set $R = A_k$ and $Q = H_1H_2\cdots H_k$. $R$ is upper trapezoidal, $Q$ is ortho
 ::: ^householder-qr
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, k}$. Assume $A$ has full column rank. The operation count of [[#^householder-qr|Theorem 46 (Householder QR Factorization)]] is approximately $\sum_{j = 1}^{k}4(n - j + 1)(k - j + 1) \sim 2nk^{2} - \frac{2}{3}k^{3}$.
+Let $A \in \mathbb{R}^{n, k}$. Assume $A$ has full column rank. The operation count of [[#^householder-qr|Householder QR Factorization]] is approximately $\sum_{j = 1}^{k}4(n - j + 1)(k - j + 1) \sim 2nk^{2} - \frac{2}{3}k^{3}$.
 :::
 
 ::: proposition
-[[#^householder-qr|Theorem 46 (Householder QR Factorization)]] is backward stable.
+[[#^householder-qr|Householder QR Factorization]] is backward stable.
 ::: ^householder-qr-backward-stability
 
-## Least Square
+### Least Squares
 ::: definition:Least Square via Normal Equations
 Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank. Form $A^T A$ and $A^T b$, compute the Cholesky factorization $A^T A = R^T R$, solve $R^T w = A^T b$ for $w$, and solve $R x = w$ for $x$. The resulting $x$ is the unique minimizer of $\|b - Ax\|_2$.
 ::: ^least-square-normal-equations
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and real arithmetic is used. The computation of $A^T A$ is $n k^2$ and the computation of the Cholesky factorization is $\frac{1}{3} k^3$. The computation of [[#^least-square-normal-equations|Definition 49 (Least Square via Normal Equations)]] is approximately $n k^2 + \frac{1}{3} k^3$.
+Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and real arithmetic is used. The computation of $A^T A$ is $n k^2$ and the computation of the Cholesky factorization is $\frac{1}{3} k^3$. The computation of [[#^least-square-normal-equations|Least Square via Normal Equations]] is approximately $n k^2 + \frac{1}{3} k^3$.
 :::
 
 ::: definition:Least Square via QR Factorization
@@ -284,7 +284,7 @@ Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full colu
 ::: ^least-square-qr
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and real arithmetic is used. The computation of [[#^least-square-qr|Definition 51 (Least Square via QR Factorization)]] is approximately $2 n k^2 - \frac{2}{3} k^3$.
+Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and real arithmetic is used. The computation of [[#^least-square-qr|Least Square via QR Factorization]] is approximately $2 n k^2 - \frac{2}{3} k^3$.
 :::
 
 ::: definition:Least Square via SVD
@@ -292,7 +292,7 @@ Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full colu
 ::: ^least-square-svd
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and real arithmetic is used. The computation of [[#^least-square-svd|Definition 53 (Least Square via SVD)]] is approximately $2 n k^2 + 11 k^3$.
+Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and real arithmetic is used. The computation of [[#^least-square-svd|Least Square via SVD]] is approximately $2 n k^2 + 11 k^3$.
 :::
 
 ::: proposition
@@ -303,7 +303,8 @@ Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full colu
 Let $A, \Delta A \in \mathbb{R}^{n, k}$, $b, \Delta b \in \mathbb{R}^n$, $x, y \in \mathbb{R}^k$, and $\varepsilon > 0$. Assume $A$ has full column rank, $x \neq 0$, and $\varepsilon \kappa_2(A) < 1$. If $x$ minimizes $\|b - Ax\|_2$, $y$ minimizes $\|b + \Delta b - (A + \Delta A) y\|_2$, $\|\Delta A\|_2 < \varepsilon \|A\|_2$ and $\|\Delta b\|_2 < \varepsilon \|b\|_2$, then $\frac{\|y - x\|_2}{\|x\|_2} \le \frac{2 \varepsilon \kappa_2(A)}{1 - \varepsilon \kappa_2(A)} + \frac{\varepsilon \kappa_2(A)(\kappa_2(A) + 1)}{1 - \varepsilon \kappa_2(A)} \frac{\|b - Ax\|_2}{\|A\|_2 \|x\|_2}$.
 :::
 
-## Eigenvalue Algorithms
+## Eigenvalue and SVD Algorithms
+### Eigenvalue Algorithms
 ::: definition:Upper-Hessenberg Matrix
 Let $H \in \mathbb{C}^{n, n}$. The matrix $H$ is an upper-Hessenberg matrix if $h_{ij} = 0$ for any $i > j + 1$.
 :::
@@ -313,7 +314,16 @@ Let $T \in \mathbb{C}^{n, n}$. The matrix $T$ is a tridiagonal matrix if $t_{ij}
 :::
 
 ::: theorem:Hessenberg Reduction
-Let $A \in \mathbb{C}^{n, n}$. There exists a unitary matrix $Q \in \mathbb{C}^{n, n}$ s.t. $Q^HAQ = H$, where $H$ is upper-Hessenberg. If $A$ is Hermitian, then $H$ is tridiagonal.
+Let $A \in \mathbb{C}^{n, n}$. Set $H = A$ and $\operatorname{phase}(z) = \frac{z}{|z|}$ for $z \neq 0$, with $\operatorname{phase}(0) = 1$. For $i = 1,\ldots,n - 2$, set $x = H_{i + 1:n,i}$. If $x = 0$, set $Q_i = I$ and skip the updates. Otherwise, compute
+$$
+\begin{aligned}
+v &\leftarrow x + \operatorname{phase}(x_1)\|x\|_2e_1,\qquad v \leftarrow \frac{v}{\|v\|_2},\\
+H_{i + 1:n,i:n} &\leftarrow H_{i + 1:n,i:n} - 2v(v^HH_{i + 1:n,i:n}),\\
+H_{:,i + 1:n} &\leftarrow H_{:,i + 1:n} - 2(H_{:,i + 1:n}v)v^H,\\
+Q_i &\leftarrow \operatorname{diag}(I_i,I - 2vv^H).
+\end{aligned}
+$$
+Store the reflection vectors. In exact arithmetic, $Q = Q_1\cdots Q_{n - 2}$ satisfies $Q^HAQ = H$, and $H$ is upper-Hessenberg. If $A = A^H$, then $H$ is tridiagonal. For $n \le 2$, take $Q = I$.
 :::
 
 ::: proposition
@@ -371,12 +381,15 @@ Let $A \in \mathbb{R}^{n, n}$. Assume $A = A^T$, the eigenvalues satisfy $|\lamb
 :::
 
 ::: definition:Shifted QR Algorithm
-Let $T \in \mathbb{R}^{n, n}$. Assume $T = T^T$ and $T$ is tridiagonal. Set $A_0 = T$. At step $k$, choose a real shift $\mu_k$ and compute
+Let $T \in \mathbb{R}^{n, n}$ and $\tau > 0$. Assume $T = T^T$ and $T$ is tridiagonal. Set $A_0 = T$ and $Q_0 = I$. On each active block, choose a real shift $\mu_k$ and compute
 $$
-A_{k - 1} - \mu_k I = U_k R_k,\qquad
-A_k = R_k U_k + \mu_k I,
+\begin{aligned}
+A_{k - 1} - \mu_kI &= U_kR_k,\\
+A_k &\leftarrow R_kU_k + \mu_kI,\\
+Q_k &\leftarrow Q_{k - 1}U_k.
+\end{aligned}
 $$
-where $U_kR_k$ is a QR factorization. Deflation splits an active block at a zero subdiagonal entry and continues the iteration on the resulting blocks. A block of size one yields an eigenvalue. In floating point arithmetic, an entry is set to zero when its magnitude is at most a tolerance of order $\varepsilon_{\text{machine}}$ times the sum of the magnitudes of its two neighboring diagonal entries.
+Here $U_kR_k$ is a QR factorization, and each block transformation is embedded in the identity when updating $Q_k$. Set $(A_k)_{j + 1,j} = (A_k)_{j,j + 1} = 0$ if $|(A_k)_{j + 1,j}| \le \tau(|(A_k)_{jj}| + |(A_k)_{j + 1,j + 1}|)$, and split at these entries. Stop when all blocks have size one. The diagonal entries and columns of $Q_k$ approximate the eigenvalues and eigenvectors of $T$. If $T = Q_H^TAQ_H$, the eigenvectors of $A$ are approximated by the columns of $Q_HQ_k$.
 :::
 
 ::: definition:Wilkinson Shift
@@ -388,15 +401,19 @@ Let $A \in \mathbb{R}^{n, n}$. Assume $A = A^T$ and $A$ is tridiagonal. In exact
 :::
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $A \neq 0$ is symmetric tridiagonal and shifted QR diagonalization is performed in the standard floating point model. Set $\tilde\Lambda$ to be the computed diagonal factor and $\tilde Q$ the exact orthogonal product represented by the computed rotations or reflectors. There exists $\delta A$ s.t. $\tilde Q\tilde\Lambda\tilde Q^T = A + \delta A$ and $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$.
+Let $A \in \mathbb{R}^{n, n}$. Assume $A \neq 0$ is symmetric tridiagonal and shifted QR diagonalization is performed in the standard floating point model with deflation tolerance $\tau = O(\varepsilon_{\text{machine}})$. Set $\tilde\Lambda$ to be the computed diagonal factor and $\tilde Q$ the exact orthogonal product represented by the computed rotations or reflectors. There exists $\delta A$ s.t. $\tilde Q\tilde\Lambda\tilde Q^T = A + \delta A$ and $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$.
 :::
 
 ::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $A \neq 0$ is symmetric and tridiagonal reduction followed by shifted QR is performed in the standard floating point model. Its exact and computed eigenvalues, ordered increasingly, satisfy $\frac{|\tilde\lambda_j - \lambda_j|}{\|A\|_2} = O(\varepsilon_{\text{machine}})$ for $j = 1, \ldots, n$.
+Let $A \in \mathbb{R}^{n, n}$. Assume $A \neq 0$ is symmetric and tridiagonal reduction followed by shifted QR is performed in the standard floating point model with deflation tolerance $\tau = O(\varepsilon_{\text{machine}})$. Its exact and computed eigenvalues, ordered increasingly, satisfy $\frac{|\tilde\lambda_j - \lambda_j|}{\|A\|_2} = O(\varepsilon_{\text{machine}})$ for $j = 1, \ldots, n$.
 :::
 
-::: definition:Jacobi Rotation
-Let $A \in \mathbb{R}^{n, n}$ and $p, q \in \{1, \ldots, n\}$. Assume $A = A^T$ and $p < q$. Set $a = A_{pp}$, $b = A_{qq}$, and $d = A_{pq}$. A Jacobi rotation $J$ equals the identity except for its principal block at $p, q$, which is $\begin{pmatrix} c & s \\ -s & c \end{pmatrix}$, where $c = \cos\theta$, $s = \sin\theta$, and $\theta \in [-\frac{\pi}{4}, \frac{\pi}{4}]$ satisfies $(b - a)\sin(2\theta) = 2d\cos(2\theta)$, with $\theta = 0$ when $d = 0$. The update $A \leftarrow J^T A J$ annihilates $A_{pq}$ and $A_{qp}$ in exact arithmetic.
+::: definition:Jacobi Algorithm
+Let $A \in \mathbb{R}^{n, n}$ and $\tau > 0$. Assume $A = A^T$. Set $B = A$ and $Q = I$. Sweep cyclically through $(p,q) = (1,2),(1,3),\ldots,(n - 1,n)$. For each pair, set $a = B_{pp}$, $b = B_{qq}$, $d = B_{pq}$, and choose $\theta \in [-\frac{\pi}{4},\frac{\pi}{4}]$ satisfying $(b - a)\sin(2\theta) = 2d\cos(2\theta)$, with $\theta = 0$ if $d = 0$. The Jacobi rotation $J$ equals the identity except for $J_{\{p,q\},\{p,q\}} = \begin{pmatrix}\cos\theta & \sin\theta\\-\sin\theta & \cos\theta\end{pmatrix}$. Update
+$$
+B \leftarrow J^TBJ,\qquad Q \leftarrow QJ.
+$$
+Stop when $\bigl(\sum_{p \neq q}|B_{pq}|^2\bigr)^{\frac{1}{2}} \le \tau\|A\|_F$. The diagonal entries of $B$ and columns of $Q$ approximate the eigenvalues and eigenvectors of $A$.
 :::
 
 ::: definition:Irreducible Tridiagonal Matrix
@@ -423,12 +440,22 @@ Let $A \in \mathbb{R}^{n, n}$ and $t \in \mathbb{R}$. Assume $A$ is symmetric tr
 Let $A \in \mathbb{R}^{n, n}$, $j \in \{1, \ldots, n\}$, $\ell, u \in \mathbb{R}$, and $\tau > 0$. Assume $A = A^T$ and $A$ is tridiagonal. Set $N(t)$ to be the number of eigenvalues strictly less than $t$, computed by Sturm sign counts, and choose $\ell < u$ s.t. $N(\ell) < j \leq N(u)$. Sturm bisection for the $j$th smallest eigenvalue repeatedly sets $m = \frac{\ell + u}{2}$ and replaces $\ell$ by $m$ if $N(m) < j$, or $u$ by $m$ otherwise. It stops when $u - \ell \leq \tau$ and returns $\frac{\ell + u}{2}$.
 :::
 
+### Singular Value Algorithms
 ::: definition:Upper Bidiagonal Matrix
 Let $B \in \mathbb{R}^{n, k}$. The matrix $B$ is an upper bidiagonal matrix if $b_{ij} = 0$ for any $(i, j)$ with $j \neq i$ and $j \neq i + 1$.
 :::
 
 ::: theorem:Golub-Kahan Bidiagonalization
-Let $A \in \mathbb{R}^{n, k}$. There exist orthogonal matrices $U \in \mathbb{R}^{n, n}$ and $V \in \mathbb{R}^{k, k}$ s.t. $U^TAV = B$, where $B$ is upper-bidiagonal.
+Let $A \in \mathbb{R}^{n, k}$. Set $B = A$ and $F(x) = I - 2vv^T$, where $v = \frac{x + \operatorname{sign}(x_1)\|x\|_2e_1}{\|x + \operatorname{sign}(x_1)\|x\|_2e_1\|_2}$ for $x \neq 0$, with $\operatorname{sign}(0) = 1$ and $F(0) = I$. For $i = 1,\ldots,\min(n,k)$, compute
+$$
+\begin{aligned}
+L_i &\leftarrow \operatorname{diag}(I_{i - 1},F(B_{i:n,i})),\\
+B &\leftarrow L_iB,\\
+R_i &\leftarrow \operatorname{diag}(I_i,F(B_{i,i + 1:k}^T))\quad(i < k),\\
+B &\leftarrow BR_i\quad(i < k).
+\end{aligned}
+$$
+Apply the reflectors to the active submatrices by rank-one updates and store their vectors. In exact arithmetic, $U = L_1\cdots L_{\min(n,k)}$ and $V = R_1\cdots R_{\min(n,k - 1)}$ satisfy $U^TAV = B$, with $B$ upper bidiagonal and $U,V$ orthogonal.
 :::
 
 ::: proposition
@@ -436,10 +463,23 @@ Let $A \in \mathbb{R}^{n, k}$. Assume $n \geq k$. The operation count of Golub-K
 :::
 
 ::: proposition
+Let $A \in \mathbb{R}^{n, k}$. Assume $n \ge k$. Compute its SVD in two stages:
+$$
+\begin{aligned}
+U_0^TAV_0 &= B\quad\text{by Golub--Kahan bidiagonalization},\\
+B &= P\Sigma Q^T\quad\text{by bidiagonal SVD QR iteration},\\
+U &\leftarrow U_0P,\qquad V \leftarrow V_0Q.
+\end{aligned}
+$$
+The output is $A = U\Sigma V^T$, with the nonnegative diagonal entries of $\Sigma$ and corresponding columns of $U,V$ ordered by decreasing singular value. For a wide matrix, apply the procedure to $A^T$ and interchange the left and right factors.
+:::
+
+::: proposition
 Let $A \in \mathbb{R}^{n, k}$. Assume $A \neq 0$ and a backward stable SVD algorithm is used. Its computed singular values satisfy $\tilde\sigma_j = \sigma_j(A + \delta A)$ for some common perturbation $\delta A$ with $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$. Consequently, $\frac{|\tilde\sigma_j - \sigma_j(A)|}{\|A\|_2} = O(\varepsilon_{\text{machine}})$ for $j = 1, \ldots, \min(n, k)$.
 :::
 
 ## Iterative Methods
+### Arnoldi and Lanczos
 ::: definition:Krylov Sequence
 Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. The Krylov sequence generated by $A$ and $b$ is $b, Ab, A^2b, \ldots$.
 :::
@@ -516,7 +556,15 @@ Let $T \in \mathbb{R}^{k, k}$. A Jacobi matrix is a symmetric tridiagonal matrix
 :::
 
 ::: proposition
-Let $w \in L^1([-1,1])$ and $\{q_j\}_{j \ge 1}$ be real polynomials. Assume $w > 0$ almost everywhere, $\deg q_j = j - 1$, and $\{q_j\}$ is orthonormal for $\langle f,g\rangle_w = \int_{-1}^1 f(x)g(x)w(x)\,dx$, with positive leading coefficients. Set $\alpha_j = \langle xq_j,q_j\rangle_w$, $\beta_j = \langle xq_j,q_{j + 1}\rangle_w$, $q_0 = 0$, $\beta_0 = 0$, and $T_k$ to be the Jacobi matrix with these diagonal and off-diagonal entries. The recurrence $xq_j = \beta_{j - 1}q_{j - 1} + \alpha_jq_j + \beta_jq_{j + 1}$ holds for $j \ge 1$. For $k \ge 1$, $\det(xI - T_k) = C_kq_{k + 1}(x)$, where $C_k$ is the reciprocal leading coefficient of $q_{k + 1}$. Its $k$ zeros are distinct and lie in $(-1,1)$.
+Let $w \in L^1([-1,1])$. Assume $w > 0$ almost everywhere. Set $\langle f,g\rangle_w = \int_{-1}^1 f(x)g(x)w(x)\,dx$, $\|f\|_w = \sqrt{\langle f,f\rangle_w}$, $q_0 = 0$, $\beta_0 = 0$, and $q_1 = \frac{1}{\sqrt{\int_{-1}^1w(x)\,dx}}$. For $j = 1,2,\ldots$, compute
+$$
+\begin{aligned}
+v &\leftarrow xq_j - \beta_{j - 1}q_{j - 1},\\
+\alpha_j &\leftarrow \langle q_j,v\rangle_w,\qquad v \leftarrow v - \alpha_jq_j,\\
+\beta_j &\leftarrow \|v\|_w,\qquad q_{j + 1} \leftarrow \frac{v}{\beta_j}.
+\end{aligned}
+$$
+The polynomials are orthonormal with $\deg q_j = j - 1$. The Jacobi matrix $T_k$ with diagonal $\alpha_1,\ldots,\alpha_k$ and off-diagonal $\beta_1,\ldots,\beta_{k - 1}$ satisfies $\det(xI - T_k) = C_kq_{k + 1}(x)$, where $C_k$ is the reciprocal leading coefficient of $q_{k + 1}$. Its zeros are distinct and lie in $(-1,1)$.
 :::
 
 ::: proof
@@ -536,9 +584,10 @@ Write $I(f) = \int_{-1}^1 f(x)\,dx$ and $I_k(f) = \sum_{j = 1}^k w_jf(x_j)$. For
 :::
 
 ::: proposition
-Let $T_k \in \mathbb{R}^{k, k}$ be the Jacobi matrix for orthonormal Legendre polynomials on $[-1,1]$. Set $T_k = V\operatorname{diag}(\lambda_1,\ldots,\lambda_k)V^T$, where $V = (v_1\ \cdots\ v_k)$ is orthogonal. The Gauss–Legendre nodes and weights are $x_j = \lambda_j$ and $w_j = 2(v_j)_1^2$ for $1 \le j \le k$.
+Let $k \ge 1$ be an integer. Set $T_k \in \mathbb{R}^{k, k}$ to be tridiagonal with $(T_k)_{jj} = 0$ for $1 \le j \le k$ and $(T_k)_{j,j + 1} = (T_k)_{j + 1,j} = \frac{j}{\sqrt{4j^2 - 1}}$ for $1 \le j < k$. Compute $T_k = V\operatorname{diag}(\lambda_1,\ldots,\lambda_k)V^T$ with $V = (v_1\ \cdots\ v_k)$ orthogonal. The Gauss–Legendre nodes and weights are $x_j = \lambda_j$ and $w_j = 2(v_j)_1^2$ for $1 \le j \le k$.
 :::
 
+### Krylov Solvers
 ::: definition:GMRES
 Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ is nonsingular and $b \neq 0$. Set $x_0 = 0$ and $\beta = \|b\|_2$. GMRES chooses $x_k \in \mathcal K_k(A,b)$ minimizing $\|b - Ax_k\|_2$. At step $k$, it extends Arnoldi and solves
 $$
@@ -640,7 +689,17 @@ Let $A,V \in \mathbb{C}^{n, n}$. Assume $V$ is nonsingular. A tridiagonal biorth
 :::
 
 ::: proposition
-Let $A \in \mathbb{C}^{n, n}$ and $v_1,w_1 \in \mathbb{C}^n$. Assume $w_1^Hv_1 = 1$ and two-sided Lanczos generates $k + 1$ vector pairs without breakdown in exact arithmetic. Set $V_k = (v_1\ \cdots\ v_k)$ and $W_k = (w_1\ \cdots\ w_k)$. The relations $W_k^HV_k = I$, $AV_k = V_{k + 1}\tilde T_k$, and $A^HW_k = W_{k + 1}\tilde S_k$ hold for rectangular tridiagonal matrices $\tilde T_k,\tilde S_k \in \mathbb{C}^{k + 1, k}$. Their leading blocks satisfy $T_k = S_k^H = W_k^HAV_k$. Moreover, $v_j \in \mathcal K_j(A,v_1)$ and $w_j \in \mathcal K_j(A^H,w_1)$ for $1 \le j \le k + 1$.
+Let $A \in \mathbb{C}^{n, n}$ and $v_1,w_1 \in \mathbb{C}^n$. Assume $w_1^Hv_1 = 1$. Set $v_0 = w_0 = 0$ and $\beta_0 = \gamma_0 = 0$. Two-sided Lanczos performs
+$$
+\begin{aligned}
+\alpha_j &\leftarrow w_j^HAv_j,\\
+u &\leftarrow Av_j - \alpha_jv_j - \gamma_{j - 1}v_{j - 1},\\
+z &\leftarrow A^Hw_j - \overline{\alpha_j}w_j - \overline{\beta_{j - 1}}w_{j - 1},\\
+\beta_j &\leftarrow \|u\|_2,\qquad \gamma_j \leftarrow \frac{z^Hu}{\beta_j},\\
+v_{j + 1} &\leftarrow \frac{u}{\beta_j},\qquad w_{j + 1} \leftarrow \frac{z}{\overline{\gamma_j}}
+\end{aligned}
+$$
+for $j = 1,2,\ldots$, stopping before division if $u = 0$, $z = 0$, or $z^Hu = 0$. In exact arithmetic before breakdown, $V_k = (v_1\ \cdots\ v_k)$ and $W_k = (w_1\ \cdots\ w_k)$ satisfy $W_k^HV_k = I$ and $W_k^HAV_k = T_k$, where $T_k$ has diagonal $\alpha_j$, subdiagonal $\beta_j$, and superdiagonal $\gamma_j$. Moreover, $AV_k = V_kT_k + \beta_kv_{k + 1}e_k^T$, $A^HW_k = W_kT_k^H + \overline{\gamma_k}w_{k + 1}e_k^T$, $v_j \in \mathcal K_j(A,v_1)$, and $w_j \in \mathcal K_j(A^H,w_1)$.
 :::
 
 ::: definition:CGN
@@ -652,11 +711,22 @@ Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ is nonsingula
 :::
 
 ::: definition:BCG
-Let $A \in \mathbb{C}^{n, n}$ and $b,w_1 \in \mathbb{C}^n$. Assume $A$ is nonsingular and $w_1^Hb = 1$. Set $x_0 = 0$ and $r_k = b - Ax_k$. In exact arithmetic and without breakdown, biconjugate gradients chooses $x_k \in \mathcal K_k(A,b)$ s.t. $r_k \perp \mathcal K_k(A^H,w_1)$. Breakdown can occur before convergence even when $A$ is nonsingular.
+Let $A \in \mathbb{C}^{n, n}$ and $b,s_0 \in \mathbb{C}^n$. Assume $A$ is nonsingular and $s_0^Hb \neq 0$. Set $x_0 = 0$, $r_0 = p_0 = b$, $q_0 = s_0$, and $\rho_0 = s_0^Hr_0$. BCG performs
+$$
+\begin{aligned}
+v_k &\leftarrow Ap_{k - 1},\qquad u_k \leftarrow A^Hq_{k - 1},\\
+\alpha_k &\leftarrow \frac{\rho_{k - 1}}{q_{k - 1}^Hv_k},\\
+x_k &\leftarrow x_{k - 1} + \alpha_kp_{k - 1},\\
+r_k &\leftarrow r_{k - 1} - \alpha_kv_k,\qquad s_k \leftarrow s_{k - 1} - \overline{\alpha_k}u_k,\\
+\rho_k &\leftarrow s_k^Hr_k,\qquad \beta_k \leftarrow \frac{\rho_k}{\rho_{k - 1}},\\
+p_k &\leftarrow r_k + \beta_kp_{k - 1},\qquad q_k \leftarrow s_k + \overline{\beta_k}q_{k - 1}
+\end{aligned}
+$$
+for $k = 1,2,\ldots$, stopping if $r_k = 0$. A zero $\rho_{k - 1}$ or $q_{k - 1}^Hv_k$ causes breakdown before division. In exact arithmetic without breakdown, $r_k = b - Ax_k$, $x_k \in \mathcal K_k(A,b)$, and $r_k \perp \mathcal K_k(A^H,s_0)$.
 :::
 
 ::: definition:Preconditioner
-Let $A,M \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ and $M$ are nonsingular. Using $M$ as a left preconditioner replaces $Ax = b$ by $M^{-1}Ax = M^{-1}b$. Right preconditioning gives $AM^{-1}y = b$ with $x = M^{-1}y$. A useful preconditioner permits inexpensive solves with $M$ and improves the convergence of the chosen iteration.
+Let $A,M \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ and $M$ are nonsingular. Left preconditioning by $M$ gives $M^{-1}Ax = M^{-1}b$. Right preconditioning gives $AM^{-1}y = b$ with $x = M^{-1}y$.
 :::
 
 ::: proposition

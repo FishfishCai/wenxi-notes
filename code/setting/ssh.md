@@ -1,4 +1,4 @@
-# Setting
+## Setting
 ```CLI
 Host *
 	ServerAliveInterval 60
@@ -18,7 +18,7 @@ Host host_name
 	IdentityFile ~/.ssh/id_ed25519
 ```
 
-# ssh public key
+## Public Key
 ```CLI
 cat ~/.ssh/id_ed25519.pub
 ```

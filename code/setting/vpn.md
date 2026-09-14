@@ -1,4 +1,4 @@
-# VPN rules
+## Rules
 ```CLI
 prepend:
   # ssh

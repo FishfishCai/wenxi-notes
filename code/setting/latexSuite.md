@@ -1,4 +1,4 @@
-#### Shortcut Key
+## Shortcut Key
 ```
 [
     // blocks
