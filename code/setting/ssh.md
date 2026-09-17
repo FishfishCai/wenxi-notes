@@ -1,16 +1,14 @@
 ## Setting
 ```CLI
 Host *
-	ServerAliveInterval 60
-	ServerAliveCountMax 999
-	TCPKeepAlive yes
-	ControlMaster auto
-	ControlPath ~/.ssh/cm-%r@%h:%p
-	ControlPersist 12h
-	IdentitiesOnly yes
-	AddKeysToAgent yes
-	UseKeychain yes
-	ConnectTimeout 20
+    ServerAliveInterval 60
+    ServerAliveCountMax 30
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%C
+    ControlPersist 24h
+    AddKeysToAgent yes
+    UseKeychain yes
+    ConnectTimeout 20
 
 Host host_name
 	HostName host_address

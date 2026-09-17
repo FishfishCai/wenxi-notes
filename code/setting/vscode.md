@@ -24,6 +24,7 @@
     "files.autoSaveDelay": 10000,
     "editor.fontSize": 15,
     "editor.minimap.enabled": false,
+    "editor.wordWrap": "on",
     "workbench.sideBar.location": "right",
     "workbench.statusBar.visible": false,
     "workbench.startupEditor": "none",
