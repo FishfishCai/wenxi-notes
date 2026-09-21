@@ -194,6 +194,7 @@ class Trainer:
         batches per step. The three intervals are independent, and each one also fires on
         the final step. ``best_model.pth`` tracks the first metric of the first evaluation
         loader, treating lower as better. Omitting the evaluation arguments trains only.
+        A non-finite loss or gradient norm raises before it can reach the weights.
 
         Parameters
         ----------
@@ -261,7 +262,11 @@ class Trainer:
 
         if isinstance(train_loader, DataLoader):
             train_loader = self.accelerator.prepare(train_loader)
-        batches = chain.from_iterable(repeat(train_loader))
+        head = iter(train_loader)
+        first = next(head, None)
+        if first is None:
+            raise ValueError("train_loader yielded no batches; training cannot start.")
+        batches = chain([first], head, chain.from_iterable(repeat(train_loader)))
 
         self.model.train()
         for metric in train_metrics.values():
@@ -274,9 +279,20 @@ class Trainer:
             with self.accelerator.accumulate(self.model):
                 result = train_step(self.model, to_device(next(batches), self.device))
                 loss = result.pop("loss")
+                if not torch.isfinite(loss):
+                    raise FloatingPointError(
+                        f"Non-finite loss after {self.step} steps; stopping before the backward pass."
+                    )
                 self.accelerator.backward(loss)
                 if self.grad_clip_norm is not None and self.accelerator.sync_gradients:
-                    self.accelerator.clip_grad_norm_(self.model.parameters(), self.grad_clip_norm)
+                    grad_norm = self.accelerator.clip_grad_norm_(
+                        self.model.parameters(), self.grad_clip_norm
+                    )
+                    if self.accelerator.scaler is None and not torch.isfinite(grad_norm):
+                        raise FloatingPointError(
+                            f"Non-finite gradient norm after {self.step} steps; "
+                            "stopping before the optimizer update."
+                        )
                 self.optimizer.step()
                 if self.scheduler is not None:
                     self.scheduler.step()
