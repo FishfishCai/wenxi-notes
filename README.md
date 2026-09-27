@@ -6,3 +6,5 @@
 - Live Background: dynamic wallpaper.
 - Math Block: display mathematical content in structured callout blocks.
 - Style Settings: expose theme and CSS options in a settings panel for controlled UI customization.
+
+$\beta_t=\dfrac{-\langle g_t,d_t\rangle}{\eta\lVert g_t\rVert^2}$

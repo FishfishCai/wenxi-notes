@@ -144,3 +144,170 @@ Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq 
 ::: corollary
 Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q_1, Q_2 \subseteq \mathcal{E}$. Assume $Q_1$ and $Q_2$ are convex. If $\operatorname{cl}(Q_1) = \operatorname{cl}(Q_2)$, then $\operatorname{ri}(Q_1) = \operatorname{ri}(Q_2)$.
 :::
+
+## Euclidean Projection and Separation
+::: definition:Distance and Projection
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$ be nonempty, and $y \in \mathcal{E}$. Set $\operatorname{dist}_Q(y) := \underset{x \in Q}{\inf}\|x - y\|$. The projection set is $\operatorname{proj}_Q(y) := \{z \in Q : \|z - y\| = \operatorname{dist}_Q(y)\}$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$ be nonempty. $|\operatorname{dist}_Q(y) - \operatorname{dist}_Q(w)| \leq \|y - w\|$ for any $y, w \in \mathcal{E}$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$. If $Q$ is nonempty and closed, then $\operatorname{proj}_Q(y) \neq \emptyset$ for any $y \in \mathcal{E}$.
+:::
+
+::: theorem:Projection onto a Closed Convex Set
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$. Assume $Q$ is nonempty, closed, and convex. The set $\operatorname{proj}_Q(y)$ consists of exactly one point for any $y \in \mathcal{E}$. For $y \in \mathcal{E}$ and $z \in Q$, $z = \operatorname{proj}_Q(y)$ iff $\langle y - z, x - z\rangle \leq 0$ for any $x \in Q$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$. Assume $Q$ is nonempty, closed, and convex. Set $p := \operatorname{proj}_Q(y)$ and $q := \operatorname{proj}_Q(w)$ for $y, w \in \mathcal{E}$. $\|p - q\|^2 \leq \langle p - q, y - w\rangle$ and $\|p - q\| \leq \|y - w\|$.
+:::
+
+::: definition:Strict Separation of a Point and a Set
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $y \in \mathcal{E}$. A hyperplane $\{x \in \mathcal{E} : \langle a, x\rangle = b\}$ strictly separates $y$ from $Q$ if $a \in \mathcal{E}\setminus\{0\}$, $b \in \mathbb{R}$, and $\langle a, x\rangle \leq b < \langle a, y\rangle$ for any $x \in Q$.
+:::
+
+::: theorem:Strict Separation
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $y \in \mathcal{E}\setminus Q$. Assume $Q$ is nonempty, closed, and convex. There exist $a \in \mathcal{E}\setminus\{0\}$ and $b \in \mathbb{R}$ s.t. $\langle a, x\rangle \leq b < \langle a, y\rangle$ for any $x \in Q$.
+:::
+
+::: definition:Supporting Halfspace
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $x \in \operatorname{cl}(Q)$. A halfspace $H = \{z \in \mathcal{E} : \langle a, z\rangle \leq b\}$ supports $Q$ at $x$ if $a \in \mathcal{E}\setminus\{0\}$, $b \in \mathbb{R}$, $Q \subseteq H$, and $\langle a, x\rangle = b$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $x \in \operatorname{cl}(Q)$. Assume $Q$ is convex. A supporting halfspace to $Q$ at $x$ exists iff $x \in \operatorname{bd}(Q)$.
+:::
+
+::: theorem:Dual Description of the Closed Convex Hull
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$ be nonempty. Set $F_Q := \{(a, b) \in \mathcal{E} \times \mathbb{R} : \langle a, x\rangle \leq b \text{ for any } x \in Q\}$. $\operatorname{cl}(\operatorname{conv}(Q)) = \bigcap_{(a,b) \in F_Q}\{x \in \mathcal{E} : \langle a, x\rangle \leq b\}$.
+:::
+
+## Cones and Polarity
+::: definition:Cone
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K \subseteq \mathcal{E}$. $K$ is a cone if $\lambda K \subseteq K$ for any $\lambda \geq 0$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K \subseteq \mathcal{E}$. $K$ is a convex cone iff $\lambda x + \mu y \in K$ for any $x, y \in K$ and $\lambda, \mu \geq 0$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K \subseteq \mathcal{E}$. If $K$ is a convex cone, then $\operatorname{aff}(K) = K - K$.
+:::
+
+::: proposition
+Intersections, Cartesian products, linear images, linear preimages, and Minkowski sums of convex cones are convex cones.
+:::
+
+::: definition:Polar Cone
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K \subseteq \mathcal{E}$ be a cone. The polar cone of $K$ is $K^\circ := \{v \in \mathcal{E} : \langle v, x\rangle \leq 0 \text{ for any } x \in K\}$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K, K_1, K_2 \subseteq \mathcal{E}$ be cones. $K^\circ$ is a closed convex cone, $K \subseteq (K^\circ)^\circ$, and $K_1 \subseteq K_2$ implies $K_2^\circ \subseteq K_1^\circ$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $L \subseteq \mathcal{E}$ be a linear subspace. $L^\circ = L^\perp$.
+:::
+
+::: theorem:Double Polar Theorem for Cones
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K \subseteq \mathcal{E}$ be a nonempty cone. $(K^\circ)^\circ = \operatorname{cl}(\operatorname{conv}(K))$.
+:::
+
+::: corollary
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K \subseteq \mathcal{E}$ be a nonempty cone. $K = (K^\circ)^\circ$ iff $K$ is closed and convex.
+:::
+
+::: lemma:Polar of a Product
+Let $\mathcal{E}_1$ and $\mathcal{E}_2$ be finite-dimensional real Euclidean spaces, and let $K_i \subseteq \mathcal{E}_i$ be nonempty cones for $i \in \{1, 2\}$. $(K_1 \times K_2)^\circ = K_1^\circ \times K_2^\circ$.
+:::
+
+::: theorem:Polarity under a Linear Map
+Let $\mathcal{E}$ and $\mathcal{Y}$ be finite-dimensional real Euclidean spaces, $A : \mathcal{E} \to \mathcal{Y}$ be linear, and $K \subseteq \mathcal{E}$ be a nonempty cone. Set $A^*$ to be the adjoint of $A$. $(AK)^\circ = (A^*)^{-1}(K^\circ)$.
+:::
+
+::: corollary
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $K_1, K_2 \subseteq \mathcal{E}$ be nonempty cones. $(K_1 + K_2)^\circ = K_1^\circ \cap K_2^\circ$.
+:::
+
+::: corollary
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $C_1, C_2 \subseteq \mathcal{E}$ be nonempty closed convex cones. $(C_1 \cap C_2)^\circ = \operatorname{cl}(C_1^\circ + C_2^\circ)$.
+:::
+
+::: definition:Polar Set
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$ contain $0$. Set $K := \{(\lambda x, \lambda) \in \mathcal{E} \times \mathbb{R} : x \in Q, \lambda \geq 0\}$. The polar set of $Q$ is $Q^\circ := \{v \in \mathcal{E} : (v, -1) \in K^\circ\}$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$ contain $0$. $Q^\circ = \{v \in \mathcal{E} : \langle v, x\rangle \leq 1 \text{ for any } x \in Q\}$. In particular, $Q^\circ$ is closed and convex and contains $0$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q_1, Q_2 \subseteq \mathcal{E}$ contain $0$. If $Q_1 \subseteq Q_2$, then $Q_2^\circ \subseteq Q_1^\circ$. If $Q_1$ is a cone, its polar set equals its polar cone.
+:::
+
+::: theorem:Double Polar Theorem for Sets
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $Q \subseteq \mathcal{E}$ contain $0$. $(Q^\circ)^\circ = \operatorname{cl}(\operatorname{conv}(Q))$.
+:::
+
+::: definition:Dual Norm
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $\rho$ be a norm on $\mathcal{E}$. The dual norm is $\rho^*(v) := \underset{\rho(x) \leq 1}{\sup}\langle v, x\rangle$ for any $v \in \mathcal{E}$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space and $\rho$ be a norm on $\mathcal{E}$. Set $B_\rho := \{x \in \mathcal{E} : \rho(x) \leq 1\}$ and $B_{\rho^*} := \{v \in \mathcal{E} : \rho^*(v) \leq 1\}$. $B_\rho^\circ = B_{\rho^*}$.
+:::
+
+## Tangent and Normal Cones
+::: definition:Tangent Cone
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $\bar{x} \in Q$. The tangent cone to $Q$ at $\bar{x}$ is $T_Q(\bar{x}) := \{w \in \mathcal{E} : \text{there exist } x_i \to \bar{x} \text{ in } Q \text{ and } \tau_i \downarrow 0 \text{ s.t. } \tau_i^{-1}(x_i - \bar{x}) \to w\}$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $\bar{x} \in Q$. $T_Q(\bar{x})$ is a closed cone.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $\bar{x} \in Q$. If $Q$ is convex, then $T_Q(\bar{x}) = \operatorname{cl}(\mathbb{R}_+(Q - \bar{x}))$, which is a convex cone.
+:::
+
+::: definition:Normal Cone
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $\bar{x} \in Q$. The normal cone to $Q$ at $\bar{x}$ is $N_Q(\bar{x}) := \{v \in \mathcal{E} : \langle v, x - \bar{x}\rangle \leq o(\|x - \bar{x}\|) \text{ as } x \to \bar{x} \text{ in } Q\}$.
+:::
+
+::: lemma:Tangent-Normal Polarity
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $\bar{x} \in Q$. $N_Q(\bar{x}) = T_Q(\bar{x})^\circ$.
+:::
+
+::: corollary
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $\bar{x} \in Q$. $N_Q(\bar{x})$ is a closed convex cone and $N_Q(\bar{x})^\circ = \operatorname{cl}(\operatorname{conv}(T_Q(\bar{x})))$. Hence $T_Q(\bar{x}) = N_Q(\bar{x})^\circ$ iff $T_Q(\bar{x})$ is convex.
+:::
+
+::: lemma:Normal Cone to a Convex Set
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, and $\bar{x} \in Q$. Assume $Q$ is convex. $N_Q(\bar{x}) = \{v \in \mathcal{E} : \langle v, x - \bar{x}\rangle \leq 0 \text{ for any } x \in Q\}$.
+:::
+
+::: lemma:Normals and Projections
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$, $\bar{x} \in Q$, and $v \in \mathcal{E}$. Assume $Q$ is nonempty, closed, and convex. The following are equivalent: $v \in N_Q(\bar{x})$; $\bar{x} \in \underset{x \in Q}{\operatorname{argmax}}\langle v, x\rangle$; $\operatorname{proj}_Q(\bar{x} + \lambda v) = \bar{x}$ for any $\lambda \geq 0$; and $\operatorname{proj}_Q(\bar{x} + \lambda v) = \bar{x}$ for some $\lambda > 0$.
+:::
+
+::: lemma:Normal Cone to a Convex Cone
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $K \subseteq \mathcal{E}$ be a convex cone, and $x \in K$. $N_K(x) = K^\circ \cap \{x\}^\perp$.
+:::
+
+::: lemma:Normal Cone of an Interior Point
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$ be convex, and $x \in Q$. $x \in \operatorname{int}(Q)$ iff $N_Q(x) = \{0\}$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$ be convex, and $x \in Q$. Set $S := \operatorname{aff}(Q) - x$. $x \in \operatorname{ri}(Q)$ iff $N_Q(x) = S^\perp$.
+:::
+
+::: proposition
+Let $\mathcal{E}$ be a finite-dimensional real Euclidean space, $Q \subseteq \mathcal{E}$ be convex, and $x \in Q$. The halfspaces supporting $Q$ at $x$ are exactly $\{y \in \mathcal{E} : \langle v, y\rangle \leq \langle v, x\rangle\}$ for $v \in N_Q(x)\setminus\{0\}$.
+:::
