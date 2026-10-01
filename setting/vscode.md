@@ -19,12 +19,13 @@
             ]
         }
     },
-
+    
     // vscode
     "files.autoSaveDelay": 10000,
     "editor.fontSize": 15,
     "editor.minimap.enabled": false,
     "editor.wordWrap": "on",
+    "editor.unicodeHighlight.nonBasicASCII": false,
     "workbench.sideBar.location": "right",
     "workbench.statusBar.visible": false,
     "workbench.startupEditor": "none",
@@ -43,21 +44,22 @@
     "update.showReleaseNotes": false,
     "chat.tips.enabled": false,
     "chat.viewSessions.orientation": "stacked",
-
+    "chat.titleBar.openInAgentsWindow.enabled": false,
+    
     // git
     "git.autofetch": true,
-
+    
     // ssh
     "remote.SSH.lockfilesInTmp": true,
     "remote.SSH.remotePlatform": {
         "server1": "linux"
     },
-
+    
     // latex
     "latex-workshop.latex.autoBuild.run": "onSave",
     "latex-workshop.showContextMenu": true,
     "latex-workshop.intellisense.package.enabled": true,
-
+    
     "latex-workshop.latex.tools": [
         {
             "name": "latexmk-xe",
@@ -105,7 +107,7 @@
             ]
         }
     ],
-
+    
     "latex-workshop.latex.recipes": [
         {
             "name": "latexmk (pdfLaTeX)",
@@ -126,9 +128,9 @@
             ]
         }
     ],
-
+    
     "latex-workshop.latex.recipe.default": "latexmk (pdfLaTeX)",
-
+    
     "latex-workshop.latex.clean.fileTypes": [
         "*.fdb_latexmk",
         "*.aux",
@@ -158,7 +160,7 @@
         "*.xdv",
         "*Notes.bib"
     ],
-
+    
     "latex-workshop.latex.clean.method": "glob",
     "latex-workshop.latex.autoClean.run": "onBuilt",
     "latex-workshop.view.pdf.internal.synctex.keybinding": "double-click",
@@ -167,17 +169,13 @@
     "latex-workshop.message.latexlog.exclude": [
         "[Ff]ont shape"
     ],
-
+    
     "workbench.editorAssociations": {
         "*.pdf": "latex-workshop-pdf-hook"
     },
-
+    
     // jupyter
     "jupyter.askForKernelRestart": false,
-
-    // claude code
-    "claudeCode.preferredLocation": "sidebar",
-    "editor.unicodeHighlight.nonBasicASCII": false
 }
 ```
 
