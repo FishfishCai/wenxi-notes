@@ -10,7 +10,7 @@ from torch import nn
 from torch.utils.data import DataLoader
 from typing import Any, Callable, Dict, Iterable, Optional, Type, Union
 
-from .baseModel import BaseModel
+from .base_model import BaseModel
 from .loss import Metric
 
 
