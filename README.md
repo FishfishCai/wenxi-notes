@@ -2,18 +2,22 @@
 
 Public Obsidian notes written by Wenxi Cai.
 
-An Obsidian vault of mathematics notes on analysis, topology, linear algebra, and optimization, with the textbooks they follow, paper collections for ongoing research, shared training code, and personal tool configurations.
+An Obsidian vault of mathematics notes on analysis, topology, linear algebra, and optimization, with the textbooks they follow, papers and web articles sorted by topic, shared training code, and personal tool configurations.
 
 ## Repository structure
 
 ```
 infra/      shared training code: base model, config loader, metric interface, trainer
+library/    papers, Zhihu articles, and blog posts with their notes, in one flat folder
 note/       mathematics notes, one file per subject
-research/   papers and reading notes, one folder per research topic
 setting/    configurations for Latex Suite, SSH, VPN, and VS Code
 textbook/   textbooks the notes follow
 .obsidian/  vault settings, Catppuccin theme, and plugins
 ```
+
+## Library
+
+`library/` has no subfolders. Every paper (`.pdf`) and saved web page (`.html`) sits next to a Markdown note with the same name, for example `PARQ - Piecewise-Affine Regularized Quantization.pdf` and `PARQ - Piecewise-Affine Regularized Quantization.md`. Topics are tags in each note's properties: `ste` and `opti` for research projects, and nested tags such as `generative/diffusion` for posts from Su Jianlin's blog (kexue.fm). A topic's own notes start with the topic name, such as `STE Index.md`. File names are titles, with `:` written as ` - `. Saved web pages are for personal reading and are excluded from the repository by `.gitignore`.
 
 ## Requirements
 

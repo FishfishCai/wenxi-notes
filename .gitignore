@@ -8,3 +8,6 @@
 
 # macOS System
 .DS_Store
+
+# Web pages saved for personal reading
+*.html
