@@ -8,7 +8,7 @@ from pathlib import Path
 from timeit import default_timer
 from torch import nn
 from torch.utils.data import DataLoader
-from typing import Any, Callable, Dict, Iterable, Optional, Type, Union
+from typing import Any, Callable, Dict, Iterable, Type, Union
 
 from .base_model import BaseModel
 from .loss import Metric
@@ -81,10 +81,10 @@ class Trainer:
         model_class: Type[BaseModel],
         config_path: Union[str, Path],
         save_dir: Union[Path, str],
-        optimizer: Optional[Callable[[nn.Module], torch.optim.Optimizer]] = None,
-        scheduler: Optional[Callable[[torch.optim.Optimizer], object]] = None,
-        accelerator: Optional[Accelerator] = None,
-        grad_clip_norm: Optional[float] = None,
+        optimizer: Callable[[nn.Module], torch.optim.Optimizer] | None = None,
+        scheduler: Callable[[torch.optim.Optimizer], object] | None = None,
+        accelerator: Accelerator | None = None,
+        grad_clip_norm: float | None = None,
         seed: int = 0,
         deterministic: bool = False,
         compile_model: bool = False,
@@ -106,16 +106,16 @@ class Trainer:
             Path to a ``.json`` hyper-parameter file or a ``.pth`` checkpoint.
         save_dir : Union[Path, str]
             Directory that receives checkpoints and ``logs.txt``.
-        optimizer : Optional[Callable[[nn.Module], torch.optim.Optimizer]]
+        optimizer : Callable[[nn.Module], torch.optim.Optimizer] | None
             Factory that builds the optimizer from the model. Training is unavailable when
             omitted, which is the evaluation-only mode. Default is None.
-        scheduler : Optional[Callable[[torch.optim.Optimizer], object]]
+        scheduler : Callable[[torch.optim.Optimizer], object] | None
             Factory that builds the learning-rate scheduler from the optimizer. It is
             stepped once per optimizer update. Default is None.
-        accelerator : Optional[Accelerator]
+        accelerator : Accelerator | None
             Accelerator carrying the device, mixed-precision, and gradient-accumulation
             settings. A default one is created when omitted. Default is None.
-        grad_clip_norm : Optional[float]
+        grad_clip_norm : float | None
             Maximum gradient norm applied before each optimizer update. No clipping when
             omitted. Default is None.
         seed : int
@@ -149,8 +149,7 @@ class Trainer:
         if self.save_logs:
             self.log_path.touch()
 
-        # The optimizer factory needs the model, and resuming needs both before prepare
-        # rewrites their keys, so this order is forced.
+        # Order is forced: optimizer needs the model, resume needs both before prepare.
         ckpt = self._build_model(config_path, model_class)
         built_optimizer = optimizer(self.model) if optimizer is not None else None
         built_scheduler = (
@@ -167,10 +166,14 @@ class Trainer:
 
         self.model = self.accelerator.prepare(self.model)
         self.optimizer = (
-            self.accelerator.prepare(built_optimizer) if built_optimizer is not None else None
+            self.accelerator.prepare(built_optimizer)
+            if built_optimizer is not None
+            else None
         )
         self.scheduler = (
-            self.accelerator.prepare(built_scheduler) if built_scheduler is not None else None
+            self.accelerator.prepare(built_scheduler)
+            if built_scheduler is not None
+            else None
         )
 
     def train_with_eval(
@@ -179,10 +182,10 @@ class Trainer:
         max_steps: int,
         train_step: StepFn,
         train_loader: Iterable[Any],
-        train_metrics: Optional[Dict[str, Metric]] = None,
-        eval_step: Optional[Union[StepFn, Dict[str, StepFn]]] = None,
-        eval_loaders: Optional[Dict[str, Iterable[Any]]] = None,
-        eval_metrics: Optional[Dict[str, Dict[str, Metric]]] = None,
+        train_metrics: Dict[str, Metric] | None = None,
+        eval_step: Union[StepFn, Dict[str, StepFn]] | None = None,
+        eval_loaders: Dict[str, Iterable[Any]] | None = None,
+        eval_metrics: Dict[str, Dict[str, Metric]] | None = None,
         log_interval: int = 100,
         eval_interval: int = 1000,
         save_interval: int = 1000,
@@ -190,11 +193,10 @@ class Trainer:
         """
         Train until ``max_steps`` optimizer updates, logging, evaluating, and saving on schedule.
 
-        A step counts one optimizer update, so gradient accumulation consumes several
-        batches per step. The three intervals are independent, and each one also fires on
-        the final step. ``best_model.pth`` tracks the first metric of the first evaluation
-        loader, treating lower as better. Omitting the evaluation arguments trains only.
-        A non-finite loss or gradient norm raises before it can reach the weights.
+        A step is one optimizer update, and each of the three intervals also fires on the
+        final step. ``best_model.pth`` tracks the first metric of the first evaluation
+        loader, lower being better, and a non-finite loss or gradient norm raises before
+        it reaches the weights.
 
         Parameters
         ----------
@@ -206,15 +208,15 @@ class Trainer:
             ``train_metrics``.
         train_loader : Iterable[Any]
             Any iterable of batches. A finite one restarts automatically when exhausted.
-        train_metrics : Optional[Dict[str, Metric]]
+        train_metrics : Dict[str, Metric] | None
             Metrics recorded per logging window and reset afterwards. Default is None.
-        eval_step : Optional[Union[StepFn, Dict[str, StepFn]]]
+        eval_step : Union[StepFn, Dict[str, StepFn]] | None
             Callable receiving the model and one batch and returning a dict forwarded to
             the metrics of that loader, or a mapping from loader name to such a callable.
             Required when ``eval_loaders`` is given. Default is None.
-        eval_loaders : Optional[Dict[str, Iterable[Any]]]
+        eval_loaders : Dict[str, Iterable[Any]] | None
             Named evaluation sets, each of which must be finite. Default is None.
-        eval_metrics : Optional[Dict[str, Dict[str, Metric]]]
+        eval_metrics : Dict[str, Dict[str, Metric]] | None
             Metrics per evaluation loader, keyed the same way as ``eval_loaders``.
             Default is None.
         log_interval : int
@@ -226,7 +228,7 @@ class Trainer:
         """
         if self.optimizer is None:
             raise ValueError(
-                "Training requires an optimizer; pass optimizer=... at construction."
+                "Training requires an optimizer. Pass optimizer=... at construction."
             )
         train_metrics = train_metrics or {}
         eval_loaders = eval_loaders or {}
@@ -243,7 +245,7 @@ class Trainer:
         missing = sorted(set(eval_loaders) - set(eval_metrics))
         if missing:
             raise ValueError(
-                f"eval_metrics has no entry for eval_loaders {missing}; it must be "
+                f"eval_metrics has no entry for eval_loaders {missing}. It must be "
                 "{loader_name: {metric_name: metric}}."
             )
         if eval_loaders and eval_step is None:
@@ -265,7 +267,7 @@ class Trainer:
         head = iter(train_loader)
         first = next(head, None)
         if first is None:
-            raise ValueError("train_loader yielded no batches; training cannot start.")
+            raise ValueError("train_loader yielded no batches, so training cannot start.")
         batches = chain([first], head, chain.from_iterable(repeat(train_loader)))
 
         self.model.train()
@@ -281,7 +283,7 @@ class Trainer:
                 loss = result.pop("loss")
                 if not torch.isfinite(loss):
                     raise FloatingPointError(
-                        f"Non-finite loss after {self.step} steps; stopping before the backward pass."
+                        f"Non-finite loss after {self.step} steps. Stopping before the backward pass."
                     )
                 self.accelerator.backward(loss)
                 if self.grad_clip_norm is not None and self.accelerator.sync_gradients:
@@ -290,8 +292,8 @@ class Trainer:
                     )
                     if self.accelerator.scaler is None and not torch.isfinite(grad_norm):
                         raise FloatingPointError(
-                            f"Non-finite gradient norm after {self.step} steps; "
-                            "stopping before the optimizer update."
+                            f"Non-finite gradient norm after {self.step} steps. "
+                            "Stopping before the optimizer update."
                         )
                 self.optimizer.step()
                 if self.scheduler is not None:
@@ -343,10 +345,9 @@ class Trainer:
         """
         Run every evaluation loader to exhaustion and reduce its metrics.
 
-        The model is switched to evaluation mode and gradients are disabled. Batch results
-        are gathered across processes before reaching the metrics, so every rank computes
-        the same value over the full data. This method also serves post-training
-        evaluation on a trainer built from a checkpoint without an optimizer.
+        Runs in evaluation mode without gradients, gathering batch results across processes
+        so every rank computes the same value over the full data. It also works on a
+        trainer built from a checkpoint without an optimizer.
 
         Parameters
         ----------
@@ -368,7 +369,11 @@ class Trainer:
 
         with torch.no_grad():
             for loader_name, eval_loader in eval_loaders.items():
-                step_fn = eval_step.get(loader_name) if isinstance(eval_step, dict) else eval_step
+                step_fn = (
+                    eval_step.get(loader_name)
+                    if isinstance(eval_step, dict)
+                    else eval_step
+                )
                 if step_fn is None:
                     raise ValueError(f"eval_step has no entry for loader {loader_name!r}.")
                 loader_metrics = eval_metrics[loader_name]
@@ -393,7 +398,7 @@ class Trainer:
         self,
         config_path: Union[str, Path],
         model_class: Type[BaseModel],
-    ) -> Optional[dict]:
+    ) -> dict | None:
         """
         Construct ``self.model`` from a JSON hyper-parameter file or a checkpoint.
 
@@ -410,7 +415,7 @@ class Trainer:
 
         Returns
         -------
-        ckpt : Optional[dict]
+        ckpt : dict | None
             Loaded checkpoint for a ``.pth`` source, None for a ``.json`` source.
         """
         path = Path(config_path).expanduser().resolve()
@@ -424,7 +429,7 @@ class Trainer:
         elif suffix == ".pth":
             ckpt = torch.load(path, map_location="cpu", weights_only=False)
             if "config" not in ckpt:
-                raise KeyError('No "config" found in checkpoint; cannot reconstruct the model.')
+                raise KeyError('No "config" found in checkpoint, so the model cannot be rebuilt.')
             config = json.loads(ckpt["config"])
             saved_name = str(ckpt["model_class"]).rsplit(".", 1)[-1]
             if saved_name != model_class.__qualname__:
@@ -449,8 +454,8 @@ class Trainer:
     def _resume_state(
         self,
         ckpt: dict,
-        optimizer: Optional[torch.optim.Optimizer],
-        scheduler: Optional[object],
+        optimizer: torch.optim.Optimizer | None,
+        scheduler: object | None,
     ) -> None:
         """
         Restore weights, training progress, and optimizer state from a checkpoint.
@@ -459,9 +464,9 @@ class Trainer:
         ----------
         ckpt : dict
             Checkpoint returned by ``_build_model``.
-        optimizer : Optional[torch.optim.Optimizer]
+        optimizer : torch.optim.Optimizer | None
             Optimizer before ``Accelerator.prepare``, so its key names match the file.
-        scheduler : Optional[object]
+        scheduler : object | None
             Scheduler before ``Accelerator.prepare``, so its key names match the file.
         """
         self.model.load_state_dict(ckpt["model"])
@@ -541,8 +546,23 @@ class Trainer:
         def walk(
             values: Dict[str, Any],
             parent: str = "",
-        ):
-            """Yield flattened ``name=value`` fragments from a possibly nested mapping."""
+        ) -> Iterable[str]:
+            """
+            Yield flattened ``name=value`` fragments from a possibly nested mapping.
+
+            Parameters
+            ----------
+            values : Dict[str, Any]
+                Possibly nested mapping from name to value.
+            parent : str
+                Path of the enclosing mapping, joined to child names with ``/``.
+                Default is an empty string.
+
+            Returns
+            -------
+            fragments : Iterable[str]
+                Lazily generated ``name=value`` strings, with numbers formatted to six decimals.
+            """
             for name, value in values.items():
                 full = f"{parent}/{name}" if parent else name
                 if isinstance(value, dict):

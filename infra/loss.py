@@ -14,24 +14,9 @@ class Metric(Protocol):
         self,
         **kwargs: Any,
     ) -> None:
-        """
-        Accumulate the contribution of one batch.
-
-        Parameters
-        ----------
-        **kwargs : Any
-            Entries of the dict returned by the step function, with ``"loss"`` removed.
-            Parameter names must match the keys the step function produces.
-        """
+        """Accumulate one batch, receiving the step function's dict minus ``"loss"`` as keyword arguments."""
         ...
 
     def compute(self) -> Union[torch.Tensor, float, Dict[str, float]]:
-        """
-        Reduce the accumulated state into the metric value.
-
-        Returns
-        -------
-        value : Union[torch.Tensor, float, Dict[str, float]]
-            Scalar value, or a mapping when the metric reports several numbers at once.
-        """
+        """Reduce the accumulated state into a scalar, or a mapping when the metric reports several numbers."""
         ...

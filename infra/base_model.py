@@ -39,8 +39,8 @@ class BaseModel(nn.Module):
         for param in parameters:
             if param.kind in (param.VAR_POSITIONAL, param.VAR_KEYWORD):
                 raise TypeError(
-                    f"{cls.__name__}.__init__ declares *{param.name} or **{param.name}; "
-                    "an explicit signature is required to rebuild it from a checkpoint."
+                    f"{cls.__name__}.__init__ declares *{param.name} or **{param.name}. "
+                    "An explicit signature is required to rebuild it from a checkpoint."
                 )
         bound = sig.bind(cls, *args, **kwargs)
         bound.apply_defaults()
