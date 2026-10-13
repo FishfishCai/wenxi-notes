@@ -1,0 +1,88 @@
+{
+  "blocks": [
+    {
+      "type": "definition",
+      "title": {
+        "family": "Times New Roman",
+        "style": "bold"
+      },
+      "body": {
+        "family": "Times New Roman",
+        "style": "roman"
+      },
+      "numbered": true
+    },
+    {
+      "type": "theorem",
+      "title": {
+        "family": "Times New Roman",
+        "style": "bold"
+      },
+      "body": {
+        "family": "Times New Roman",
+        "style": "italic"
+      },
+      "numbered": true
+    },
+    {
+      "type": "proposition",
+      "title": {
+        "family": "Times New Roman",
+        "style": "bold"
+      },
+      "body": {
+        "family": "Times New Roman",
+        "style": "italic"
+      },
+      "numbered": true
+    },
+    {
+      "type": "lemma",
+      "title": {
+        "family": "Times New Roman",
+        "style": "bold"
+      },
+      "body": {
+        "family": "Times New Roman",
+        "style": "italic"
+      },
+      "numbered": true
+    },
+    {
+      "type": "corollary",
+      "title": {
+        "family": "Times New Roman",
+        "style": "bold"
+      },
+      "body": {
+        "family": "Times New Roman",
+        "style": "italic"
+      },
+      "numbered": true
+    },
+    {
+      "type": "example",
+      "title": {
+        "family": "Times New Roman",
+        "style": "bold"
+      },
+      "body": {
+        "family": "Times New Roman",
+        "style": "roman"
+      },
+      "numbered": false
+    },
+    {
+      "type": "note",
+      "title": {
+        "family": "Times New Roman",
+        "style": "bold"
+      },
+      "body": {
+        "family": "Times New Roman",
+        "style": "roman"
+      },
+      "numbered": false
+    }
+  ]
+}

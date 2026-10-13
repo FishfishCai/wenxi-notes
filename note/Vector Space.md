@@ -141,9 +141,8 @@ Let $V$ be an inner product space. The norm induced by the inner product is $\|x
 Let $V$ be a real or complex inner product space and $a, b \in V$. With the induced norm, $|\langle a, b\rangle| \leq \|a\|\|b\|$. Equality holds iff $a$ and $b$ are linearly dependent.
 :::
 
-::: proof
+*Proof.*
 If $a = 0$ or $b = 0$, the equality holds. Assume $a \neq 0$ and write $b = \beta a + \delta$, where $\beta = \frac{\langle a, b\rangle}{\langle a, a\rangle}$ and $\delta = b - \beta a$. Then $\langle a, \delta\rangle = 0$ and $\|b\|^2 = |\beta|^2\|a\|^2 + \|\delta\|^2$. Thus, $|\langle a, b\rangle|^2 = |\beta|^2\|a\|^4 \leq \|a\|^2\|b\|^2$. Equality holds iff $\delta = 0$, i.e., $b = \beta a$.
-:::
 
 ::: proposition
 Let $V$ be a real or complex inner product space. The induced norm satisfies the norm axioms and $\|a + b\| \leq \|a\| + \|b\|$ for any $a, b \in V$.

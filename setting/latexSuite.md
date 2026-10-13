@@ -14,7 +14,7 @@
 	{trigger: "Vmat", replacement: "\\begin{Vmatrix}\n$0\n\\end{Vmatrix}", options: "MA"},
 	{trigger: "dm", replacement: "$$\n$0\n$$", options: "tA"},
 	{trigger: "mk", replacement: "$$0$$1", options: "tA"},
-	{trigger: "proof", replacement: "::: proof\n$0\n:::\n$1", options: "t"},
+	{trigger: "proof", replacement: "*Proof.*\n$0", options: "t"},
 
     // Math Block
 	{trigger: "def", replacement: "::: definition:$0\n$1\n:::", options: "t"},

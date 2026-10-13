@@ -1,137 +1,3 @@
-## Numerical Foundations
-### Operation Counts
-::: proposition
-Let $a, b \in \mathbb{R}^n$. The operation count for $a^T b$ is $2n - 1$.
-::: ^dot-product-operation-count
-
-::: proposition
-Let $a, b \in \mathbb{R}^n$. The operation count for $a - b$ is $n$.
-::: ^vector-subtraction-operation-count
-
-::: proposition
-Let $\alpha \in \mathbb{R}$ and $a \in \mathbb{R}^n$. The operation count for $\alpha a$ is $n$.
-::: ^scalar-vector-operation-count
-
-::: proposition
-Let $p, x \in \mathbb{R}^n$. The operation count for computing $(I - pp^T)x$ is $4n - 1$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, k}$ and $B \in \mathbb{R}^{k, m}$. The operation count for $AB$ is $nm(2k - 1)$.
-:::
-
-### Floating Point Arithmetic
-::: definition:Idealized Floating Point Number System
-Let $\beta, t \in \mathbb{Z}$. Assume the radix satisfies $\beta \geq 2$ and the precision satisfies $t \geq 1$. The idealized floating point system is $F = \{0\} \cup \left\{ x \in \mathbb{R} : x = \pm \frac{m}{\beta^t} \beta^e, \ \beta^{t - 1} \leq m \leq \beta^t - 1, \ e, m \in \mathbb{Z} \right\}$. The fraction (or mantissa) of $x$ is $\pm \frac{m}{\beta^t}$, and $e$ is the exponent.
-:::
-
-::: definition:Machine Epsilon
-Let $F$ be an idealized floating point system. The machine epsilon is $\varepsilon_{\text{machine}} = \beta^{1 - t}$.
-:::
-
-::: proposition
-Let $F$ be an idealized floating point system. For any $x \in \mathbb{R}$, there exists $x' \in F$ s.t. $|x - x'| \leq \frac{1}{2}\varepsilon_{\text{machine}} |x|$.
-:::
-
-::: definition:Rounding Map
-Let $F$ be an idealized floating point system. The rounding map $\mathrm{fl} : \mathbb{R} \to F$ sends each $x \in \mathbb{R}$ to a nearest element of $F$, using a fixed rule to resolve ties. For $A = \mathbb{R}^d$, write $F_A := \mathrm{fl}(A) = F^d$, where $\mathrm{fl}$ acts coordinatewise.
-:::
-
-::: definition:Floating Point Operation
-Let $F$ be an idealized floating point system, $x, y \in F$, and $* \in \{+, -, \times, \div\}$. Assume $y \neq 0$ when $* = \div$. The floating point operation is $x \circledast y := \mathrm{fl}(x * y)$.
-:::
-
-::: theorem:Fundamental Axiom of Floating Point Arithmetic
-Let $F$ be an idealized floating point system, $x, y \in F$, and $* \in \{+, -, \times, \div\}$. Assume $y \neq 0$ when $* = \div$. There exists $\delta \in \mathbb{R}$ with $|\delta| \leq \frac{1}{2}\varepsilon_{\text{machine}}$ s.t. $x \circledast y = (x * y)(1 + \delta)$.
-:::
-
-### Accuracy
-::: definition:Absolute Error
-Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{R}^m$, $f : X \to Y$ and $\tilde f : F_X \to F_Y$. The absolute error of $\tilde f$ at $x$ is $\|\tilde f(x) - f(x)\|$.
-:::
-
-::: definition:Relative Error
-Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{R}^m$, $f : X \to Y$ and $\tilde f : F_X \to F_Y$. Assume $f(x) \neq 0$. The relative error of $\tilde f$ at $x$ is $\frac{\|\tilde f(x) - f(x)\|}{\|f(x)\|}$.
-:::
-
-::: definition:$O(\varepsilon_{\text{machine}})$
-Let $X = \mathbb{R}^n$ and $\phi_F, \psi_F : F_X \to [0, \infty)$ be families of functions indexed by idealized floating point systems $F$. The notation $\phi_F = O(\psi_F)$ as $\varepsilon_{\text{machine}} \to 0$ means that there exist $C > 0$ and $\varepsilon_0 > 0$ s.t. $\phi_F(x) \leq C\psi_F(x)$ for any $F$ with $\varepsilon_{\text{machine}} < \varepsilon_0$ and any $x \in F_X$. 
-:::
-
-::: definition:Accuracy
-Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{R}^m$, $f : X \to Y$, and $\tilde f : F_X \to F_Y$. $\tilde f$ is accurate for $f$ if there exist $C > 0$ and $\varepsilon_0 > 0$ s.t. $\|\tilde f(x) - f(x)\| \leq C\varepsilon_{\text{machine}}\|f(x)\|$ for any $F$ with $\varepsilon_{\text{machine}} < \varepsilon_0$ and any $x \in F_X$.
-::: ^accuracy
-
-### Conditioning
-::: definition:Condition Number
-Let $f : \mathbb{R}^n \to \mathbb{R}^m$ and $x \in \mathbb{R}^n$. Assume $f$ is continuous. The condition number of $f$ at $x$ is $\hat{\kappa}(x) := \underset{\Delta \to 0,\ \Delta > 0}{\lim} \underset{0 < \|\Delta x\| \leq \Delta}{\sup} \frac{\|f(x + \Delta x) - f(x)\|}{\|\Delta x\|}$.
-::: ^condition-number
-
-::: note
-For [[#^condition-number|Condition Number]], if $f$ is differentiable at $x$, then $\hat{\kappa}(x) = \|J_f(x)\|$.
-:::
-
-::: definition:Relative Condition Number
-Let $f : \mathbb{R}^n \to \mathbb{R}^m$ and $x \in \mathbb{R}^n$. Assume $f$ is continuous, $x \neq 0$, and $f(x) \neq 0$. The relative condition number of $f$ at $x$ is $\kappa(x) := \underset{\Delta \to 0,\ \Delta > 0}{\lim} \underset{0 < \|\Delta x\| \leq \Delta}{\sup} \frac{\frac{\|f(x + \Delta x) - f(x)\|}{\|f(x)\|}}{\frac{\|\Delta x\|}{\|x\|}}$.
-::: ^relative-condition-number
-
-::: note
-For [[#^relative-condition-number|Relative Condition Number]], if $f$ is differentiable at $x$, then $\kappa(x) = \frac{\|J_f(x)\|\|x\|}{\|f(x)\|}$.
-:::
-
-::: definition:Condition Number of Matrix
-Let $A \in \mathbb{R}^{n, k}$. Assume $A$ is full-rank. The condition number of $A$ is $\kappa(A) := \|A\|\|A^{+}\|$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $A$ is nonsingular. $\kappa_2(A) := \|A\|_2\|A^{-1}\|_2 = \frac{\sigma_1(A)}{\sigma_n(A)}$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $\| \cdot \|$ is the spectral norm and each entry of $A$ is i.i.d. normal with $\mu = 0$ and $\sigma^2 = 1$. $\mathbb{E}[\log \kappa(A)] \sim \log n$ as $n \to \infty$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $x, b \in \mathbb{R}^n$. Assume $A$ is nonsingular, $Ax = b$, and $b \neq 0$. Given $A$, the condition number of computing $b$ with $Ax = b$ is $\kappa(x) = \|A\|\frac{\|x\|}{\|b\|} \leq \|A\|\|A^{-1}\|$. If $\| \cdot \| = \| \cdot \|_2$, then equality holds for any $x$ that is a multiple of a right singular vector of $A$ corresponding to the minimal singular value $\sigma_n$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $x, b \in \mathbb{R}^n$. Assume $A$ is nonsingular, $Ax = b$, and $b \neq 0$. Given $A$, the condition number of computing $x$ with $Ax = b$ is $\kappa(b) = \|A^{-1}\|\frac{\|b\|}{\|x\|} \leq \|A\|\|A^{-1}\|$. If $\| \cdot \| = \| \cdot \|_2$, then equality holds for any $b$ that is a multiple of a left singular vector of $A$ corresponding to the maximal singular value $\sigma_1$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $x, b \in \mathbb{R}^n$. Assume $A$ is nonsingular, $Ax = b$, and $b \neq 0$. Given $b$, the condition number of computing $x$ with $x = A^{-1}b$ is $\kappa(A) = \|A\|\|A^{-1}\|$.
-:::
-
-### Stability
-::: definition:Stability
-Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{R}^m$, $f : X \to Y$, and $\tilde f : F_X \to F_Y$. $\tilde f$ is stable for $f$ if there exist $C_1, C_2 > 0$ and $\varepsilon_0 > 0$ s.t. for any $F$ with $\varepsilon_{\text{machine}} < \varepsilon_0$ and any $x \in F_X$, there exists $\tilde x \in X$ satisfying $\|\tilde x - x\| \leq C_1\varepsilon_{\text{machine}}\|x\|$ and $\|\tilde f(x) - f(\tilde x)\| \leq C_2\varepsilon_{\text{machine}}\|f(\tilde x)\|$.
-::: ^stability
-
-::: definition:Backward Stability
-Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{R}^m$, $f : X \to Y$, and $\tilde f : F_X \to F_Y$. $\tilde f$ is backward stable for $f$ if there exist $C > 0$ and $\varepsilon_0 > 0$ s.t. for any $F$ with $\varepsilon_{\text{machine}} < \varepsilon_0$ and any $x \in F_X$, there exists $\tilde x \in X$ satisfying $\|\tilde x - x\| \leq C\varepsilon_{\text{machine}}\|x\|$ and $\tilde f(x) = f(\tilde x)$.
-::: ^backward-stability
-
-::: proposition
-Let $* \in \{+, -, \times, \div\}$. For each idealized floating point system $F$, set $f_*(x, y) := x * y$ and $\tilde f_{F, *}(x, y) := \mathrm{fl}(x) \circledast \mathrm{fl}(y)$ on their natural domains. With the Euclidean norm on $\mathbb{R}^2$, the family $\tilde f_{F, *}$ is backward stable for $f_*$.
-:::
-
-::: note
-For all sufficiently small $\varepsilon_{\text{machine}}$, [[#^accuracy|Accuracy]] implies that $f(x) = 0$ gives $\tilde f(x) = f(x)$. [[#^stability|Stability]] implies that $x = 0$ gives $\tilde x = x$ and that $f(\tilde x) = 0$ gives $\tilde f(x) = f(\tilde x)$. [[#^backward-stability|Backward Stability]] implies that $x = 0$ gives $\tilde x = x$.
-:::
-
-::: note
-For fixed $n$ and $m$, [[#^accuracy|Accuracy]], [[#^stability|Stability]] and [[#^backward-stability|Backward Stability]] are unchanged if the Euclidean norms are replaced by any other norms, since all norms on finite-dimensional real spaces are equivalent.
-:::
-
-::: proposition
-Let $F$ be an idealized floating point system, $X = \mathbb{R}^n$, $Y = \mathbb{R}^m$, $f : X \to Y$, $\tilde f : F_X \to F_Y$, and $x \in F_X$. Assume $f$ is differentiable at $x$, $x \neq 0$, $f(x) \neq 0$, and its relative condition number is finite and positive. Set $\kappa(x)$ to be the relative condition number of $f$ at $x$. If $\tilde f$ is backward stable for $f$, then $\frac{\|\tilde f(x) - f(x)\|}{\|f(x)\|} = O(\kappa(x) \varepsilon_{\text{machine}})$ as $\varepsilon_{\text{machine}} \to 0$ with $x$ fixed.
-:::
-
-::: proof
-By the definition of backward stability, $\tilde f(x) = f(\tilde x)$ for some $\tilde x \in X$ satisfying $\frac{\|\tilde x - x\|}{\|x\|} = O(\varepsilon_{\text{machine}})$. By the definition of $\kappa(x)$, this implies $\frac{\|\tilde f(x) - f(x)\|}{\|f(x)\|} \le (\kappa(x) + o(1)) \frac{\|\tilde x - x\|}{\|x\|}$, where $o(1)$ denotes a quantity that converges to zero as $\varepsilon_{\text{machine}} \to 0$. For fixed $x$, combining these gives the proof.
-:::
-
 ## Matrix Factorizations
 ### LU Factorization
 ::: theorem:Gaussian Elimination
@@ -166,37 +32,9 @@ Let $A \in \mathbb{C}^{n, n}$. There exist a permutation matrix $P \in \mathbb{R
 Let $A \in \mathbb{R}^{n, n}$. Assume the indicated elimination completes without breakdown. The operation count of [[#^lu-partial-pivoting|LU Factorization with Partial Pivoting]] is $\sim \frac{2}{3}n^{3}$.
 :::
 
-::: definition:Growth Factor
-Let $A \in \mathbb{C}^{n, n}$. Assume $A \neq 0$ and Gaussian elimination completes. Set $U$ to be its upper-triangular factor. The growth factor for $A$ is $\rho = \frac{\underset{i, j}{\max} |u_{ij}|}{\underset{i, j}{\max} |a_{ij}|}$.
-:::
-
-::: proposition
-Let $A \in \mathbb{C}^{n, n}$. Assume $A$ is nonsingular and the factorization $A = LU$ is computed by Gaussian elimination without pivoting on a computer satisfying the axioms of floating point arithmetic. If $A$ has an LU factorization and the factorization completes successfully in floating point arithmetic, then the computed matrices $\tilde{L}$ and $\tilde{U}$ satisfy $\tilde{L}\tilde{U} = A + \delta A$ and $\frac{\|\delta A\|}{\|L\|\|U\|} = O(\varepsilon_{\text{machine}})$ for some $\delta A \in \mathbb{C}^{n, n}$.
-:::
-
-::: proposition
-Let $A \in \mathbb{C}^{n, n}$. Assume the factorization $PA = LU$ is computed by Gaussian elimination with partial pivoting on a computer satisfying the axioms of floating point arithmetic. The computed matrices $\tilde{P}$, $\tilde{L}$, and $\tilde{U}$ satisfy $\tilde{L}\tilde{U} = \tilde{P}A + \delta A$ and $\frac{\|\delta A\|}{\|A\|} = O(\rho \varepsilon_{\text{machine}})$ for some $\delta A \in \mathbb{C}^{n, n}$, where $\rho$ is the growth factor for $A$. If $|\ell_{ij}| < 1$ for each $i > j$, implying that there are no ties in the selection of pivots in exact arithmetic, then $\tilde{P} = P$ for all sufficiently small $\varepsilon_{\text{machine}}$.
-:::
-
-::: proposition
-Let $A \in \mathbb{C}^{n, n}$. For Gaussian elimination with partial pivoting applied to $A$, the growth factor satisfies $\rho \le 2^{n - 1}$.
-:::
-
-::: proposition
-Gaussian elimination with partial pivoting is backward stable.
-:::
-
-::: note
-For the above, backward stability holds in the sense that for each fixed dimension $n$, the bound $\frac{\|\delta A\|}{\|A\|} = O(\varepsilon_{\text{machine}})$ applies uniformly to all matrices of that dimension, but the constant involves $2^{n - 1}$. In practice, large growth factors are exponentially rare among random matrices, and Gaussian elimination with partial pivoting is utterly stable in practice.
-:::
-
 ### Cholesky Factorizations
 ::: proposition
 Let $A \in \mathbb{R}^{n, n}$. Assume $A$ is symmetric positive definite. The operation count of [[Matrix#^cholesky-factorization|Cholesky Factorization]] is $\sim \frac{1}{3}n^{3}$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $A$ is symmetric positive definite and [[Matrix#^cholesky-factorization|Cholesky factorization]] is computed on a computer satisfying the axioms of floating point arithmetic. For all sufficiently small $\varepsilon_{\text{machine}}$, the algorithm completes and its computed factor $\tilde R$ satisfies $\tilde R^T \tilde R = A + \delta A$ with $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$ for some $\delta A \in \mathbb{R}^{n, n}$.
 :::
 
 ### QR Factorization
@@ -266,10 +104,6 @@ Set $R = A_k$ and $Q = H_1H_2\cdots H_k$. $R$ is upper trapezoidal, $Q$ is ortho
 Let $A \in \mathbb{R}^{n, k}$. Assume $A$ has full column rank. The operation count of [[#^householder-qr|Householder QR Factorization]] is approximately $\sum_{j = 1}^{k}4(n - j + 1)(k - j + 1) \sim 2nk^{2} - \frac{2}{3}k^{3}$.
 :::
 
-::: proposition
-[[#^householder-qr|Householder QR Factorization]] is backward stable.
-::: ^householder-qr-backward-stability
-
 ### Least Squares
 ::: definition:Least Square via Normal Equations
 Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank. Form $A^T A$ and $A^T b$, compute the Cholesky factorization $A^T A = R^T R$, solve $R^T w = A^T b$ for $w$, and solve $R x = w$ for $x$. The resulting $x$ is the unique minimizer of $\|b - Ax\|_2$.
@@ -293,14 +127,6 @@ Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full colu
 
 ::: proposition
 Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and real arithmetic is used. The computation of [[#^least-square-svd|Least Square via SVD]] is approximately $2 n k^2 + 11 k^3$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, k}$ and $b \in \mathbb{R}^n$. Assume $A$ has full column rank and [[#^least-square-qr|least squares via QR factorization]] is implemented using Householder reflections on a computer satisfying the axioms of floating point arithmetic. The algorithm is backward stable: its computed solution $\tilde x$ minimizes $\|b - (A + \delta A)x\|_2$ for some $\delta A \in \mathbb{R}^{n, k}$ satisfying $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$.
-:::
-
-::: proposition
-Let $A, \Delta A \in \mathbb{R}^{n, k}$, $b, \Delta b \in \mathbb{R}^n$, $x, y \in \mathbb{R}^k$, and $\varepsilon > 0$. Assume $A$ has full column rank, $x \neq 0$, and $\varepsilon \kappa_2(A) < 1$. If $x$ minimizes $\|b - Ax\|_2$, $y$ minimizes $\|b + \Delta b - (A + \Delta A) y\|_2$, $\|\Delta A\|_2 < \varepsilon \|A\|_2$ and $\|\Delta b\|_2 < \varepsilon \|b\|_2$, then $\frac{\|y - x\|_2}{\|x\|_2} \le \frac{2 \varepsilon \kappa_2(A)}{1 - \varepsilon \kappa_2(A)} + \frac{\varepsilon \kappa_2(A)(\kappa_2(A) + 1)}{1 - \varepsilon \kappa_2(A)} \frac{\|b - Ax\|_2}{\|A\|_2 \|x\|_2}$.
 :::
 
 ## Eigenvalue and SVD Algorithms
@@ -331,16 +157,11 @@ Let $A \in \mathbb{C}^{n, n}$. Householder Hessenberg reduction costs $\sim \fra
 :::
 
 ::: proposition
-Let $A \in \mathbb{C}^{n, n}$. Assume $A \neq 0$ and Householder Hessenberg reduction is performed in the standard floating point model. Set $\tilde H$ to be the computed factor and $\tilde Q$ the exact unitary product represented by the computed reflectors. There exists $\delta A$ s.t. $\tilde Q\tilde H\tilde Q^H = A + \delta A$ and $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$.
-:::
-
-::: proposition
 Let $A \in \mathbb{R}^{n, n}$ and $v_0 \in \mathbb{R}^n$. Assume $n \geq 2$, $A$ is symmetric with orthonormal eigenpairs $(\lambda_j, q_j)$ ordered by $|\lambda_1| > |\lambda_2| \geq \cdots \geq |\lambda_n|$, $\|v_0\|_2 = 1$, and $q_1^T v_0 \neq 0$. Set $c = \left|\frac{\lambda_2}{\lambda_1}\right|$, $v_k = \frac{Av_{k - 1}}{\|Av_{k - 1}\|_2}$, and $\rho_k = r(v_k)$. Power iteration satisfies $\|v_k - (\pm q_1)\|_2 = O(c^k)$ and $|\rho_k - \lambda_1| = O(c^{2k})$ as $k \to \infty$, with signs chosen at each step.
 :::
 
-::: proof
+*Proof.*
 $v_{0} = a_1q_1 + a_2q_2 + \cdots + a_nq_n$. Since $v_{k}$ is a multiple of $A^kv_{0}$, $v_{k} = c_k\lambda_1^k(a_1q_1 + a_2(\frac{\lambda_2}{\lambda_1})^kq_2 + \cdots + a_n(\frac{\lambda_n}{\lambda_1})^kq_n)$. Since $a_1 = q_1^{T}v_{0} \neq 0$, the first equation follows. The second follows from this and $r(q_1) - r(x) = O(\|x - q_1\|_2^2)$.
-:::
 
 ::: proposition
 Let $A \in \mathbb{R}^{n, n}$, $\mu \in \mathbb{R}$, and $v_0 \in \mathbb{R}^n$. Assume $n \geq 2$, $A$ is symmetric with orthonormal eigenpairs $(\lambda_j, q_j)$, $\mu$ is not an eigenvalue, $\|v_0\|_2 = 1$, and $q_J^T v_0 \neq 0$, where $\lambda_J$ is simple and uniquely closest to $\mu$ and $\lambda_K$ is second closest. Set $c = \left|\frac{\mu - \lambda_J}{\mu - \lambda_K}\right|$, $(A - \mu I)w_k = v_{k - 1}$, $v_k = \frac{w_k}{\|w_k\|_2}$, and $\rho_k = r(v_k)$. Inverse iteration satisfies $\|v_k - (\pm q_J)\|_2 = O(c^k)$ and $|\rho_k - \lambda_J| = O(c^{2k})$ as $k \to \infty$, with signs chosen at each step.
@@ -360,9 +181,8 @@ for $k \geq 0$. The iteration stops if $Av_k = \rho_k v_k$. Otherwise, the next 
 Let $A \in \mathbb{R}^{n, n}$ and $v_0 \in \mathbb{R}^n$. Assume $A = A^T$ and $\|v_0\|_2 = 1$. Set $v_k$ and $\rho_k$ to be the Rayleigh quotient iterates. The iteration converges to an eigenpair for almost every starting unit vector. If $\lambda_J$ is a simple eigenvalue with unit eigenvector $q_J$ and $v_0$ is sufficiently close to $q_J$, then convergence is ultimately cubic: $\|v_{k + 1} - (\pm q_J)\|_2 = O(\|v_k - (\pm q_J)\|_2^3)$ and $|\rho_{k + 1} - \lambda_J| = O(|\rho_k - \lambda_J|^3)$ as $k \to \infty$, with signs chosen at each step. Finite termination is included.
 :::
 
-::: proof
+*Proof.*
 For a simple $\lambda_J$, if $\|v_{k} - q_J\| \le \epsilon$ for sufficiently small $\epsilon$, the Rayleigh quotient satisfies $|\rho_k - \lambda_J| = O(\epsilon^2)$ by the quadratic accuracy of the Rayleigh quotient. By the inverse-iteration estimate in [[#^inverse-iteration-convergence|inverse iteration]], one step of inverse iteration with shift $\mu = \rho_k$ gives $\|v_{k + 1} - ( \pm q_J)\| = O(|\rho_k - \lambda_J| \cdot \|v_{k} - ( \pm q_J)\|) = O(\epsilon^3)$. The constants are uniform near $\lambda_J$ and $q_J$.
-:::
 
 ::: proposition
 Let $A \in \mathbb{R}^{n, n}$ and $V_0 \in \mathbb{R}^{n, m}$. Assume $1 \leq m < n$, $A$ is symmetric with orthonormal eigenpairs $(\lambda_j, q_j)$ ordered by $|\lambda_1| > \cdots > |\lambda_m| > |\lambda_{m + 1}| \geq \cdots \geq |\lambda_n|$, and all leading principal minors of $[q_1\;\cdots\;q_m]^T V_0$ are nonzero. Set $V_0 = \hat Q_0R_0$, $A\hat Q_{t - 1} = \hat Q_tR_t$ by reduced QR factorization, $q_{j,t} = (\hat Q_t)_{:,j}$, and $c = \underset{1 \leq j \leq m}{\max}\left|\frac{\lambda_{j + 1}}{\lambda_j}\right|$. Simultaneous iteration satisfies $\|q_{j,t} - q_j\|_2 = O(c^t)$ for $1 \leq j \leq m$ as $t \to \infty$, after adjusting column signs.
@@ -372,9 +192,8 @@ Let $A \in \mathbb{R}^{n, n}$ and $V_0 \in \mathbb{R}^{n, m}$. Assume $1 \leq m 
 Let $A \in \mathbb{R}^{n, n}$. Set $A_0 = A$, $A_{k - 1} = U_kR_k$ by QR factorization, $A_k = R_kU_k$, $\bar Q_k = U_1\cdots U_k$, and $\bar R_k = R_k\cdots R_1$, with $\bar Q_0 = \bar R_0 = I$. Pure QR iteration is equivalent to simultaneous iteration starting from $I$, with $A^k = \bar Q_k\bar R_k$ and $A_k = \bar Q_k^T A\bar Q_k$.
 :::
 
-::: proof
+*Proof.*
 By induction on $k$. For $k = 0$, $A^0 = I = \bar Q_0\bar R_0$ and $A_0 = A$. For $k \ge 1$, $A\bar Q_{k - 1} = \bar Q_{k - 1}A_{k - 1} = \bar Q_{k - 1}U_kR_k = \bar Q_kR_k$. Thus $A^k = A\bar Q_{k - 1}\bar R_{k - 1} = \bar Q_kR_k\bar R_{k - 1} = \bar Q_k\bar R_k$, which is also the factorization generated by simultaneous iteration. Finally, $A_k = U_k^T A_{k - 1}U_k = \bar Q_k^T A\bar Q_k$.
-:::
 
 ::: proposition
 Let $A \in \mathbb{R}^{n, n}$. Assume $A = A^T$, the eigenvalues satisfy $|\lambda_1| > |\lambda_2| > \cdots > |\lambda_n|$, and the eigenvector matrix $Q$ of $A$ has all nonzero leading principal minors. Set $A_k$ and $\bar Q_k$ to be the pure QR iterates and accumulated orthogonal factors starting from $A_0 = A$. $A_{k}$ converges linearly with constant $\underset{1 \le j < n}{\max} \frac{|\lambda_{j + 1}|}{|\lambda_j|}$ to $\mathrm{diag}(\lambda_1, \ldots, \lambda_n)$, and $\bar Q_k$ (with the signs of its columns adjusted as necessary) converges at the same rate to $Q$.
@@ -398,14 +217,6 @@ Let $A_k \in \mathbb{R}^{n, n}$. Assume $n \geq 2$ and $A_k = A_k^T$. Set $B = \
 
 ::: proposition
 Let $A \in \mathbb{R}^{n, n}$. Assume $A = A^T$ and $A$ is tridiagonal. In exact arithmetic, shifted QR iteration with the Wilkinson shift and deflation converges. For each unreduced active block, convergence of its trailing subdiagonal entry to zero is at least quadratic and is generically cubic.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $A \neq 0$ is symmetric tridiagonal and shifted QR diagonalization is performed in the standard floating point model with deflation tolerance $\tau = O(\varepsilon_{\text{machine}})$. Set $\tilde\Lambda$ to be the computed diagonal factor and $\tilde Q$ the exact orthogonal product represented by the computed rotations or reflectors. There exists $\delta A$ s.t. $\tilde Q\tilde\Lambda\tilde Q^T = A + \delta A$ and $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$. Assume $A \neq 0$ is symmetric and tridiagonal reduction followed by shifted QR is performed in the standard floating point model with deflation tolerance $\tau = O(\varepsilon_{\text{machine}})$. Its exact and computed eigenvalues, ordered increasingly, satisfy $\frac{|\tilde\lambda_j - \lambda_j|}{\|A\|_2} = O(\varepsilon_{\text{machine}})$ for $j = 1, \ldots, n$.
 :::
 
 ::: definition:Jacobi Algorithm
@@ -474,10 +285,6 @@ $$
 The output is $A = U\Sigma V^T$, with the nonnegative diagonal entries of $\Sigma$ and corresponding columns of $U,V$ ordered by decreasing singular value. For a wide matrix, apply the procedure to $A^T$ and interchange the left and right factors.
 :::
 
-::: proposition
-Let $A \in \mathbb{R}^{n, k}$. Assume $A \neq 0$ and a backward stable SVD algorithm is used. Its computed singular values satisfy $\tilde\sigma_j = \sigma_j(A + \delta A)$ for some common perturbation $\delta A$ with $\frac{\|\delta A\|_2}{\|A\|_2} = O(\varepsilon_{\text{machine}})$. Consequently, $\frac{|\tilde\sigma_j - \sigma_j(A)|}{\|A\|_2} = O(\varepsilon_{\text{machine}})$ for $j = 1, \ldots, \min(n, k)$.
-:::
-
 ## Iterative Methods
 ### Arnoldi and Lanczos
 ::: definition:Krylov Sequence
@@ -521,9 +328,8 @@ Let $A \in \mathbb{C}^{n, n}$, $b \in \mathbb{C}^n$, and $k \ge 1$ be an integer
 Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $K_k$ has full column rank and Arnoldi is performed in exact arithmetic. The unique solution of the Arnoldi approximation problem is $\pi_k(z) = \det(zI - H_k)$.
 ::: ^arnoldi-polynomial-characterization
 
-::: proof
+*Proof.*
 The minimization is a least squares problem with residual $A^kb + z$, $z \in \mathcal K_k(A,b)$, so optimality is equivalent to $Q_k^Hp(A)b = 0$. The Arnoldi relation gives $Q_k^HA^jb = \|b\|_2H_k^je_1$ for $0 \le j \le k$. Cayley–Hamilton therefore gives $Q_k^H\pi_k(A)b = 0$. Two minimizing monic polynomials would differ by a polynomial $d$ of degree at most $k - 1$ with $d(A)b = 0$. Full column rank of $K_k$ implies $d = 0$.
-:::
 
 ::: proposition
 Let $A \in \mathbb{C}^{n, n}$, $b \in \mathbb{C}^n$, $\sigma \in \mathbb{C}$, and $U \in \mathbb{C}^{n, n}$. Assume $U$ is unitary and Arnoldi reaches step $k$ in exact arithmetic. Set $\{\theta_j\}$ to be its Ritz values. Replacing $(A,b)$ by $(A + \sigma I,b)$ gives Ritz values $\{\theta_j + \sigma\}$. Replacing it by $(\sigma A,b)$ with $\sigma \neq 0$ gives $\{\sigma\theta_j\}$. Replacing it by $(UAU^H,Ub)$ leaves the Ritz values unchanged.
@@ -548,7 +354,7 @@ Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A = A^H$ and Lan
 :::
 
 ::: proposition
-Let $A \in \mathbb{C}^{n, n}$. Assume $A = A^H$. Each Lanczos step without reorthogonalization requires one matrix-vector product and $O(n)$ additional operations. In floating point arithmetic, the generated vectors need not remain mutually orthogonal.
+Let $A \in \mathbb{C}^{n, n}$. Assume $A = A^H$. Each Lanczos step without reorthogonalization requires one matrix-vector product and $O(n)$ additional operations.
 :::
 
 ::: definition:Jacobi Matrix
@@ -567,9 +373,8 @@ $$
 The polynomials are orthonormal with $\deg q_j = j - 1$. The Jacobi matrix $T_k$ with diagonal $\alpha_1,\ldots,\alpha_k$ and off-diagonal $\beta_1,\ldots,\beta_{k - 1}$ satisfies $\det(xI - T_k) = C_kq_{k + 1}(x)$, where $C_k$ is the reciprocal leading coefficient of $q_{k + 1}$. Its zeros are distinct and lie in $(-1,1)$.
 :::
 
-::: proof
+*Proof.*
 For $i \le j - 2$, $\langle xq_j,q_i\rangle_w = \langle q_j,xq_i\rangle_w = 0$, which gives the three-term recurrence. The monic polynomials $C_kq_{k + 1}$ and determinants $\det(xI - T_k)$ satisfy the same recurrence $d_k = (x - \alpha_k)d_{k - 1} - \beta_{k - 1}^2d_{k - 2}$, with $d_0 = 1$ and $d_1 = x - \alpha_1$. If $q_{k + 1}$ had fewer than $k$ sign changes in $(-1,1)$, multiplying by the product of its sign-change factors would give a nonzero integral against $w$, contradicting orthogonality to polynomials of degree below $k$.
-:::
 
 ::: proposition
 Let $x_1,\ldots,x_k \in [-1,1]$ be distinct. There exist unique weights $w_1,\ldots,w_k$ s.t. $\int_{-1}^1 f(x)\,dx = \sum_{j = 1}^k w_jf(x_j)$ for every polynomial $f$ of degree at most $k - 1$.
@@ -579,9 +384,8 @@ Let $x_1,\ldots,x_k \in [-1,1]$ be distinct. There exist unique weights $w_1,\ld
 Let $k \ge 1$ be an integer. The quadrature rule with nodes at the zeros of the degree-$k$ Legendre polynomial and weights from [[#^quadrature-interpolation|quadrature interpolation]] is the Gauss–Legendre rule. Its degree of exactness is $2k - 1$, the largest possible for a $k$-node rule on $[-1,1]$.
 :::
 
-::: proof
+*Proof.*
 Write $I(f) = \int_{-1}^1 f(x)\,dx$ and $I_k(f) = \sum_{j = 1}^k w_jf(x_j)$. For any nodes, $f(x) = \prod_{j = 1}^k(x - x_j)^2$ satisfies $I(f) > 0 = I_k(f)$, so exactness cannot reach degree $2k$. Let $L_k$ be the degree-$k$ Legendre polynomial. For $\deg f \le 2k - 1$, polynomial division gives $f = gL_k + r$ with $\deg g,\deg r \le k - 1$. Legendre orthogonality with weight $1$ gives $I(gL_k) = 0$, and its zeros give $I_k(gL_k) = 0$. Thus $I(f) = I(r) = I_k(r) = I_k(f)$.
-:::
 
 ::: proposition
 Let $k \ge 1$ be an integer. Set $T_k \in \mathbb{R}^{k, k}$ to be tridiagonal with $(T_k)_{jj} = 0$ for $1 \le j \le k$ and $(T_k)_{j,j + 1} = (T_k)_{j + 1,j} = \frac{j}{\sqrt{4j^2 - 1}}$ for $1 \le j < k$. Compute $T_k = V\operatorname{diag}(\lambda_1,\ldots,\lambda_k)V^T$ with $V = (v_1\ \cdots\ v_k)$ orthogonal. The Gauss–Legendre nodes and weights are $x_j = \lambda_j$ and $w_j = 2(v_j)_1^2$ for $1 \le j \le k$.
@@ -612,72 +416,23 @@ Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ is nonsingula
 Let $A \in \mathbb{C}^{n, n}$, $b \in \mathbb{C}^n$, $\sigma \in \mathbb{C}\setminus\{0\}$, and $U \in \mathbb{C}^{n, n}$. Assume $A$ is nonsingular and $U$ is unitary. Set $r_k$ to be the exact-arithmetic GMRES residual from $x_0 = 0$. Replacing $(A,b)$ by $(\sigma A,\sigma b)$ gives residual $\sigma r_k$. Replacing it by $(UAU^H,Ub)$ gives $Ur_k$. GMRES is not generally invariant under shifts $A \mapsto A + \tau I$ with $\tau \in \mathbb{C}$.
 :::
 
+::: definition:Matrix Condition Number
+Let $A \in \mathbb{C}^{n, n}$. Assume $A$ is nonsingular. Its spectral condition number is $\kappa_2(A) = \lVert A\rVert_2\lVert A^{-1}\rVert_2 = \frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}$.
+:::
+
 ::: proposition
 Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ is nonsingular and diagonalizable, $b \neq 0$, and GMRES is performed in exact arithmetic from $x_0 = 0$. Set $A = X\Lambda X^{-1}$, $r_k = b - Ax_k$, and $P_k = \{p \in \mathbb{C}[z] : \deg p \le k,\ p(0) = 1\}$. $\frac{\|r_k\|_2}{\|b\|_2} \le \kappa_2(X)\underset{p \in P_k}{\inf}\underset{\lambda \in \sigma(A)}{\max}|p(\lambda)|$.
 :::
 
-::: proof
+*Proof.*
 For $p \in P_k$, $\|p(A)\|_2 = \|Xp(\Lambda)X^{-1}\|_2 \le \kappa_2(X)\underset{\lambda \in \sigma(A)}{\max}|p(\lambda)|$. Apply the GMRES polynomial bound.
+
+::: note
+The CG recurrence, orthogonality, subspace minimization, polynomial error bound, finite termination, and Chebyshev bound are collected in [[Conjugate Gradient]]. For complex Hermitian $A \succ 0$, the same recurrence uses the Hermitian inner product $\langle u,v\rangle = u^Hv$.
 :::
 
-::: definition:Conjugate Gradient Method
-Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ is Hermitian positive definite. Set $x_0 = 0$ and $r_0 = p_0 = b$. CG performs the following operations while $r_{k - 1} \neq 0$:
-$$
-\begin{aligned}
-v_k &\leftarrow Ap_{k - 1},\\
-\alpha_k &\leftarrow \frac{r_{k - 1}^Hr_{k - 1}}{p_{k - 1}^Hv_k},\\
-x_k &\leftarrow x_{k - 1} + \alpha_kp_{k - 1},\\
-r_k &\leftarrow r_{k - 1} - \alpha_kv_k,\\
-\beta_k &\leftarrow \frac{r_k^Hr_k}{r_{k - 1}^Hr_{k - 1}},\\
-p_k &\leftarrow r_k + \beta_kp_{k - 1}.
-\end{aligned}
-$$
-After termination, subsequent iterates remain fixed.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $b \in \mathbb{R}^n$. Assume $A$ is symmetric positive definite and CG is performed in exact arithmetic from $x_0 = 0$. If $r_{k - 1} \neq 0$, then $\mathcal K_k(A,b) = \operatorname{span}\{x_1,\ldots,x_k\} = \operatorname{span}\{p_0,\ldots,p_{k - 1}\} = \operatorname{span}\{r_0,\ldots,r_{k - 1}\}$. Moreover, $r_k^Tr_j = 0$ and $p_k^TAp_j = 0$ for $0 \le j < k$.
-::: ^cg-orthogonality
-
-::: proof
-Induct on $k$. The recurrences place $r_j,p_j$ in $\mathcal K_{j + 1}(A,b)$. Suppose the preceding nonzero residuals are orthogonal and the preceding directions are $A$-conjugate. For $j < k - 1$, $r_j \in \operatorname{span}\{p_0,\ldots,p_j\}$ gives $r_k^Tr_j = 0$. Since $p_{k - 1} - r_{k - 1}$ is a multiple of $p_{k - 2}$, $p_{k - 1}^TAr_{k - 1} = p_{k - 1}^TAp_{k - 1}$, so the choice of $\alpha_k$ gives $r_k^Tr_{k - 1} = 0$.
-For $j < k - 1$, $Ap_j = \frac{r_j - r_{j + 1}}{\alpha_{j + 1}}$ gives $p_k^TAp_j = 0$. For $j = k - 1$, $r_k^TAp_{k - 1} = -\frac{\|r_k\|_2^2}{\alpha_k}$, so the choice of $\beta_k$ gives $p_k^TAp_{k - 1} = 0$. The nonzero orthogonal residuals form a basis of $\mathcal K_k(A,b)$. The triangular recurrences for $p_j$ and $x_j$, with $\alpha_j > 0$, give the other span identities. At $k = 1$, use $p_0 = r_0$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $b \in \mathbb{R}^n$. Assume $A$ is symmetric positive definite and CG is performed in exact arithmetic from $x_0 = 0$. Set $x = A^{-1}b$ and $\|z\|_A = \sqrt{z^TAz}$. The iterate $x_k$ uniquely minimizes $\|x - z\|_A$ over $z \in \mathcal K_k(A,b)$. The errors satisfy $\|x - x_k\|_A \le \|x - x_{k - 1}\|_A$, and CG terminates in at most $n$ steps.
-::: ^cg-minimization
-
-::: proof
-For $z = x_k - d \in \mathcal K_k(A,b)$, [[#^cg-orthogonality|CG orthogonality]] gives $r_k^Td = 0$. Hence $\|x - z\|_A^2 = \|x - x_k\|_A^2 + \|d\|_A^2$, with equality to the minimum iff $d = 0$. Nested Krylov spaces give monotonicity. More than $n$ nonzero mutually orthogonal residuals in $\mathbb{R}^n$ are impossible, so $r_k = 0$ for some $k \le n$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $b \in \mathbb{R}^n$. Assume $A$ is symmetric positive definite, $b \neq 0$, and CG is performed in exact arithmetic from $x_0 = 0$. Set $e_k = A^{-1}b - x_k$ and $P_k = \{p \in \mathbb{R}[z] : \deg p \le k,\ p(0) = 1\}$. $\|e_k\|_A = \underset{p \in P_k}{\min}\|p(A)e_0\|_A$ and $\frac{\|e_k\|_A}{\|e_0\|_A} \le \underset{p \in P_k}{\inf}\underset{\lambda \in \sigma(A)}{\max}|p(\lambda)|$.
-::: ^cg-polynomial-error
-
-::: proof
-The errors attainable in $\mathcal K_k(A,b)$ are exactly $p(A)e_0$ with $p \in P_k$. Apply [[#^cg-minimization|CG minimization]]. In an orthonormal eigenbasis, write $e_0 = \sum_j a_jv_j$. Then $\|p(A)e_0\|_A^2 = \sum_j a_j^2\lambda_jp(\lambda_j)^2 \le \underset{\lambda \in \sigma(A)}{\max}|p(\lambda)|^2\|e_0\|_A^2$.
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $b \in \mathbb{R}^n$. Assume $A$ is symmetric positive definite. If $A$ has $m$ distinct eigenvalues, then exact-arithmetic CG from $x_0 = 0$ terminates in at most $m$ steps.
-:::
-
-::: proof
-If $b = 0$, the initial iterate solves the system. Otherwise, for the distinct eigenvalues $\mu_1,\ldots,\mu_m$, the polynomial $p(z) = \prod_{j = 1}^m(1 - \frac{z}{\mu_j})$ satisfies $p(0) = 1$ and vanishes on $\sigma(A)$. Apply [[#^cg-polynomial-error|CG polynomial error bound]].
-:::
-
-::: proposition
-Let $A \in \mathbb{R}^{n, n}$ and $b \in \mathbb{R}^n$. Assume $A$ is symmetric positive definite, $b \neq 0$, and CG is performed in exact arithmetic from $x_0 = 0$. Set $e_k = A^{-1}b - x_k$ and $\kappa = \kappa_2(A) = \frac{\lambda_{\max}(A)}{\lambda_{\min}(A)}$. $\frac{\|e_k\|_A}{\|e_0\|_A} \le 2\left(\frac{\sqrt\kappa - 1}{\sqrt\kappa + 1}\right)^k$ for $k \ge 1$.
-:::
-
-::: proof
-If $\kappa = 1$, then $A = cI$ with $c > 0$, and CG terminates in one step. Otherwise, set $a = \lambda_{\min}(A)$, $d = \lambda_{\max}(A)$, $\gamma = \frac{d + a}{d - a}$, and $p(z) = \frac{T_k(\frac{d + a - 2z}{d - a})}{T_k(\gamma)}$, where $T_k$ is the Chebyshev polynomial. Since $p(0) = 1$ and $|T_k(t)| \le 1$ on $[-1,1]$, [[#^cg-polynomial-error|CG polynomial error bound]] is at most $\frac{1}{T_k(\gamma)}$. The identity $T_k(\gamma) = \frac{s^k + s^{-k}}{2}$ with $s = \gamma + \sqrt{\gamma^2 - 1} = \frac{\sqrt\kappa + 1}{\sqrt\kappa - 1}$ gives the bound.
-:::
-
-::: proposition
-Let $A \in \mathbb{C}^{n, n}$. Assume $A$ is Hermitian positive definite. Each CG step requires one matrix-vector product and $O(n)$ additional operations.
+::: note
+For [[Conjugate Gradient#^cg-subspace-optimality|CG subspace optimality]], nested search spaces give $\lVert x_k-x^*\rVert_A \leq \lVert x_{k-1}-x^*\rVert_A$. The corresponding polynomial characterization is $\lVert x_k-x^*\rVert_A = \underset{q\in\mathcal P_k}{\min}\lVert q(A)(x_0-x^*)\rVert_A$, with $\mathcal P_k$ as in the [[Conjugate Gradient#^cg-polynomial-bound|polynomial error bound]].
 :::
 
 ::: definition:Biorthogonal Vectors
@@ -703,7 +458,7 @@ for $j = 1,2,\ldots$, stopping before division if $u = 0$, $z = 0$, or $z^Hu = 0
 :::
 
 ::: definition:CGN
-Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ is nonsingular. CGN applies CG to $A^HAx = A^Hb$, evaluating products as $A^H(Av)$ without forming $A^HA$.
+Let $A \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ is nonsingular. CGN applies [[Conjugate Gradient#^conjugate-gradient-method|CG]] to $A^HAx = A^Hb$, evaluating products as $A^H(Av)$ without forming $A^HA$.
 :::
 
 ::: proposition
@@ -729,6 +484,6 @@ for $k = 1,2,\ldots$, stopping if $r_k = 0$. A zero $\rho_{k - 1}$ or $q_{k - 1}
 Let $A,M \in \mathbb{C}^{n, n}$ and $b \in \mathbb{C}^n$. Assume $A$ and $M$ are nonsingular. Left preconditioning by $M$ gives $M^{-1}Ax = M^{-1}b$. Right preconditioning gives $AM^{-1}y = b$ with $x = M^{-1}y$.
 :::
 
-::: proposition
-Let $A,M \in \mathbb{R}^{n, n}$ and $b \in \mathbb{R}^n$. Assume $A,M$ are symmetric positive definite and $b \neq 0$. Set $M = C^TC$, $B = C^{-T}AC^{-1}$, $\kappa = \kappa_2(B) = \frac{\lambda_{\max}(M^{-1}A)}{\lambda_{\min}(M^{-1}A)}$, $y_k$ to be the exact-arithmetic CG iterates for $By = C^{-T}b$ from $y_0 = 0$, $x_k = C^{-1}y_k$, and $e_k = A^{-1}b - x_k$. The preconditioned CG error satisfies $\frac{\|e_k\|_A}{\|e_0\|_A} \le 2\left(\frac{\sqrt\kappa - 1}{\sqrt\kappa + 1}\right)^k$ for $k \ge 1$.
+::: note
+The preconditioned CG recurrence and error bound are given in [[Conjugate Gradient]]. For $M = C^TC \succ 0$ and $A \succ 0$, $M^{-1}A = C^{-1}(C^{-T}AC^{-1})C$, so $\kappa_2(C^{-T}AC^{-1}) = \frac{\lambda_{\max}(M^{-1}A)}{\lambda_{\min}(M^{-1}A)}$. This eigenvalue ratio need not equal $\kappa_2(M^{-1}A)$, since $M^{-1}A$ need not be symmetric.
 :::

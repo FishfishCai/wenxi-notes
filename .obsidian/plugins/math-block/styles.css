@@ -12,14 +12,10 @@
   font-weight: var(--math-block-title-weight);
 }
 
-.math-block-body,
-.math-block-tombstone {
+.math-block-body {
   font-family: var(--math-block-body-family);
   font-style: var(--math-block-body-style);
   font-weight: var(--math-block-body-weight);
-}
-
-.math-block-body {
   white-space: normal;
 }
 
@@ -45,15 +41,6 @@
   margin-bottom: 0;
 }
 
-.math-block-proof > .math-block-body {
-  margin-inline: 2em;
-}
-
-.math-block-tombstone {
-  display: block;
-  text-align: right;
-}
-
 .math-block-editor-widget {
   display: flow-root;
   cursor: text;
@@ -63,14 +50,10 @@
   margin: 0;
 }
 
-.math-block-hover-popover .markdown-preview-section:not(.math-block-hover-target) {
-  display: none;
-}
-
 .math-block-settings-table {
   width: 100%;
   max-width: 100%;
-  margin: 0.9em 0 0;
+  margin: 0;
   overflow: hidden;
   border: 1px solid var(--background-modifier-border);
   border-radius: 8px;
@@ -81,16 +64,16 @@
 }
 
 .math-block-settings-name-column {
-  width: 24%;
+  width: 22%;
 }
 
 .math-block-settings-title-column,
 .math-block-settings-body-column {
-  width: 31%;
+  width: 34%;
 }
 
 .math-block-settings-numbering-column {
-  width: 14%;
+  width: 10%;
 }
 
 .math-block-settings-container {
@@ -102,11 +85,20 @@
 
 .math-block-settings-table th,
 .math-block-settings-table td {
-  padding: 0.65em 0.75em;
+  padding: 0.65em 0.4em;
   border: 0;
   border-bottom: 1px solid var(--background-modifier-border);
   text-align: left;
   vertical-align: middle;
+}
+
+.math-block-settings-table :is(th, td):first-child {
+  padding-inline-start: 0.75em;
+}
+
+.math-block-settings-table :is(th, td):last-child {
+  padding-inline-end: 0.75em;
+  text-align: center;
 }
 
 .math-block-settings-table th {
@@ -127,7 +119,7 @@
   background: var(--background-secondary-alt);
 }
 
-.math-block-settings-table tbody:last-of-type tr:last-child td {
+.math-block-settings-table tbody tr:last-child td {
   border-bottom: 0;
 }
 
@@ -141,16 +133,39 @@
 
 .math-block-settings-name {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 28px;
+  grid-template-columns: minmax(0, 1fr) 26px;
   align-items: center;
-  gap: 0.45em;
+  gap: 0.2em;
 }
 
 .math-block-settings-typography {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.35em;
+}
+
+.math-block-settings-family {
+  position: relative;
+  min-width: 0;
+}
+
+.math-block-settings-table .math-block-settings-family input[type="text"] {
+  padding-inline-end: 24px;
+}
+
+.math-block-settings-family-toggle {
+  position: absolute;
+  inset-inline-end: 2px;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  transform: translateY(-50%);
+  --icon-size: 14px;
 }
 
 .math-block-settings-style-controls {
@@ -163,7 +178,7 @@
 }
 
 .math-block-settings-style-button {
-  width: 28px;
+  width: 24px;
   height: 26px;
   min-width: 0;
   padding: 0;
@@ -195,8 +210,8 @@
 }
 
 .math-block-settings-delete {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   padding: 5px;
   color: var(--text-muted);
   opacity: 0.45;
@@ -215,22 +230,10 @@
   margin-top: 0.8em;
 }
 
-.math-block-settings-table td.math-block-settings-numbered {
-  text-align: center;
-}
-
 .math-block-settings-numbered input[type="checkbox"] {
   width: 18px;
   height: 18px;
   margin: 0;
-}
-
-.math-block-settings-not-applicable {
-  color: var(--text-muted);
-}
-
-.math-block-settings-proof-group tr:last-child td {
-  border-bottom: 5px solid var(--background-secondary);
 }
 
 .math-block-settings-table input:invalid {
