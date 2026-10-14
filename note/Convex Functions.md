@@ -144,6 +144,10 @@ Q := \{(x,r) \in \mathcal{E} \times \mathbb{R} : \exists y \in \mathcal{E},\ f(y
 $$
 Since $E_Q = h$, under attainment $\operatorname{epi} h = Q + (\{0\} \times \mathbb{R}_+) = Q$ by [[#^lower-envelope-epigraph|the lower-envelope epigraph identity]].
 
+::: note
+Value functions under linear constraints and infimal convolutions are special cases of infimum projection.
+:::
+
 ::: definition:Perspective
 Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. The perspective of $f$ is
 $$
@@ -161,4 +165,145 @@ $$
 \operatorname{epi} f_\pi = \{\alpha(1,x,r) : \alpha > 0,\ (x,r) \in \operatorname{epi} f\}.
 $$
 If $f$ is convex, then $f_\pi$ is convex.
+:::
+
+## Closed Convex Envelopes
+::: definition:Closed Convex Envelope
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. The closed convex envelope $\overline{\operatorname{co}}f$ is defined by $\operatorname{epi}(\overline{\operatorname{co}}f) := \operatorname{cl}(\operatorname{conv}(\operatorname{epi} f)).$
+::: ^closed-convex-envelope
+
+::: definition:Minorant
+Let $f, g : \mathcal{E} \to \overline{\mathbb{R}}$. $g$ is a minorant of $f$ if $g \leq f$. An affine minorant is of the form $g(x) = \langle a,x\rangle + b$, with $a \in \mathcal{E}$ and $b \in \mathbb{R}$.
+:::
+
+::: theorem:Existence of Affine Minorants
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. Assume $f$ is proper. $f$ admits an affine minorant iff $\overline{\operatorname{co}}f$ is proper.
+::: ^affine-minorant-existence
+
+*Proof.*
+Set $F := \overline{\operatorname{co}}f$ and $Q := \operatorname{epi} F$. If $g$ is an affine minorant, then $g \leq F \leq f$, implying $F$ is proper.
+Conversely, assume $F$ is proper. Choose $x_0$ with $F(x_0) \in \mathbb{R}$ and $r_0 < F(x_0)$. By [[Convex Set#^strict-separation|Strict Separation]], there exist $a \in \mathcal{E}$ and $\mu, \beta \in \mathbb{R}$ s.t.
+$$
+\langle a,x\rangle + \mu r \leq \beta < \langle a,x_0\rangle + \mu r_0
+\quad\text{for any }(x,r) \in Q.
+$$
+If $\mu > 0$, upward unboundedness of $Q$ contradicts the first inequality. If $\mu = 0$, the point $(x_0,F(x_0)) \in Q$ gives $\langle a,x_0\rangle \leq \beta < \langle a,x_0\rangle$. Hence $\mu < 0$, and
+$$
+g(x) := \left\langle\frac{a}{-\mu},x\right\rangle - \frac{\beta}{-\mu}
+\leq F(x) \leq f(x).
+$$
+
+::: theorem:Affine Representation of the Closed Convex Envelope
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. Assume $f$ and $\overline{\operatorname{co}}f$ are proper. Set $F := \overline{\operatorname{co}}f$.
+$$
+F(x) = \underset{g \leq f,\ g\ \mathrm{affine}}{\sup} g(x)
+\quad\text{for any }x \in \mathcal{E}.
+$$
+::: ^affine-envelope-representation
+
+*Proof.*
+Every affine minorant $g \leq f$ satisfies $g \leq F$, so $F(x) \geq \underset{g \leq f,\ g\ \mathrm{affine}}{\sup} g(x)$.
+Set $h(x) := \underset{g \leq f,\ g\ \mathrm{affine}}{\sup} g(x)$ and $Q := \operatorname{epi} F$.
+By [[#^affine-minorant-existence|Existence of Affine Minorants]], choose $g_1(x) = \langle a_1,x\rangle + b_1 \leq F(x)$. For any $(x_0,r_0) \notin Q$, [[Convex Set#^strict-separation|Strict Separation]] gives
+$$
+\langle a,x\rangle + \mu r \leq \beta < \langle a,x_0\rangle + \mu r_0
+\quad\text{for any }(x,r) \in Q.
+$$
+Upward unboundedness of $Q$ rules out $\mu > 0$. If $\mu < 0$, the affine minorant
+$$
+g(x) := \left\langle\frac{a}{-\mu},x\right\rangle - \frac{\beta}{-\mu}
+\leq F(x) \leq f(x)
+$$
+satisfies $g(x_0) > r_0$, hence $h(x_0) > r_0$.
+If $\mu = 0$, set $\ell(x) := \langle a,x\rangle - \beta$. Here $\ell(x) \leq 0$ for any $(x,r) \in Q$, while $\ell(x_0) > 0$. Choose
+$$
+\lambda > \max\left\{0,\frac{r_0 - g_1(x_0)}{\ell(x_0)}\right\},
+\qquad
+g_\lambda(x) := g_1(x) + \lambda\ell(x)
+= \langle a_1 + \lambda a,x\rangle + b_1 - \lambda\beta.
+$$
+For any $(x,r) \in Q$, $g_\lambda(x) \leq g_1(x) \leq F(x) \leq r,$ so $g_\lambda \leq F \leq f$, whereas $g_\lambda(x_0) > r_0$. Thus $h(x_0) > r_0$ in both cases, giving $\operatorname{epi} h \subseteq Q$.
+
+## Fenchel Conjugacy
+::: definition:Fenchel Conjugate
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. The Fenchel conjugate of $f$ is
+$$
+f^*(y) := \underset{x \in \mathcal{E}}{\sup}\{\langle y,x\rangle - f(x)\}.
+$$
+:::
+
+::: note
+For a fixed slope $y$ with $f^*(y) \in \mathbb{R}$, $f^*(y)$ is the smallest signed shift $c$ s.t. $\langle y,x\rangle - c \leq f(x)$ for any $x$.
+:::
+
+::: lemma
+Let $f, g : \mathcal{E} \to \overline{\mathbb{R}}$. If $g \leq f$, then $g^* \geq f^*$.
+::: ^conjugacy-order-reversal
+
+::: proposition
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. $(y,r) \in \operatorname{epi} f^* \iff \langle y,x\rangle - r \leq f(x)\text{ for any }x \in \mathcal{E}.$
+:::
+
+::: proposition
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. $f^*(y) = \sigma_{\operatorname{epi} f}(y,-1)$ for any $y \in \mathcal{E}$.
+:::
+
+::: lemma
+Let $g : \mathcal{E} \to \mathbb{R}$. Assume $g$ is affine. $g^{**} = g$.
+::: ^affine-biconjugacy
+
+::: theorem:Biconjugacy
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. Assume $f$ and $\overline{\operatorname{co}}f$ are proper. $f^{**} = \overline{\operatorname{co}}f$. If $f$ is closed and convex, then $f^{**} = f$.
+:::
+
+*Proof.*
+Set $F := \overline{\operatorname{co}}f$. For any $x \in \mathcal{E}$,
+$$
+\begin{aligned}
+f^{**}(x)
+&= \underset{y \in \mathcal{E}}{\sup}
+\left\{\langle x,y\rangle -
+\underset{z \in \mathcal{E}}{\sup}\{\langle y,z\rangle - f(z)\}\right\}\\
+&\leq \underset{y \in \mathcal{E}}{\sup}
+\{\langle x,y\rangle - (\langle y,x\rangle - f(x))\}
+= f(x).
+\end{aligned}
+$$
+Since $f^{**}$ is closed and convex, $f^{**} \leq F$.
+Reversely, for any affine minorant $g \leq f$, [[#^conjugacy-order-reversal|order reversal]] applied twice and [[#^affine-biconjugacy|affine biconjugacy]] give $g = g^{**} \leq f^{**}$.
+
+::: example
+Let $Q \subseteq \mathcal{E}$, $a \in \mathcal{E}$, $b \in \mathbb{R}$, and $p, q \in \mathbb{R}$. Assume $Q$ is nonempty, $p, q > 1$, and $\frac{1}{p} + \frac{1}{q} = 1$.
+
+$$
+\begin{array}{c|c|c|c}
+\qquad f(x) \qquad & \quad \operatorname{dom} f \quad & \qquad f^*(y) \qquad & \quad \operatorname{dom} f^* \quad \\
+\hline
+\delta_Q(x) & Q & \sigma_Q(y) & \operatorname{dom}\sigma_Q \\
+\langle a,x\rangle + b & \mathcal{E} & -b + \delta_{\{a\}}(y) & \{a\} \\
+\lvert x\rvert & \mathbb{R} & 0 & [-1,1] \\
+\frac{1}{p}\lvert x\rvert^p & \mathbb{R} & \frac{1}{q}\lvert y\rvert^q & \mathbb{R} \\
+\sqrt{1 + x^2} & \mathbb{R} & -\sqrt{1 - y^2} & [-1,1] \\
+-\log x & (0,+\infty) & -1 - \log(-y) & (-\infty,0) \\
+e^x & \mathbb{R} & y\log y - y & [0,+\infty) \\
+x\log x & (0,+\infty) & e^{y - 1} & \mathbb{R} \\
+\log(1 + e^x) & \mathbb{R} & \quad y\log y + (1 - y)\log(1 - y) \quad & [0,1]
+\end{array}
+$$
+:::
+
+::: example
+Let $f, g : \mathcal{E} \to \overline{\mathbb{R}}$, $\varphi : \mathcal{E} \times \mathcal{Y} \to \overline{\mathbb{R}}$, $A : \mathcal{E} \to \mathcal{Y}$, $b \in \mathcal{E}$, and $\lambda \in \mathbb{R}$. Assume $f$, $g$, and $\varphi$ are proper and convex, $A$ is linear, and $\lambda > 0$.
+
+$$
+\begin{array}{c|c}
+\qquad\qquad h(x) \qquad\qquad & \qquad\qquad h^*(y) \qquad\qquad \\
+\hline
+\lambda f(x) & \lambda f^*\left(\frac{y}{\lambda}\right) \\
+f(x + b) & f^*(y) - \langle b,y\rangle \\
+\underset{z \in \mathcal{Y}}{\inf}\varphi(x,z) & \varphi^*(y,0) \\
+(f \square g)(x) & f^*(y) + g^*(y) \\
+\underset{u : Au = x}{\inf} f(u) & f^*(A^*y)
+\end{array}
+$$
 :::

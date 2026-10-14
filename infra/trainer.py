@@ -2,7 +2,7 @@ import json
 import sys
 import torch
 from accelerate import Accelerator
-from accelerate.utils import set_seed
+from accelerate.utils import broadcast, set_seed
 from itertools import chain, repeat
 from pathlib import Path
 from timeit import default_timer
@@ -85,6 +85,7 @@ class Trainer:
         scheduler: Callable[[torch.optim.Optimizer], object] | None = None,
         accelerator: Accelerator | None = None,
         grad_clip_norm: float | None = None,
+        ema_decay: float | None = None,
         seed: int = 0,
         deterministic: bool = False,
         compile_model: bool = False,
@@ -92,7 +93,8 @@ class Trainer:
         save_logs: bool = True,
     ) -> None:
         """
-        Build the model, optimizer, and scheduler, restoring training state from a checkpoint.
+        Build the model, optimizer, scheduler, and moving average, restoring training state
+        from a checkpoint.
 
         The file extension of ``config_path`` decides the mode: a ``.json`` file starts a
         fresh run from its hyper-parameters, a ``.pth`` checkpoint resumes model weights,
@@ -118,6 +120,10 @@ class Trainer:
         grad_clip_norm : float | None
             Maximum gradient norm applied before each optimizer update. No clipping when
             omitted. Default is None.
+        ema_decay : float | None
+            Decay of the exponential moving average of the weights that evaluation uses,
+            updated after each optimizer update and stored in checkpoints. No average when
+            omitted. Default is None.
         seed : int
             Base seed for Python, NumPy, and torch. Each process is offset by its rank so
             that data augmentation differs across ranks. Default is 0.
@@ -135,6 +141,7 @@ class Trainer:
         self.device = self.accelerator.device
         self._is_main = self.accelerator.is_main_process
         self.grad_clip_norm = grad_clip_norm
+        self.ema_decay = ema_decay
         set_seed(seed, device_specific=True, deterministic=deterministic)
 
         self.step = 0
@@ -159,8 +166,6 @@ class Trainer:
         )
         if ckpt is not None:
             self._resume_state(ckpt, built_optimizer, built_scheduler)
-        # Reseed from the resume point so continuing a run never replays past draws.
-        set_seed(seed + self.step, device_specific=True, deterministic=deterministic)
         if compile_model:
             self.model = torch.compile(self.model)
 
@@ -175,6 +180,13 @@ class Trainer:
             if built_scheduler is not None
             else None
         )
+        self.ema_model = (
+            self._prepare_ema(ckpt, compile_model)
+            if ema_decay is not None
+            else None
+        )
+        # Reseed from the resume point once everything is built, so a run never replays past draws.
+        set_seed(seed + self.step, device_specific=True, deterministic=deterministic)
 
     def train_with_eval(
         self,
@@ -303,9 +315,14 @@ class Trainer:
                 metric.update(**result)
             window_loss = window_loss + loss.detach()
             window_batches += 1
-            # Accumulation micro-batches are not optimizer updates, so they do not count.
-            if not self.accelerator.sync_gradients:
+            # Only applied optimizer updates count, not accumulation micro-batches or skipped steps.
+            if (
+                not self.accelerator.sync_gradients
+                or self.accelerator.optimizer_step_was_skipped
+            ):
                 continue
+            if self.ema_model is not None:
+                self._update_ema()
             self.step += 1
             last = self.step >= max_steps
 
@@ -345,9 +362,10 @@ class Trainer:
         """
         Run every evaluation loader to exhaustion and reduce its metrics.
 
-        Runs in evaluation mode without gradients, gathering batch results across processes
-        so every rank computes the same value over the full data. It also works on a
-        trainer built from a checkpoint without an optimizer.
+        Runs the moving average of the weights when one is kept and the model otherwise, in
+        evaluation mode without gradients and with the buffers of the main process, gathering
+        batch results across processes so every rank computes the same value over the full
+        data. It also works on a trainer built from a checkpoint without an optimizer.
 
         Parameters
         ----------
@@ -364,7 +382,12 @@ class Trainer:
         eval_results : Dict[str, Dict[str, Any]]
             Mapping from loader name to its metric name and reduced value.
         """
-        self.model.eval()
+        model = self.ema_model if self.ema_model is not None else self.model
+        if self.ema_model is not None and self.accelerator.num_processes > 1:
+            module = self.accelerator.unwrap_model(model, keep_torch_compile=False)
+            for buffer in module.buffers():
+                broadcast(buffer, from_process=0)
+        model.eval()
         eval_results: Dict[str, Dict[str, Any]] = {}
 
         with torch.no_grad():
@@ -382,7 +405,7 @@ class Trainer:
                 if isinstance(eval_loader, DataLoader):
                     eval_loader = self.accelerator.prepare(eval_loader)
                 for batch in eval_loader:
-                    result = step_fn(self.model, to_device(batch, self.device))
+                    result = step_fn(model, to_device(batch, self.device))
                     result = self.accelerator.gather_for_metrics(result)
                     for metric in loader_metrics.values():
                         metric.update(**result)
@@ -490,9 +513,9 @@ class Trainer:
         """
         Write weights, model config, and training state to ``<save_dir>/<filename>.pth``.
 
-        All processes synchronise first and only the main one writes the file. The model
-        is unwrapped from its distributed and compiled wrappers so the stored keys match a
-        plain module.
+        All processes synchronise first and only the main one writes the file. The model and
+        its moving average are unwrapped from their distributed and compiled wrappers so the
+        stored keys match a plain module.
 
         Parameters
         ----------
@@ -510,6 +533,9 @@ class Trainer:
             "step": int(self.step),
             "best_metric_value": self.best_metric_value,
         }
+        if self.ema_model is not None:
+            ema = self.accelerator.unwrap_model(self.ema_model, keep_torch_compile=False)
+            ckpt["ema"] = ema.state_dict()
         for key, obj in (
             ("optimizer", self.optimizer),
             ("scheduler", self.scheduler),
@@ -522,6 +548,55 @@ class Trainer:
         if self.verbose:
             print(f"Saved training state to {save_path}")
             sys.stdout.flush()
+
+    def _prepare_ema(
+        self,
+        ckpt: dict | None,
+        compile_model: bool,
+    ) -> nn.Module:
+        """
+        Build the moving average of the weights and prepare it for evaluation.
+
+        The average starts from the one stored in the checkpoint, or else from the prepared
+        model, whose weights every process shares.
+
+        Parameters
+        ----------
+        ckpt : dict | None
+            Checkpoint returned by ``_build_model``, None for a fresh run.
+        compile_model : bool
+            Whether to wrap the average with ``torch.compile``.
+
+        Returns
+        -------
+        ema_model : nn.Module
+            Average without gradients, prepared by the accelerator for evaluation and
+            compiled when asked.
+        """
+        module = self.accelerator.unwrap_model(self.model, keep_torch_compile=False)
+        ema = type(module)(**module.config).requires_grad_(False)
+        ema.load_state_dict(
+            ckpt["ema"]
+            if ckpt is not None and "ema" in ckpt
+            else module.state_dict()
+        )
+        ema = self.accelerator.prepare_model(ema, evaluation_mode=True)
+        return torch.compile(ema) if compile_model else ema
+
+    @torch.no_grad()
+    def _update_ema(
+        self,
+    ) -> None:
+        """Move the moving average toward the current weights and copy their buffers."""
+        module = self.accelerator.unwrap_model(self.model, keep_torch_compile=False)
+        ema = self.accelerator.unwrap_model(self.ema_model, keep_torch_compile=False)
+        torch._foreach_lerp_(
+            list(ema.parameters()),
+            list(module.parameters()),
+            1.0 - self.ema_decay,
+        )
+        for ema_buffer, buffer in zip(ema.buffers(), module.buffers()):
+            ema_buffer.copy_(buffer)
 
     def _log(
         self,

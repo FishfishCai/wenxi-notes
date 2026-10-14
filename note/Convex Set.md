@@ -152,7 +152,7 @@ Let $Q \subseteq \mathcal{E}$, and $y \in \mathcal{E}$. A hyperplane $\{x \in \m
 
 ::: theorem:Strict Separation
 Let $Q \subseteq \mathcal{E}$, and $y \in \mathcal{E}\setminus Q$. Assume $Q$ is nonempty, closed, and convex. There exist $a \in \mathcal{E}\setminus\{0\}$ and $b \in \mathbb{R}$ s.t. $\langle a, x\rangle \leq b < \langle a, y\rangle$ for any $x \in Q$.
-:::
+::: ^strict-separation
 
 ::: definition:Supporting Halfspace
 Let $Q \subseteq \mathcal{E}$, and $x \in \operatorname{cl}(Q)$. A halfspace $H = \{z \in \mathcal{E} : \langle a, z\rangle \leq b\}$ supports $Q$ at $x$ if $a \in \mathcal{E}\setminus\{0\}$, $b \in \mathbb{R}$, $Q \subseteq H$, and $\langle a, x\rangle = b$.
