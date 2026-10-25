@@ -116,39 +116,43 @@ Set $z(t) = \frac{L+m-2t}{L-m}$ and choose $q_k(t) = \frac{T_k(z(t))}{T_k(z(0))}
 Let $A, M \in \mathbb{R}^{n, n}$ and $b, x_0 \in \mathbb{R}^n$. Assume $A \succ 0$ and $M \succ 0$. Set $\widetilde p_0 = b - Ax_0$ and $d_0 = M^{-1}\widetilde p_0$. The preconditioned conjugate gradient method for $Ax = b$ computes
 $$
 \begin{aligned}
-\widehat a_k &= -\frac{\langle\widetilde p_k, M^{-1}\widetilde p_k\rangle}{\langle d_k, Ad_k\rangle},\\
-x_{k+1} &= x_k - \widehat a_kd_k,\\
-\widetilde p_{k+1} &= \widetilde p_k + \widehat a_kAd_k = b - Ax_{k+1},\\
-\widehat\beta_{k+1} &= \frac{\langle\widetilde p_{k+1}, M^{-1}\widetilde p_{k+1}\rangle}{\langle\widetilde p_k, M^{-1}\widetilde p_k\rangle},\\
-d_{k+1} &= M^{-1}\widetilde p_{k+1} + \widehat\beta_{k+1}d_k.
+a_k &= -\frac{\langle\widetilde p_k, M^{-1}\widetilde p_k\rangle}{\langle d_k, Ad_k\rangle},\\
+x_{k+1} &= x_k - a_kd_k,\\
+\widetilde p_{k+1} &= \widetilde p_k + a_kAd_k = b - Ax_{k+1},\\
+\beta_{k+1} &= \frac{\langle\widetilde p_{k+1}, M^{-1}\widetilde p_{k+1}\rangle}{\langle\widetilde p_k, M^{-1}\widetilde p_k\rangle},\\
+d_{k+1} &= M^{-1}\widetilde p_{k+1} + \beta_{k+1}d_k.
 \end{aligned}
 $$
 Stop whenever $\widetilde p_j = 0$ and return $x_j$.
 :::
 
 ::: note
-Choose an invertible $C$ with $M = C^\top C$, and set $\widehat A = C^{-T}AC^{-1}$, $\widehat b = C^{-T}b$, and $\widehat x_0 = Cx_0$. [[#^conjugate-gradient-method|Conjugate Gradient Method]] applied to $\widehat A\widehat x = \widehat b$ initializes $\widehat p_0 = \widehat{\widetilde p}_0 = \widehat b - \widehat A\widehat x_0 = C^{-T}\widetilde p_0$. Set $d_0 = C^{-1}\widehat p_0 = C^{-1}\widehat{\widetilde p}_0 = M^{-1}\widetilde p_0$. The iterations preserve $\widehat x_k = Cx_k$, $\widehat{\widetilde p}_k = C^{-T}\widetilde p_k$, and $\widehat p_k = Cd_k$ and the next step gives
+Choose an invertible $C$ with $M = C^\top C$, and set $\widehat A = C^{-T}AC^{-1}$, $\widehat b = C^{-T}b$, and $\widehat x_0 = Cx_0$. [[#^conjugate-gradient-method|Conjugate Gradient Method]] applied to $\widehat A\widehat x = \widehat b$ initializes $\widehat p_0 = \widehat{\widetilde p}_0 = \widehat b - \widehat A\widehat x_0$. Make the substitutions $\widehat a_k = a_k$, $\widehat x_k = Cx_k$, $\widehat{\widetilde p}_k = C^{-T}\widetilde p_k$, $\widehat\beta_k = \beta_k$, and $\widehat p_k = Cd_k$. Thus $\widetilde p_0 = b - Ax_0$, $d_0 = M^{-1}\widetilde p_0$, and
 $$
 \begin{aligned}
 \widehat a_k
-&= -\frac{\langle\widehat{\widetilde p}_k,\widehat{\widetilde p}_k\rangle}
+= -\frac{\langle\widehat{\widetilde p}_k,\widehat{\widetilde p}_k\rangle}
 {\langle\widehat p_k,\widehat A\widehat p_k\rangle}
-= -\frac{\langle\widetilde p_k,M^{-1}\widetilde p_k\rangle}{\langle d_k,Ad_k\rangle},\\
+&\quad\Longrightarrow\quad
+a_k = -\frac{\langle\widetilde p_k,M^{-1}\widetilde p_k\rangle}{\langle d_k,Ad_k\rangle},\\
 \widehat x_{k+1}
-&= \widehat x_k - \widehat a_k\widehat p_k
-= C(x_k - \widehat a_kd_k) = Cx_{k+1},\\
+= \widehat x_k - \widehat a_k\widehat p_k
+&\quad\Longrightarrow\quad
+x_{k+1} = x_k - a_kd_k,\\
 \widehat{\widetilde p}_{k+1}
-&= \widehat{\widetilde p}_k + \widehat a_k\widehat A\widehat p_k
-= C^{-T}(\widetilde p_k + \widehat a_kAd_k) = C^{-T}\widetilde p_{k+1},\\
+= \widehat{\widetilde p}_k + \widehat a_k\widehat A\widehat p_k
+&\quad\Longrightarrow\quad
+\widetilde p_{k+1} = \widetilde p_k + a_kAd_k,\\
 \widehat\beta_{k+1}
-&= \frac{\langle\widehat{\widetilde p}_{k+1},\widehat{\widetilde p}_{k+1}\rangle}
+= \frac{\langle\widehat{\widetilde p}_{k+1},\widehat{\widetilde p}_{k+1}\rangle}
 {\langle\widehat{\widetilde p}_k,\widehat{\widetilde p}_k\rangle}
-= \frac{\langle\widetilde p_{k+1},M^{-1}\widetilde p_{k+1}\rangle}{\langle\widetilde p_k,M^{-1}\widetilde p_k\rangle},\\
+&\quad\Longrightarrow\quad
+\beta_{k+1} = \frac{\langle\widetilde p_{k+1},M^{-1}\widetilde p_{k+1}\rangle}{\langle\widetilde p_k,M^{-1}\widetilde p_k\rangle},\\
 \widehat p_{k+1}
-&= \widehat{\widetilde p}_{k+1} + \widehat\beta_{k+1}\widehat p_k
-= C(M^{-1}\widetilde p_{k+1} + \widehat\beta_{k+1}d_k) = Cd_{k+1}.
+= \widehat{\widetilde p}_{k+1} + \widehat\beta_{k+1}\widehat p_k
+&\quad\Longrightarrow\quad
+d_{k+1} = M^{-1}\widetilde p_{k+1} + \beta_{k+1}d_k.
 \end{aligned}
 $$
-Multiplying the second, third, and fifth identities by $C^{-1}$, $C^T$, and $C^{-1}$, respectively, recovers the five updates in the preceding definition. Since $\lVert\widehat x_k - \widehat x^*\rVert_{\widehat A} = \lVert x_k - x^*\rVert_A$ for $\widehat x^* = Cx^*$, the [[#^cg-chebyshev-bound|Chebyshev convergence bound]] applies with $\kappa = \frac{\lambda_{\max}(\widehat A)}{\lambda_{\min}(\widehat A)}$.
+Since $\lVert\widehat x_k - \widehat x^*\rVert_{\widehat A} = \lVert x_k - x^*\rVert_A$ for $\widehat x^* = Cx^*$, the [[#^cg-chebyshev-bound|Chebyshev convergence bound]] applies with $\kappa = \frac{\lambda_{\max}(\widehat A)}{\lambda_{\min}(\widehat A)}$.
 :::
-

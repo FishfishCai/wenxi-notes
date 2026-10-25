@@ -45,6 +45,7 @@
     "chat.tips.enabled": false,
     "chat.viewSessions.orientation": "stacked",
     "chat.titleBar.openInAgentsWindow.enabled": false,
+    "chat.disableAIFeatures": true,
     
     // git
     "git.autofetch": true,

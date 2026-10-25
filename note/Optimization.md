@@ -46,94 +46,6 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in 
 Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^2$. If $\nabla f(x^*) = 0$ and $\nabla^2 f(x^*) \succ 0$, then $x^*$ is a strict local minimizer of $f$.
 :::
 
-## Upper Bound Tools
-### Lipschitz Continuity
-::: definition:Lipschitz continuous
-Let $f : \mathbb{R}^n \to \mathbb{R}^m$ and $L > 0$. $f$ is Lipschitz continuous with constant $L$ if $\| f(x) - f(y) \| \leq L \| x - y \|$ for any $x, y \in \mathbb{R}^n$.
-:::
-
-### L-smooth
-::: definition:L-smooth
-Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^1$. $f$ is L-smooth if $\| \nabla f(x) - \nabla f(y) \|_{*} \leq L \| x - y \|$ for any $x, y \in \mathbb{R}^n$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x, y \in \mathbb{R}^n$. If $f$ is L-smooth, then $| f(y) - f(x) - \nabla f(x)^T (y - x) | \leq \frac{L}{2} \| y - x \|^2$.
-::: ^l-smooth-first-order-bound
-
-::: note
-The converse of [[#^l-smooth-first-order-bound|Proposition 12]] may hold, but it is hard to prove.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $L > 0$. Assume $f \in \mathcal{C}^2$. $f$ is L-smooth iff $- L I \preceq \nabla^2 f(x) \preceq L I$ for any $x \in \mathbb{R}^n$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f$ is $L$-smooth and $x^*$ is its global minimizer. $\frac{\|\nabla f(x)\|_2^2}{2L} \le f(x) - f(x^*) \le \frac{L}{2}\|x - x^*\|_2^2$ for any $x \in \mathbb{R}^n$.
-:::
-
-### Lipschitz Continuous Hessian
-::: definition:Lipschitz continuous Hessian
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $M > 0$. For $f \in \mathcal{C}^2$, the Hessian of $f$ is Lipschitz continuous with constant $M$ if $\|\nabla^2 f(x) - \nabla^2 f(y)\| \leq M \|x - y\|$ for any $x, y \in \mathbb{R}^n$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x, p \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^2$ and the Hessian of $f$ is Lipschitz continuous with constant $M$. $f(y) \leq f(x) + \nabla f(x)^T (y - x) + \frac{1}{2} (y - x)^T \nabla^2 f(x) (y - x) + \frac{1}{6}M\|y-x\|^3$.
-:::
-
-## Lower Bound Tools
-### Convex
-::: definition:Convex function
-Let $f : \mathbb{R}^n \to \mathbb{R}$. $f$ is convex if $f( (1 - \alpha) x + \alpha y ) \leq (1 - \alpha) f(x) + \alpha f(y)$ for any $x, y \in \mathbb{R}^n$ and $\alpha \in [0, 1]$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^1$. $f$ is convex iff $f(y) \geq f(x) + \nabla f(x)^T (y - x)$ for any $x, y \in \mathbb{R}^n$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^2$. $f$ is convex iff $\nabla^2 f(x) \succeq 0$ for any $x \in \mathbb{R}^n$.
-:::
-
-::: proposition
-Let $D \subseteq \mathbb{R}^n$ and $f : D \to \mathbb{R}$. Assume $f$ is convex and $D$ is convex. Then the set of global minimizers of $f$ is convex.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^1$ and $f$ is convex. If $\nabla f(x^*) = 0$, then $x^*$ is a global minimizer of $f$.
-:::
-
-### Strongly Convex
-::: definition:Strongly convex
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $m > 0$. $f$ is strongly convex with modulus $m$ if $f( (1 - \alpha) x + \alpha y ) \leq (1 - \alpha) f(x) + \alpha f(y) - \frac{1}{2} m \alpha (1 - \alpha) \| x - y \|^2$ for any $x, y \in \mathbb{R}^n$ and $\alpha \in [0, 1]$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^1$. $f$ is strongly convex with modulus $m$ iff $f(y) \geq f(x) + \nabla f(x)^T (y - x) + \frac{m}{2} \| y - x \|^2$ for any $x, y \in \mathbb{R}^n$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$. Assume $f \in \mathcal{C}^2$. $f$ is strongly convex with modulus $m$ iff $\nabla^2 f(x) \succeq m I$ for any $x \in \mathbb{R}^n$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^1$ and $f$ is strongly convex. If $\nabla f(x^*) = 0$, then $x^*$ is the unique global minimizer of $f$.
-:::
-
-::: proposition
-Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^* \in \mathbb{R}^n$. Assume $f \in \mathcal{C}^1$ is strongly convex with modulus $m$ and $x^*$ is its global minimizer. $\frac{m}{2}\|x-x^{*}\|^{2}_{x} \leqslant f(x)-f(x^{*}) \leqslant \frac{\|\nabla f(x)\|^2}{2m}$.
-:::
-
-### Polyak-Łojasiewicz Condition
-::: definition:Polyak-Łojasiewicz condition
-Let $f : \mathbb{R}^n \to \mathbb{R}$, $x^* \in \mathbb{R}^n$ a minimizer of $f$, and $m > 0$. $f$ satisfies the Polyak-Łojasiewicz condition with constant $m$ if $f(x) - f(x^*) \leq \frac{\|\nabla f(x)\|^2}{2m}$ for any $x \in \mathbb{R}^n$.
-:::
-
-::: note
-Strong convexity implies Polyak-Łojasiewicz condition, but the converse fails.
-:::
-
 ## Upper Bound Method
 ### Descent Direction
 ::: definition:Descent direction
@@ -292,7 +204,7 @@ Let $\mathcal{X} \subseteq \mathbb{R}^n$, $f : \mathcal{X} \to \mathbb{R}$, $h :
 :::
 
 ::: proposition
-Let $f : \mathcal{X} \to \mathbb{R}$, $\mathcal{X} \subseteq \mathbb{R}^n$, $\|\cdot\|$ be a norm on $\mathcal{X}$, $h : \mathcal{X} \to \mathbb{R}$, $x^* \in \mathcal{X}$, $x_0 \in \mathcal{X}$, and $\{\alpha_t\}$ be a steplength sequence. Assume $\mathcal{X}$ is convex, $\alpha_t > 0$ for any $t$, $h$ is strongly convex with modulus $m$ w.r.t. $\|\cdot\|$, $f$ is convex and $L$-Lipschitz continuous w.r.t. $\|\cdot\|$, and $x^*$ solves $\underset{x \in \mathcal{X}}{\min} f(x)$. Set $\{x_t\}$ as the mirror-descent iterates confined to $\mathcal{X}$. $f(\bar{x}_T) - f(x^*) \leq \frac{D_h(x^*, x_0) + \frac{L^2}{2m}\sum_{t = 0}^{T} \alpha_t^2}{\sum_{t = 0}^{T} \alpha_t}$ where $\bar{x}_T = \left(\sum_{t = 0}^{T} \alpha_t\right)^{-1}\sum_{t = 0}^{T} \alpha_t x_t$ for any integer $T \geq 1$.
+Let $f : \mathcal{X} \to \mathbb{R}$, $\mathcal{X} \subseteq \mathbb{R}^n$, $\|\cdot\|$ be a norm on $\mathcal{X}$, $h : \mathcal{X} \to \mathbb{R}$, $x^* \in \mathcal{X}$, $x_0 \in \mathcal{X}$, $\{\alpha_t\}$ be a steplength sequence, and $m, L > 0$. Assume $\mathcal{X}$ is convex, $\alpha_t > 0$ for any $t$, $h \in \mathcal{C}^1$ satisfies $D_h(x, z) \geq \frac{m}{2}\|x - z\|^2$ for any $x, z \in \mathcal{X}$, $f \in \mathcal{C}^1$ is convex and satisfies $|f(x) - f(z)| \leq L\|x - z\|$ for any $x, z \in \mathcal{X}$, and $x^*$ solves $\underset{x \in \mathcal{X}}{\min} f(x)$. Set $\{x_t\}$ as the mirror-descent iterates confined to $\mathcal{X}$. $f(\bar{x}_T) - f(x^*) \leq \frac{D_h(x^*, x_0) + \frac{L^2}{2m}\sum_{t = 0}^{T} \alpha_t^2}{\sum_{t = 0}^{T} \alpha_t}$ where $\bar{x}_T = \left(\sum_{t = 0}^{T} \alpha_t\right)^{-1}\sum_{t = 0}^{T} \alpha_t x_t$ for any integer $T \geq 1$.
 :::
 
 ::: corollary
