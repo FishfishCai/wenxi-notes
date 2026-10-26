@@ -52,4 +52,4 @@ Let $f : \mathcal{E} \to \mathbb{R}$, and $M > 0$. Assume $f \in \mathcal{C}^2$.
 
 ::: proposition
 Let $f : \mathcal{E} \to \mathbb{R}$. Assume $f \in \mathcal{C}^2$ and the Hessian of $f$ is Lipschitz continuous with constant $M$. $f(y) \leq f(x) + \langle \nabla f(x), y - x\rangle + \frac{1}{2}\langle \nabla^2 f(x)(y - x), y - x\rangle + \frac{M}{6}\|y - x\|^3$ for any $x, y \in \mathcal{E}$.
-:::
+::: ^lipschitz-hessian-cubic-bound

@@ -15,7 +15,7 @@ Both [[#^distance-lipschitz|Proposition 2]] and [[#^projection-existence|Proposi
 
 ::: theorem:Projection onto a Closed Convex Set
 Let $Q \subseteq \mathcal{E}$. Assume $Q$ is nonempty, closed, and convex. The set $\operatorname{proj}_Q(y)$ consists of exactly one point for any $y \in \mathcal{E}$. For $y \in \mathcal{E}$ and $z \in Q$, $z = \operatorname{proj}_Q(y)$ iff $\langle y - z, x - z\rangle \leq 0$ for any $x \in Q$.
-:::
+::: ^projection-onto-a-closed-convex-set
 
 *Proof.*
 Consider $\phi(t) := \frac{1}{2}\|y - x_t\|^2$ with $x_t := z + t(x - z)$, whose right derivative satisfies $0 \leq \phi'(0) = -\langle y - z, x - z\rangle$. Conversely, use
