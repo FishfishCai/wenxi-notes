@@ -40,7 +40,7 @@ f^{**}(x)
 \end{aligned}
 $$
 Since $f^{**}$ is closed and convex, $f^{**} \leq F$.
-Reversely, for any affine minorant $g \leq f$, [[#^conjugacy-order-reversal|order reversal]] applied twice and [[#^affine-biconjugacy|affine biconjugacy]] give $g = g^{**} \leq f^{**}$.这里还要用到closed copnvex envelope那个性质
+Reversely, for any affine minorant $g \leq f$, [[#^conjugacy-order-reversal|order reversal]] applied twice and [[#^affine-biconjugacy|affine biconjugacy]] give $g = g^{**} \leq f^{**}$. By [[Closed Convex Envelope#^affine-representation-of-the-closed-convex-envelope|Theorem 4 (Affine Representation of the Closed Convex Envelope)]], taking the supremum over all such $g$ gives $F \leq f^{**}$.
 
 ::: example
 Let $Q \subseteq \mathcal{E}$, $a \in \mathcal{E}$, $b \in \mathbb{R}$, and $p, q \in \mathbb{R}$. Assume $Q$ is nonempty, $p, q > 1$, and $\frac{1}{p} + \frac{1}{q} = 1$.

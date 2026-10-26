@@ -29,7 +29,7 @@ $$
 F(x) = \underset{g \leq f,\ g\ \mathrm{affine}}{\sup} g(x)
 \quad\text{for any }x \in \mathcal{E}.
 $$
-:::
+::: ^affine-representation-of-the-closed-convex-envelope
 
 *Proof.*
 Every affine minorant $g \leq f$ satisfies $g \leq F$, so $F(x) \geq \underset{g \leq f,\ g\ \mathrm{affine}}{\sup} g(x)$.
