@@ -1,24 +1,22 @@
 ## Setting
 ```CLI
+Host host_name
+    HostName host_address
+    User user_name
+
+Host github.com
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+
 Host *
     ServerAliveInterval 60
-    ServerAliveCountMax 30
+    ServerAliveCountMax 5
     ControlMaster auto
     ControlPath ~/.ssh/cm-%C
     ControlPersist 24h
     AddKeysToAgent yes
     UseKeychain yes
-    ConnectTimeout 20
-
-Host host_name
-	HostName host_address
-	User user_name
-	IdentityFile ~/.ssh/id_ed25519
-
-# only offer this key to GitHub, never other keys loaded in ssh-agent
-Host github.com
-	IdentityFile ~/.ssh/id_ed25519
-	IdentitiesOnly yes
+    ConnectTimeout 30
 ```
 
 ## GitHub

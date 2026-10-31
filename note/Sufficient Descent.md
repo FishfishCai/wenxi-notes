@@ -48,7 +48,7 @@ Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x_k, d_k \in \mathbb{R}^n$. Assume $f
 
 ::: definition:Weak Wolfe conditions
 Let $f : \mathbb{R}^n \to \mathbb{R}$, $x_k, d_k \in \mathbb{R}^n$, $\alpha > 0$, and $0 < c_1 < c_2 < 1$. Assume $f \in \mathcal{C}^1$ and $\nabla f(x_k)^T d_k < 0$. $\alpha$ satisfies the weak Wolfe conditions if $f(x_k + \alpha d_k) \leq f(x_k) + c_1\alpha\nabla f(x_k)^T d_k$ and $\nabla f(x_k + \alpha d_k)^T d_k \geq c_2\nabla f(x_k)^T d_k$.
-:::
+::: ^weak-wolfe-conditions
 
 ::: definition:Extrapolation and bisection for weak Wolfe conditions
 Let $f : \mathbb{R}^n \to \mathbb{R}$, $x_k, d_k \in \mathbb{R}^n$, and $0 < c_1 < c_2 < 1$. Assume $f \in \mathcal{C}^1$, $\nabla f(x_k)^T d_k < 0$, and $f$ is bounded below along the ray $x_k + \alpha d_k$ for $\alpha > 0$. Set $\ell = 0$, $u = +\infty$, and $\alpha = 1$. If $f(x_k + \alpha d_k) > f(x_k) + c_1\alpha\nabla f(x_k)^T d_k$, replace $u$ by $\alpha$ and replace $\alpha$ by $\frac{\ell + u}{2}$. Otherwise, if $\nabla f(x_k + \alpha d_k)^T d_k < c_2\nabla f(x_k)^T d_k$, replace $\ell$ by $\alpha$ and replace $\alpha$ by $2\ell$ if $u = +\infty$, or by $\frac{\ell + u}{2}$ if $u < +\infty$.

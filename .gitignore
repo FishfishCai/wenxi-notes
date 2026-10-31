@@ -2,12 +2,9 @@
 .obsidian/workspace.json
 .obsidian/graph.json
 
-# AI
+# ai
 .agents/
 .claude/
 
-# macOS System
+# system
 .DS_Store
-
-# Web pages saved for personal reading
-*.html

@@ -172,11 +172,11 @@ $$f(u_k) - f(x^*) \leq V_k(x^*) - f(x^*) \leq \frac{\gamma_k}{\gamma_{-1}}\left[
 Letting $\gamma_{-1} \to \infty$ and using $\gamma_k = \frac{L}{\lambda_{k + 1}^2}$ and $\lambda_{k + 1} \geq \frac{k + 2}{2}$ gives $f(u_k) - f(x^*) \leq \frac{2L\|u_{-1} - x^*\|^2}{(k + 2)^2}$.
 :::
 
-::: proposition
+::: proposition:Regularization
 Let $f : \mathbb{R}^n \to \mathbb{R}$, $x^*, x_0 \in \mathbb{R}^n$, and $R, \varepsilon > 0$. Assume $f$ is convex and $L$-smooth, $x^*$ is its global minimizer, and $\|x_0 - x^*\| \leq R$. Set $\mu = \frac{\varepsilon}{R^2}$, $F_\mu(x) = f(x) + \frac{\mu}{2}\|x - x_0\|^2$, $\kappa_\mu = \frac{L + \mu}{\mu}$, and $\{x_k\}$ as the accelerated gradient descent iterates for $F_\mu$ with $\alpha_k = \frac{1}{L + \mu}$ and $\beta_k = \frac{\sqrt{\kappa_\mu} - 1}{\sqrt{\kappa_\mu} + 1}$. $f(x_k) - f(x^*) \leq \frac{L + 2\mu}{2}R^2\left(1 - \frac{1}{\sqrt{\kappa_\mu}}\right)^k + \frac{\varepsilon}{2}$ for any integer $k \geq 1$, and $f(x_k) - f(x^*) \leq \varepsilon$ for any integer $k \geq \sqrt{1 + \frac{LR^2}{\varepsilon}}\ln\left(2 + \frac{LR^2}{\varepsilon}\right)$.
 :::
 
-::: proposition
+::: proposition:Restarting
 Let $f : \mathbb{R}^n \to \mathbb{R}$ and $x^*, x_0 \in \mathbb{R}^n$. Assume $f$ is $L$-smooth and strongly convex with modulus $m$, and $x^*$ is its global minimizer. Set $N = \left\lceil\sqrt{\frac{8L}{m}}\right\rceil$, $z_0 = x_0$, and $z_{t + 1}$ as the $N$th accelerated gradient descent iterate started from $z_t$ with $\alpha_k = \frac{1}{L}$, $\beta_0 = 0$, and $\beta_k = \frac{\lambda_k - 1}{\lambda_{k + 1}}$, where $\lambda_0 = 0$ and $\lambda_{k + 1} = \frac{1 + \sqrt{1 + 4\lambda_k^2}}{2}$. $f(z_t) - f(x^*) \leq 2^{-t}(f(x_0) - f(x^*))$ for any integer $t \geq 0$, and $f(z_T) - f(x^*) \leq \varepsilon$ after $NT$ gradient evaluations for any $\varepsilon > 0$ and integer $T \geq \log_2\frac{f(x_0) - f(x^*)}{\varepsilon}$.
 :::
 

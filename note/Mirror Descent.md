@@ -18,6 +18,6 @@ Let $\mathcal{X} \subseteq \mathbb{R}^n$, $f : \mathcal{X} \to \mathbb{R}$, $h :
 Let $f : \mathcal{X} \to \mathbb{R}$, $\mathcal{X} \subseteq \mathbb{R}^n$, $\|\cdot\|$ be a norm on $\mathcal{X}$, $h : \mathcal{X} \to \mathbb{R}$, $x^* \in \mathcal{X}$, $x_0 \in \mathcal{X}$, $\{\alpha_t\}$ be a steplength sequence, and $m, L > 0$. Assume $\mathcal{X}$ is convex, $\alpha_t > 0$ for any $t$, $h \in \mathcal{C}^1$ satisfies $D_h(x, z) \geq \frac{m}{2}\|x - z\|^2$ for any $x, z \in \mathcal{X}$, $f \in \mathcal{C}^1$ is convex and satisfies $|f(x) - f(z)| \leq L\|x - z\|$ for any $x, z \in \mathcal{X}$, and $x^*$ solves $\underset{x \in \mathcal{X}}{\min} f(x)$. Set $\{x_t\}$ as the mirror-descent iterates confined to $\mathcal{X}$. $f(\bar{x}_T) - f(x^*) \leq \frac{D_h(x^*, x_0) + \frac{L^2}{2m}\sum_{t = 0}^{T} \alpha_t^2}{\sum_{t = 0}^{T} \alpha_t}$ where $\bar{x}_T = \left(\sum_{t = 0}^{T} \alpha_t\right)^{-1}\sum_{t = 0}^{T} \alpha_t x_t$ for any integer $T \geq 1$.
 ::: ^mirror-descent-convergence
 
-::: corollary
+::: note
 Assume the hypotheses of [[#^mirror-descent-convergence|Proposition 5]] and $D_h(x^*, x_0) \leq R$. If $\alpha_t = \frac{\sqrt{2mR}}{L\sqrt{T + 1}}$ for $0 \leq t \leq T$, then $f(\bar{x}_T) - f(x^*) \leq \frac{L\sqrt{2R}}{\sqrt{m}\sqrt{T + 1}}$ for any integer $T \geq 1$. In particular, $f(\bar{x}_T) - f(x^*) \leq \varepsilon$ for any $\varepsilon > 0$ and integer $T \geq \max\left\{1, \frac{2L^2R}{m\varepsilon^2} - 1\right\}$.
 :::

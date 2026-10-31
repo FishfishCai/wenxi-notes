@@ -19,10 +19,6 @@ Let $f : \mathcal{E} \to \mathbb{R}$, and $L > 0$. Assume $f \in \mathcal{C}^1$.
 :::
 
 ::: proposition
-Let $f : \mathcal{E} \to \mathbb{R}$. If $f$ is $L$-smooth, then $|f(y) - f(x) - \langle \nabla f(x), y - x\rangle| \leq \frac{L}{2}\|y - x\|^2$ for any $x, y \in \mathcal{E}$.
-::: ^l-smooth-first-order-bound
-
-::: proposition
 Let $f : \mathcal{E} \to \mathbb{R}$. Assume $f$ is convex. $f$ is $L$-smooth iff $f(y) \leq f(x) + \langle v, y - x\rangle + \frac{L}{2}\|y - x\|^2$ for any $x, y \in \mathcal{E}$ and $v \in \partial f(x)$.
 ::: ^l-smooth-convex-upper-bound
 

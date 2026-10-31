@@ -3,7 +3,7 @@ Let $f : \mathcal{E} \to \mathbb{R} \cup \{+\infty\}$, and $m > 0$. $f$ is stron
 :::
 
 ::: proposition
-Let $f : \mathcal{E} \to \mathbb{R} \cup \{+\infty\}$. $f$ is strongly convex with modulus $m$ iff $x \mapsto f(x) - \frac{m}{2}\|x\|^2$ is convex.
+Let $f : \mathcal{E} \to \mathbb{R} \cup \{+\infty\}$. $f$ is strongly convex with modulus $m$ iff $f(x) - \frac{m}{2}\|x\|^2$ is convex.
 :::
 
 ::: theorem:Strengthened Subgradient Inequality

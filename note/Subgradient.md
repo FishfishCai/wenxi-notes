@@ -37,6 +37,10 @@ Let $f_i : \mathcal{E}_i \to \mathbb{R} \cup \{+\infty\}$ for $i \in \{1, \ldots
 :::
 
 ::: proposition
+Let $f_i : \mathcal{E} \to \mathbb{R}$ for $i \in \{1,\ldots,k\}$. Assume each $f_i$ is convex and differentiable. Set $f(x) := \underset{1 \le i \le k}{\max} f_i(x)$ and $I(x) := \{i \in \{1,\ldots,k\} : f_i(x) = f(x)\}$. $\partial f(x) = \operatorname{conv}\{\nabla f_i(x) : i \in I(x)\}$ for any $x \in \mathcal{E}$.
+:::
+
+::: proposition
 Let $f, g : \mathcal{E} \to \mathbb{R} \cup \{+\infty\}$, and $x \in \mathcal{E}$. Assume $f$ and $g$ are proper. If $f$ is differentiable at $x$, then $\partial(f + g)(x) = \{\nabla f(x)\} + \partial g(x)$.
 :::
 
@@ -68,8 +72,8 @@ Let $f : \mathcal{E} \to \overline{\mathbb{R}}$, and $x \in \mathcal{E}$. Assume
 Let $f : \mathcal{E} \to \mathbb{R} \cup \{+\infty\}$, and $x \in \mathcal{E}$. Assume $f$ is proper and convex. $x \in \underset{y \in \mathcal{E}}{\operatorname{argmin}} f(y)$ iff $0 \in \partial f(x)$.
 :::
 
-::: theorem:Fenchel-Young Inequality
-Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. Assume $f$ is proper and convex. $f(x) + f^*(v) \geq \langle x, v\rangle$ for any $x, v \in \mathcal{E}$. For $x, v \in \mathcal{E}$, $f(x) + f^*(v) = \langle x, v\rangle$ iff $v \in \partial f(x)$.
+::: theorem:Fenchel-Young Equality
+Let $f : \mathcal{E} \to \overline{\mathbb{R}}$. Assume $f$ is proper. $f(x) + f^*(v) \geq \langle x, v\rangle$ for any $x, v \in \mathcal{E}$. For $x, v \in \mathcal{E}$, $f(x) + f^*(v) = \langle x, v\rangle$ iff $v \in \partial f(x)$.
 :::
 
 ::: corollary:Subdifferential Inversion
